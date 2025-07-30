@@ -11,6 +11,7 @@ import useGetAllUsers from "@/hooks/data/useGetAllusers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
+import { LoadingDots } from "../ui/loading";
 
 interface AddMemberFormProps {
   groupId: string;
@@ -75,6 +76,7 @@ export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
       }
     },
   });
+  const isFormValid = formik.values.selectedUsers.length > 0;
 
   const filteredUsers = ALL_USERS?.filter((user: any) =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
@@ -109,7 +111,7 @@ export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
     return formik.values.selectedUsers.some((user) => user.id === userId);
   };
 
-  const isFormValid = formik.values.selectedUsers.length > 0;
+  if (isLoadinAllUsers) return <LoadingDots />;
 
   return (
     <div className="w-full mx-auto">

@@ -8,6 +8,7 @@ import useGetPermit from "@/hooks/data/useGetPermit";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
+import { LoadingDots } from "../ui/loading";
 
 interface AddPermissionFormProps {
   existingPermissions: string[];
@@ -20,8 +21,14 @@ export function AddPermissionForm({
   groupId,
   onCancel,
 }: AddPermissionFormProps) {
-  const { data: ALL_PERMIT, isLoading: isLoadingPermissions } = useGetPermit();
+  const { data: ALL_PERMITION, isLoading: isLoadingPermissions } =
+    useGetPermit();
   const queryClient = useQueryClient();
+
+  const ALL_PERMIT = ALL_PERMITION.filter(
+    (permit2: any) =>
+      !existingPermissions.some((permit: any) => permit.id === permit2.id)
+  );
 
   const { mutate: addedPermit, isPending } = useMutation({
     mutationFn: async (userData: any) => {
@@ -121,6 +128,7 @@ export function AddPermissionForm({
       </div>
     );
   }
+  if (isLoadingPermissions) return <LoadingDots />;
 
   return (
     <div className="w-full mx-auto">

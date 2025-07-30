@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Users, Plus, UserPlus, KeyRound } from "lucide-react";
+import {
+  ArrowLeft,
+  Users,
+  Plus,
+  UserPlus,
+  KeyRound,
+  PencilIcon,
+  SquarePen,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +36,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
 import { LoadingDots } from "@/components/ui/loading";
+import { useFormik } from "formik";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function GroupDetailPage() {
   const params = useParams();
@@ -36,6 +47,7 @@ export default function GroupDetailPage() {
   const queryClient = useQueryClient();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false);
   const [addPermissionDialogOpen, setAddPermissionDialogOpen] = useState(false);
   const [deleteType, setDeleteType] = useState<"member" | "permission">(
@@ -75,6 +87,63 @@ export default function GroupDetailPage() {
         });
         return [];
       }
+    },
+  });
+
+  const { mutate: updateGroup, isPending } = useMutation({
+    mutationFn: async (userData: any) => {
+      const res = await axiosInstance.patch(
+        `/api/account/v2/authorization/group_permissions/${id}/`,
+        userData
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["getGroup"] });
+        toast({
+          title: data?.details || "Group updated successfully",
+          description: data?.message || "Group has been Updated.",
+          variant: "default",
+        });
+        formik.resetForm();
+        setUpdateDialogOpen(false)
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response.data;
+      if (errors) {
+        const allErrors = Object.values(errors).flat().join("\n");
+        toast({
+          title: "Group update Failed",
+          description: allErrors,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: detail || "Group Update Failed",
+          description: message || "An error occurred during Update",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      name: GROUP?.group?.name || "",
+    },
+    validate: (values) => {
+      const errors: { name?: string } = {};
+
+      if (!values.name.trim()) {
+        errors.name = "Group name is required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      updateGroup(values);
     },
   });
 
@@ -188,8 +257,8 @@ export default function GroupDetailPage() {
     }
   };
 
-    if (isLoading || removePending || removePermitPending) return <LoadingDots />;
-    
+  if (isLoading || removePending || removePermitPending) return <LoadingDots />;
+
   if (!GROUP) {
     return (
       <div className="container mx-auto p-6">
@@ -207,15 +276,18 @@ export default function GroupDetailPage() {
     );
   }
 
-
   return (
     <div className=" mx-auto space-y-4">
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div>
+          <div className="flex justify-start items-start gap-1">
             <h1 className="text-3xl font-bold tracking-tight">
               {GROUP?.group?.name || "Group Name"}
             </h1>
+            <SquarePen
+              onClick={() => setUpdateDialogOpen(true)}
+              className="h-4 w-4 cursor-pointer hover:text-primary hover:scale-110 hover:-translate-y-1 transition-transform duration-200 delay-50"
+            />
           </div>
         </div>
       </div>
@@ -371,6 +443,59 @@ export default function GroupDetailPage() {
             groupId={id}
             onCancel={() => setAddPermissionDialogOpen(false)}
           />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Update Group</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={formik.handleSubmit}
+            className="space-y-2 sm:space-y-3"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="name">Group Name</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter group name"
+                className={
+                  formik.touched.name && formik.errors.name
+                    ? "border-red-500"
+                    : ""
+                }
+              />
+              {formik.touched.name && formik.errors.name && (
+                <p className="text-sm text-red-500">
+                  {formik.errors.name as string}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  formik.resetForm(), setUpdateDialogOpen(false);
+                }}
+                className="w-full sm:w-auto bg-transparent"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full sm:w-auto"
+              >
+                {isPending ? "Updating..." : "Update Group"}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

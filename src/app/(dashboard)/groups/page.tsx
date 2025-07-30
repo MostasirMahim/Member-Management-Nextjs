@@ -33,7 +33,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
 import useGetGroups from "@/hooks/data/useGetGroups";
-import { LoadingSkeleton } from "@/components/ui/loading";
+import { LoadingDots, LoadingSkeleton } from "@/components/ui/loading";
 
 type GroupType = {
   id: number;
@@ -101,7 +101,7 @@ export default function GroupsPage() {
     }
   };
 
-  if (isLoading || removePending) return <LoadingSkeleton />;
+  if (isLoading || removePending) return <LoadingDots />;
 
   return (
     <div className=" mx-auto space-y-6">

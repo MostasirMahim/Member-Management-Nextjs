@@ -10,6 +10,7 @@ import useGetPermit from "@/hooks/data/useGetPermit";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
+import { LoadingDots } from "../ui/loading";
 
 interface CreateGroupFormProps {
   onCancel: () => void;
@@ -109,7 +110,7 @@ export function CreateGroupForm({ onCancel }: CreateGroupFormProps) {
   const clearAll = () => {
     formik.setFieldValue("permissions", []);
   };
-
+  if (isLoadingPermissions) return <LoadingDots />;
   return (
     <div className="w-full mx-auto">
       <form onSubmit={formik.handleSubmit} className="space-y-2 sm:space-y-3">
@@ -203,7 +204,7 @@ export function CreateGroupForm({ onCancel }: CreateGroupFormProps) {
           </Button>
           <Button
             type="submit"
-            disabled={formik.isSubmitting || !formik.isValid}
+            disabled={isPending}
             className="w-full sm:w-auto"
           >
             {isPending ? "Creating..." : "Create Group"}
