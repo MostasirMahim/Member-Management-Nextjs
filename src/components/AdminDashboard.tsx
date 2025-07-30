@@ -20,6 +20,7 @@ import {
   Plus,
   Eye,
   Edit,
+  Logs,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -172,6 +173,11 @@ const navigation = [
     icon: <Users className="h-5 w-5" />,
     label: "Onboarding",
     href: "/registration/email",
+  },
+  {
+    icon: <Logs className="h-5 w-5" />,
+    label: "Activity Logs",
+    href: "/activity_logs",
   },
 ];
 
