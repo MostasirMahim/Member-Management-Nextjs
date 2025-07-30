@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react"; // To manage success state
-import { Eye, EyeOff, PartyPopper, UserCog } from "lucide-react";
+import { Eye, EyeOff, IdCardIcon, PartyPopper, UserCog, UserPlus } from "lucide-react";
 import Image from "next/image";
 import { useFormStore, useRegUserStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
@@ -37,6 +37,7 @@ export default function OnboardingStep3() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { email, isOtpPass } = useRegUserStore();
   const router = useRouter();
+  const [registeredUsername, setRegisteredUsername] = useState("");
 
    useEffect(() => {
       if (!isOtpPass) {
@@ -54,11 +55,12 @@ export default function OnboardingStep3() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         toast({
-          title: data.details || "Member Added",
-          description: data.message || "New member has been successfully added.",
+          title: data.details || "Employee Added",
+          description: data.message || "New employee has been successfully added.",
           variant: "default",
         });
         setIsSuccess(true);
+        setRegisteredUsername(data.username);
       }
       console.log("New Pass Chenge successfully:", data);
     },
@@ -118,17 +120,17 @@ export default function OnboardingStep3() {
               </div>
 
               <h1 className="text-2xl font-bold">
-                Welcome <span className="text-blue-600">Mahim</span>
+                Employee <span className="text-blue-600">{registeredUsername}</span> has been added
               </h1>
               <p className="text-gray-700 text-sm">
-                Your password has been successfully updated.
+                An employee with given username has been successfully added
               </p>
             </div>
             <Button
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/registration/email")}
             >
-              Go to Dashboard
+              <UserPlus /> Add more 
             </Button>
           </CardContent>
         </Card>
@@ -146,7 +148,8 @@ export default function OnboardingStep3() {
               <UserCog className="w-12 h-12 text-blue-600" />
             </div>
             <div className="text-center space-y-2">
-              <h1 className="text-2xl font-bold">Member Details</h1>
+              <h1 className="text-2xl font-bold">
+                Employee Details</h1>
               <p className="text-sm inline-block px-2 text-blue-600 font-medium border-2 p-1 rounded-md bg-blue-50 border-blue-700">
                 {email}
               </p>
@@ -155,7 +158,7 @@ export default function OnboardingStep3() {
           <form onSubmit={formik.handleSubmit} className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-2 w-full">
               <div className="space-y-2 w-full">
-                <Label htmlFor="username">Member Username</Label>
+                <Label htmlFor="username">Employee Username</Label>
                 <Input
                   id="username"
                   name="username"
@@ -177,7 +180,7 @@ export default function OnboardingStep3() {
                 ) : null}
               </div>
               <div className="space-y-2 w-full">
-                <Label htmlFor="fullname">Member Name</Label>
+                <Label htmlFor="fullname">Employee Name</Label>
                 <Input
                   id="fullname"
                   name="fullname"
@@ -201,7 +204,7 @@ export default function OnboardingStep3() {
             </div>
             <div className="flex flex-col sm:flex-row gap-2 w-full">
               <div className="space-y-2 w-full">
-                <Label htmlFor="newPassword">New Password</Label>
+                <Label htmlFor="newPassword">A default password for this account</Label>
                 <div className="relative">
                   <Input
                     id="newPassword"
@@ -241,7 +244,7 @@ export default function OnboardingStep3() {
                 ) : null}
               </div>
               <div className="space-y-2 w-full">
-                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
