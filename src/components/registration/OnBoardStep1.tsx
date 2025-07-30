@@ -8,7 +8,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Mails } from "lucide-react";
+import { Mails,IdCardIcon } from "lucide-react";
 import { useFormStore, useRegUserStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
 import { sendOtp } from "@/actions/authorization/action";
@@ -82,18 +82,18 @@ function OnboardingStep1() {
         <CardContent className="p-8 space-y-6 w-full ">
           <div className="space-y-3 text-center">
             <div className="relative flex items-center justify-center w-24 h-24 mx-auto rounded-full bg-blue-100 border-2 border-blue-200">
-              <Mails className="w-12 h-12 text-blue-600" />
+              <IdCardIcon className="w-12 h-12 text-blue-600" />
             </div>
             <h1 className="text-2xl font-bold ">
-              Add A <span className="text-primary">Member</span>
+              Add an <span className="text-primary">employee</span>
             </h1>
             <p className="text-sm text-gray-500">
-              We will send you an OTP to Verify
+              An OTP will be sent to this email for verify
             </p>
           </div>
           <form onSubmit={formik.handleSubmit} className="space-y-4 w-full ">
             <div className="space-y-2">
-              <Label htmlFor="employeeEmail">New Member Email</Label>
+              <Label htmlFor="employeeEmail">New employee Email</Label>
               <Input
                 id="employeeEmail"
                 name="employeeEmail"
