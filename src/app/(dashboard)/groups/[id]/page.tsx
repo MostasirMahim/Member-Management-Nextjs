@@ -27,6 +27,7 @@ import { AddMemberForm } from "@/components/groups/AddUserGP";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
+import { LoadingDots } from "@/components/ui/loading";
 
 export default function GroupDetailPage() {
   const params = useParams();
@@ -187,6 +188,8 @@ export default function GroupDetailPage() {
     }
   };
 
+    if (isLoading || removePending || removePermitPending) return <LoadingDots />;
+    
   if (!GROUP) {
     return (
       <div className="container mx-auto p-6">
@@ -203,6 +206,7 @@ export default function GroupDetailPage() {
       </div>
     );
   }
+
 
   return (
     <div className=" mx-auto space-y-4">

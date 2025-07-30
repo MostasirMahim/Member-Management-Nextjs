@@ -7,14 +7,59 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import useGetPermit from "@/hooks/data/useGetPermit";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "@/hooks/use-toast";
 
 interface CreateGroupFormProps {
-  onSubmit: (data: { name: string; permissions: string[] }) => void;
   onCancel: () => void;
 }
 
-export function CreateGroupForm({ onSubmit, onCancel }: CreateGroupFormProps) {
+export function CreateGroupForm({ onCancel }: CreateGroupFormProps) {
   const { data: ALL_PERMIT, isLoading: isLoadingPermissions } = useGetPermit();
+  const queryClient = useQueryClient();
+
+  const { mutate: createGroup, isPending } = useMutation({
+    mutationFn: async (groupData: any) => {
+      const res = await axiosInstance.post(
+        "/api/account/v1/authorization/group_permissions/",
+        groupData
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["getGroups"] });
+        toast({
+          title: data?.details || "New Group Created",
+          description:
+            data?.message || "New group has been created successfully.",
+          variant: "default",
+        });
+
+        formik.resetForm();
+        onCancel();
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response.data;
+      if (errors) {
+        const allErrors = Object.values(errors).flat().join("\n");
+        toast({
+          title: "Users Added Failed",
+          description: allErrors,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: detail || "Users Added Failed",
+          description: message || "An error occurred during Added",
+          variant: "destructive",
+        });
+      }
+    },
+  });
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -34,7 +79,7 @@ export function CreateGroupForm({ onSubmit, onCancel }: CreateGroupFormProps) {
       return errors;
     },
     onSubmit: async (values) => {
-      console.log("Form submitted with values:", values);
+      createGroup({ name: values.name, permission: values.permissions });
     },
   });
 
@@ -161,7 +206,7 @@ export function CreateGroupForm({ onSubmit, onCancel }: CreateGroupFormProps) {
             disabled={formik.isSubmitting || !formik.isValid}
             className="w-full sm:w-auto"
           >
-            {formik.isSubmitting ? "Creating..." : "Create Group"}
+            {isPending ? "Creating..." : "Create Group"}
           </Button>
         </div>
       </form>

@@ -8,7 +8,7 @@ function useGetGroups() {
       queryKey: ["getGroups"],
       queryFn: async () => {
         try {
-          const res = await axiosInstance.get("/api/account/v1/authorization/group_permissions/")
+          const res = await axiosInstance.get("/api/account/v2/authorization/group_permissions/")
           if (res?.data?.status == 'success') {
             return res.data.data;
           } else {
