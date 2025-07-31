@@ -194,8 +194,8 @@ const navigation = [
     subItems: [
       {
         icon: <MailPlus className="h-4 w-4" />,
-        label: "Add configurations",
-        href: "/emails/add_config/",
+        label: "Configurations",
+        href: "/emails/configurations/",
       },
     ],
   },
