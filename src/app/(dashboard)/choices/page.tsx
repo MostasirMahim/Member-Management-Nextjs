@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "@/hooks/use-toast";
+import useGetChoices from "@/hooks/data/useGetChoices";
+import { LoadingDots } from "@/components/ui/loading";
+
 interface ChoiceItem {
   id: string;
   name: string;
@@ -29,155 +35,104 @@ interface ChoiceSection {
   items: ChoiceItem[];
   hasCode?: boolean;
 }
+type Slug = keyof typeof apiMap;
+type hasCode = {
+  hasCode: boolean;
+};
 
-const DUMMY_DATA: ChoiceSection[] = [
-  {
-    title: "Membership Type",
-    slug: "membership-type",
-    component: "MembershipTypeChoice",
-    items: [
-      { id: "1", name: "LM" },
-      { id: "2", name: "GM" },
-      { id: "3", name: "Associate Member" },
-      { id: "10", name: "LM" },
-      { id: "20", name: "GM" },
-      { id: "30", name: "Associate Member" },
-      { id: "100", name: "LM" },
-      { id: "200", name: "GM" },
-      { id: "300", name: "Associate Member" },
-      { id: "18", name: "LM" },
-      { id: "28", name: "GM" },
-      { id: "38", name: "Associate Member" },
-    ],
-  },
-  {
-    title: "Institute Name",
-    slug: "institute-name",
-    component: "InstituteNameChoice",
-    hasCode: true,
-    items: [
-      { id: "1", name: "Bramonbaria Polytechnic Institute", code: "BPI" },
-      { id: "2", name: "Dhaka University", code: "DU" },
-      {
-        id: "3",
-        name: "Bangladesh University of Engineering and Technology",
-        code: "BUET",
-      },
-    ],
-  },
-  {
-    title: "Gender",
-    slug: "gender",
-    component: "GenderChoice",
-    items: [
-      { id: "1", name: "Male" },
-      { id: "2", name: "Female" },
-      { id: "3", name: "Other" },
-    ],
-  },
-  {
-    title: "Membership Status",
-    slug: "membership-status",
-    component: "MembershipStatusChoice",
-    items: [
-      { id: "1", name: "Active" },
-      { id: "2", name: "Inactive" },
-      { id: "3", name: "Pending" },
-    ],
-  },
-  {
-    title: "Marital Status",
-    slug: "marital-status",
-    component: "MaritalStatusChoice",
-    items: [
-      { id: "1", name: "Single" },
-      { id: "2", name: "Married" },
-      { id: "3", name: "Divorced" },
-      { id: "4", name: "Widowed" },
-    ],
-  },
-  {
-    title: "Employment Type",
-    slug: "employment-type",
-    component: "EmploymentTypeChoice",
-    items: [
-      { id: "1", name: "Full Time" },
-      { id: "2", name: "Part Time" },
-      { id: "3", name: "Contract" },
-      { id: "4", name: "Freelance" },
-    ],
-  },
-  {
-    title: "Email Type",
-    slug: "email-type",
-    component: "EmailTypeChoice",
-    items: [
-      { id: "1", name: "Personal" },
-      { id: "2", name: "Work" },
-      { id: "3", name: "Other" },
-    ],
-  },
-  {
-    title: "Contact Type",
-    slug: "contact-type",
-    component: "ContactTypeChoice",
-    items: [
-      { id: "1", name: "Mobile" },
-      { id: "2", name: "Home" },
-      { id: "3", name: "Office" },
-    ],
-  },
-  {
-    title: "Address Type",
-    slug: "address-type",
-    component: "AddressTypeChoice",
-    items: [
-      { id: "1", name: "Present" },
-      { id: "2", name: "Permanent" },
-      { id: "3", name: "Office" },
-    ],
-  },
-  {
-    title: "Document Type",
-    slug: "document-type",
-    component: "DocumentTypeChoice",
-    items: [
-      { id: "1", name: "National ID" },
-      { id: "2", name: "Passport" },
-      { id: "3", name: "Birth Certificate" },
-    ],
-  },
-  {
-    title: "Spouse Status Type",
-    slug: "spouse-status-type",
-    component: "SpouseStatusTypeChoice",
-    items: [
-      { id: "1", name: "Active" },
-      { id: "2", name: "Deceased" },
-    ],
-  },
-  {
-    title: "Descendant Relation Type",
-    slug: "descendant-relation-type",
-    component: "DescendantRelationTypeChoice",
-    items: [
-      { id: "1", name: "Son" },
-      { id: "2", name: "Daughter" },
-      { id: "3", name: "Grandson" },
-      { id: "4", name: "Granddaughter" },
-    ],
-  },
-];
+const apiMap = {
+  membership_type: "/api/core/v1/membership_type/",
+  institute_name: "/api/core/v1/institute_name/",
+  gender: "/api/core/v1/gender/",
+  membership_status: "/api/core/v1/member_ship_status_choice/",
+  marital_status: "/api/core/v1/marital_status_choice/",
+  employment_type: "/api/core/v1/employment_type_choice/",
+  email_type: "/api/core/v1/email_type_choice/",
+  contact_type: "/api/core/v1/contact_type_choice/",
+  address_type: "/api/core/v1/address_type_choice/",
+  document_type: "/api/core/v1/document_type_choice/",
+  spouse_status_choice: "/api/core/v1/spouse_status_type_choice/",
+  descendant_relation_choice: "/api/core/v1/descendant_relation_type_choice/",
+} as const;
 
 export default function ManageChoicesPage() {
-  const [sections, setSections] = useState<ChoiceSection[]>(DUMMY_DATA);
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     sectionIndex: -1,
     title: "",
   });
+  function getApiEndpoint(slug: Slug): string {
+    return apiMap[slug];
+  }
+  const queryClient = useQueryClient();
+  const { data: CHOICES, isLoading } = useGetChoices();
+  const [sections, setSections] = useState<ChoiceSection[]>([]);
+  useEffect(() => {
+    if (CHOICES) {
+      setSections(CHOICES);
+    }
+  }, [CHOICES]);
 
-  const formiks = DUMMY_DATA.map((section) =>
+  const { mutate: addChoice, isPending } = useMutation({
+    mutationFn: async ({ slug, formData }: { slug: Slug; formData: any }) => {
+      const endpoint = getApiEndpoint(slug);
+      if (!endpoint) {
+        toast({
+          title: "Endpoint Not Found",
+          description: "Technical Mistake",
+          variant: "destructive",
+        });
+        return;
+      }
+      const res = await axiosInstance.post(`${endpoint}`, formData);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["getChoices"] });
+        toast({
+          title: data?.details || "Choice Added successfully",
+          description: data?.message || "Choice has been successfully added.",
+          variant: "default",
+        });
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response.data;
+      if (errors) {
+        const allErrors = Object.values(errors).flat().join("\n");
+        toast({
+          title: "Choice Added Failed",
+          description: allErrors,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: detail || "Choice Added Failed",
+          description: message || "An error occurred during Choice Added",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
+  //To Identify Institutions Extra Code Field
+  const FORMIK_COUNT: hasCode[] = [
+    { hasCode: false },
+    { hasCode: false },
+    { hasCode: true },
+    { hasCode: false },
+    { hasCode: false },
+    { hasCode: false },
+    { hasCode: false },
+    { hasCode: false },
+    { hasCode: false },
+    { hasCode: false },
+    { hasCode: false },
+    { hasCode: false },
+  ];
+  const formiks = FORMIK_COUNT.map((section) =>
     useFormik({
       initialValues: {
         name: "",
@@ -198,34 +153,18 @@ export default function ManageChoicesPage() {
 
   const handleConfirm = (sectionIndex: number) => {
     const section = sections[sectionIndex];
-    const formData = formiks[sectionIndex].values;
+    const formik = formiks[sectionIndex];
+    const formData = formik.values;
 
-    const submissionData = {
-      component: section.component,
-      slug: section.slug,
-      title: section.title,
+    addChoice({
+      slug: section.slug as Slug,
       formData: formData,
-      timestamp: new Date().toISOString(),
-    };
+    });
 
-    console.log(submissionData);
-
-    const newItem: ChoiceItem = {
-      id: Date.now().toString(),
-      name: formData.name,
-      code: formData.code,
-    };
-
-    setSections((prev) =>
-      prev.map((s, i) =>
-        i === sectionIndex ? { ...s, items: [...s.items, newItem] } : s
-      )
-    );
-
-    formiks[sectionIndex].resetForm();
+    formik.resetForm();
     setConfirmDialog({ isOpen: false, sectionIndex: -1, title: "" });
   };
-
+  if (isLoading) return <LoadingDots />;
   return (
     <div className="min-h-screen bg-background ">
       <div className="mx-auto max-w-7xl">
@@ -247,7 +186,7 @@ export default function ManageChoicesPage() {
               </CardHeader>
 
               <CardContent className="space-y-6">
-                <div className="space-y-2 max-h-[250px] overflow-y-auto">
+                <div className="space-y-2 max-h-[250px]  overflow-y-auto">
                   {section.items.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       No items found
@@ -298,6 +237,7 @@ export default function ManageChoicesPage() {
                   <Button
                     onClick={() => handleAddClick(sectionIndex)}
                     className="self-end"
+                    disabled={isPending}
                   >
                     Add
                   </Button>

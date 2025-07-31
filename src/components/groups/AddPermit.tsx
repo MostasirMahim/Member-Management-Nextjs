@@ -25,7 +25,7 @@ export function AddPermissionForm({
     useGetPermit();
   const queryClient = useQueryClient();
 
-  const ALL_PERMIT = ALL_PERMITION.filter(
+  const ALL_PERMIT = ALL_PERMITION?.filter(
     (permit2: any) =>
       !existingPermissions.some((permit: any) => permit.id === permit2.id)
   );

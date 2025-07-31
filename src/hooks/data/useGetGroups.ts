@@ -16,7 +16,7 @@ function useGetGroups() {
             return [];
           }
         } catch (error:any) {
-          console.error("Error fetching user stats:", error);
+          console.error("Error fetching:", error);
           toast({
             title: "Error",
             description: error?.response?.data?.message || "Failed to fetch groups",

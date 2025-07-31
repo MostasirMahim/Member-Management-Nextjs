@@ -6,8 +6,9 @@ export async function createMembershipType(data: Record<string, any>) {
   try {
     const req = await axiosInstance.post(`/api/core/v1/membership_type/`, data);
     return req.data;
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
+    console.error(err?.response?.data?.message);
   }
 }
 
@@ -137,7 +138,7 @@ export async function createDescendantRelation(data: Record<string, any>) {
   }
 }
 
-export const postHandlers = {
+const handlers = {
   membership_type: createMembershipType,
   institute_name: createInstituteName,
   gender: createGender,
@@ -150,4 +151,17 @@ export const postHandlers = {
   document_type_choice: createDocumentType,
   spouse_status_type_choice: createSpouseStatus,
   descendant_relation_type_choice: createDescendantRelation,
-};
+} as const;
+
+export type Slug = keyof typeof handlers;
+
+export async function postHandlers(
+  slug: Slug,
+  data: Record<string, any>
+): Promise<any> {
+  const fn = handlers[slug];
+
+  if (!fn) throw new Error("No handler found for slug: " + slug);
+  const res = await fn(data);
+  return res;
+}

@@ -100,14 +100,17 @@ export default function GroupDetailPage() {
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-        queryClient.invalidateQueries({ queryKey: ["getGroup"] });
+        Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["getGroup"] }),
+          queryClient.invalidateQueries({ queryKey: ["getGroups"] }),
+        ]);
         toast({
           title: data?.details || "Group updated successfully",
           description: data?.message || "Group has been Updated.",
           variant: "default",
         });
         formik.resetForm();
-        setUpdateDialogOpen(false)
+        setUpdateDialogOpen(false);
       }
     },
     onError: (error: any) => {
