@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Send } from "lucide-react";
+import { Ban, Check, Send } from "lucide-react";
 import { Button } from "../ui/button";
 
 interface Props {
@@ -57,9 +57,13 @@ function EmailConfigTable({ data }: Props) {
               <TableCell className="text-center">{config.id}</TableCell>
               <TableCell className="text-center">
                 {config.is_active ? (
-                  <span className="text-green-700 font-semibold">✅</span>
+                  <span className="text-green-700 font-semibold">
+                    <Check />
+                  </span>
                 ) : (
-                  <span className="text-red-600 font-semibold">❌</span>
+                  <span className="text-red-600 font-semibold">
+                    <Ban />
+                  </span>
                 )}
               </TableCell>
               <TableCell className="text-center capitalize">
