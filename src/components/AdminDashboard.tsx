@@ -179,6 +179,11 @@ const navigation = [
     label: "Activity Logs",
     href: "/activity_logs",
   },
+  {
+    icon: <Logs className="h-5 w-5" />,
+    label: "My activity logs",
+    href: "/activity_logs/my",
+  },
 ];
 
 interface NavItemProps {
