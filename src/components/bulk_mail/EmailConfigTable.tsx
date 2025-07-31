@@ -1,3 +1,4 @@
+"use client";
 import {
   Table,
   TableBody,
@@ -7,17 +8,68 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Send } from "lucide-react";
+import { Ban, Check, Send } from "lucide-react";
 import { Button } from "../ui/button";
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import axiosInstance from "@/lib/axiosInstance";
+import { useRouter } from "next/navigation";
 interface Props {
   data: any;
 }
 function EmailConfigTable({ data }: Props) {
+  const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+  const [deleteConfigId, setDeleteConfigId] = useState(null);
+  const router = useRouter();
   const emailConfigs = data?.data;
+
+  const handleDelete = async () => {
+    try {
+      const response = await axiosInstance.delete(
+        `/api/mails/v1/configs/${deleteConfigId}/`
+      );
+      const data = response.data;
+      alert("Deleted successfully");
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+      alert("Something went wrong");
+    }
+  };
 
   return (
     <div className="p-4">
+      <AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              email configuration.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteConfigId(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleDelete()}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Group
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Table>
         <TableCaption>
           <div>
@@ -57,9 +109,13 @@ function EmailConfigTable({ data }: Props) {
               <TableCell className="text-center">{config.id}</TableCell>
               <TableCell className="text-center">
                 {config.is_active ? (
-                  <span className="text-green-700 font-semibold">✅</span>
+                  <span className="text-green-700 font-semibold">
+                    <Check />
+                  </span>
                 ) : (
-                  <span className="text-red-600 font-semibold">❌</span>
+                  <span className="text-red-600 font-semibold">
+                    <Ban />
+                  </span>
                 )}
               </TableCell>
               <TableCell className="text-center capitalize">
@@ -140,7 +196,15 @@ function EmailConfigTable({ data }: Props) {
                 <Button variant="default">Update</Button>
               </TableCell>
               <TableCell>
-                <Button variant="destructive">Delete</Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setDeleteConfigId(config.id);
+                    setOpenDeleteAlert(true);
+                  }}
+                >
+                  Delete
+                </Button>
               </TableCell>
             </TableRow>
           ))}

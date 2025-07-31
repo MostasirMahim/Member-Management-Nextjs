@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -38,10 +39,16 @@
     "react": "^18",
     "react-day-picker": "^9.8.0",
     "react-dom": "^18",
+<<<<<<< HEAD
     "react-toastify": "^11.0.5",
+=======
+    "react-hook-form": "^7.61.1",
+    "sonner": "^2.0.6",
+>>>>>>> 67ed600095ab6ea8d1fe76873087593c26b93bb6
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "yup": "^1.6.1",
+    "zod": "^4.0.14",
     "zustand": "^5.0.6"
   },
   "devDependencies": {

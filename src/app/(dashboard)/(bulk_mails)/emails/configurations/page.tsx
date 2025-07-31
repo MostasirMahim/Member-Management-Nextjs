@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
 import { MailPlus } from "lucide-react";
 import { cookies } from "next/headers";
-import React from "react";
+import Link from "next/link";
+import React, { Suspense } from "react";
 
 async function EmailConfigPage() {
   const cookieStore = cookies();
@@ -31,11 +32,14 @@ async function EmailConfigPage() {
         </div>
         <div>
           <Button variant="outline" size="lg">
-            <MailPlus /> Create configurations
+            <Link href="/emails/configurations/add/">
+              <span className="flex items-center justify-center gap-1">
+                <MailPlus /> Create configurations
+              </span>
+            </Link>
           </Button>
         </div>
       </div>
-
       <EmailConfigTable data={responseData} />
     </div>
   );
