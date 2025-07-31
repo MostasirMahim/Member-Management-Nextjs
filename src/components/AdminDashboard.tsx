@@ -21,6 +21,8 @@ import {
   Eye,
   Edit,
   Logs,
+  Mails,
+  MailPlus,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -183,6 +185,19 @@ const navigation = [
     icon: <Logs className="h-5 w-5" />,
     label: "My activity logs",
     href: "/activity_logs/my",
+  },
+  ,
+  {
+    icon: <Mails className="h-5 w-5" />,
+    label: "Email management",
+    href: "#",
+    subItems: [
+      {
+        icon: <MailPlus className="h-4 w-4" />,
+        label: "Add configurations",
+        href: "/emails/add_config/",
+      },
+    ],
   },
 ];
 
