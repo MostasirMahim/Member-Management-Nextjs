@@ -15,9 +15,8 @@ import {
   useEffect,
 } from "react";
 import { useRouter } from "next/navigation";
-import { useFormStore, useRegUserStore } from "@/store/store";
+import { useRegUserStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
-import { verifyOtp } from "@/actions/authorization/action";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
 
@@ -38,24 +37,25 @@ export default function OnboardingStep2() {
     }
   }, [email]);
   const { mutate: verifyRegOtp, isPending } = useMutation({
-    mutationFn: async ({ email, otp }: { email: string; otp: number }) =>{
-      const res = await axiosInstance.post("/api/account/v1/authorization/admin_user_verify_otp/", { email, otp });
+    mutationFn: async ({ email, otp }: { email: string; otp: number }) => {
+      const res = await axiosInstance.post(
+        "/api/account/v1/authorization/admin_user_verify_otp/",
+        { email, otp }
+      );
       return res.data;
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-         SET_OTP_Pass(true);
+        SET_OTP_Pass(true);
         toast({
           title: data.details || "OTP Verified",
           description: data.message || "You can now proceed to the next step.",
           variant: "default",
         });
         router.push("/registration/add");
-
-       
       }
     },
-    onError: (error:any) => {
+    onError: (error: any) => {
       console.error("Error OTP Verification:", error);
       const { message, errors, details } = error?.response.data;
       if (errors) {

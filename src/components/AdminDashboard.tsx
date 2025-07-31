@@ -55,9 +55,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { currentUser } from "@/lib/dummy";
 import ModeToggle from "./ThemeToggle";
 import { cn } from "@/lib/utils";
-import { logoutAction } from "@/actions/authentication/actions";
 import { LoadingDots } from "./ui/loading";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
+import axiosInstance from "@/lib/axiosInstance";
 
 const navigation = [
   {
@@ -309,43 +309,26 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
   const { mutate: logOutFunc, isPending } = useMutation({
     mutationFn: async () => {
-      const res = await logoutAction();
-      return res;
+      const res = await axiosInstance.delete("/api/account/v1/logout/");
+      return res.data;
     },
     onSuccess: (data) => {
       if (data.status === "success") {
-        toast({
-          title: data.details || "Logged Out",
-          description: data.message || "You have been logged out successfully.",
-          variant: "default",
-        });
-        queryClient.invalidateQueries({ queryKey: ["authUser"] });
         router.replace("/login");
-      } else {
-        const { message, errors, details } = data?.response.data;
-        if (errors) {
-          const allErrors = Object.values(errors).flat().join("\n");
-          toast({
-            title: "Logout Failed",
-            description: allErrors,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: details || "Logout Failed",
-            description: message || "An error occurred during logout.",
-            variant: "destructive",
-          });
-        }
+        toast.success(data.message || "You have been logged out successfully.");
+        queryClient.invalidateQueries({ queryKey: ["authUser"] });
       }
     },
     onError: (error: any) => {
-      console.error("Error in Logout:", error);
-      toast({
-        title: "Logout Failed",
-        description: error?.message || "An error occurred during logout.",
-        variant: "destructive",
-      });
+      console.error("Error in Logout:", error?.response);
+      const { message, errors, details } = error?.response.data;
+      if (errors) {
+        errors?.map((error: any) => {
+          toast.error(error?.message);
+        });
+      } else {
+        toast.error(details || "Logout Failed");
+      }
     },
   });
 
@@ -377,7 +360,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
       <ScrollArea className="flex-1 px-3">
         <nav className="space-y-1">
-          {navigation.map((item) => (
+          {navigation.map((item: any) => (
             <NavItem
               key={item.label}
               icon={item.icon}
@@ -395,7 +378,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
   if (isPending) return <LoadingDots />;
   return (
-    <div className="min-h-screen flex bg-muted/30">
+    <div className="min-h-screen h-screen max-h-screen overflow-y-auto flex bg-muted/30">
       <aside className="hidden lg:block w-64 border-r bg-background h-screen sticky top-0">
         <Sidebar />
       </aside>

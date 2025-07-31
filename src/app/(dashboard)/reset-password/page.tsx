@@ -8,9 +8,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState } from "react"; // To manage success state
 import { Eye, EyeOff, PartyPopper } from "lucide-react";
-import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
-import { changePass } from "@/actions/authentication/actions";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";

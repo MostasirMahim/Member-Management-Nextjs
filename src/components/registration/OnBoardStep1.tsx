@@ -8,10 +8,9 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Mails,IdCardIcon } from "lucide-react";
-import { useFormStore, useRegUserStore } from "@/store/store";
+import { IdCardIcon } from "lucide-react";
+import { useRegUserStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
-import { sendOtp } from "@/actions/authorization/action";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
 
@@ -28,7 +27,7 @@ function OnboardingStep1() {
     mutationFn: async (email: string) => {
       const res = await axiosInstance.post(
         "/api/account/v1/authorization/admin_user_email/",
-        {email}
+        { email }
       );
       return res.data;
     },

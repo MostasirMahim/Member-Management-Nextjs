@@ -7,11 +7,16 @@ import { Button } from "@/components/ui/button";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react"; // To manage success state
-import { Eye, EyeOff, IdCardIcon, PartyPopper, UserCog, UserPlus } from "lucide-react";
-import Image from "next/image";
+import {
+  Eye,
+  EyeOff,
+  IdCardIcon,
+  PartyPopper,
+  UserCog,
+  UserPlus,
+} from "lucide-react";
 import { useFormStore, useRegUserStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
-import { addUser } from "@/actions/authorization/action";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
@@ -39,11 +44,11 @@ export default function OnboardingStep3() {
   const router = useRouter();
   const [registeredUsername, setRegisteredUsername] = useState("");
 
-   useEffect(() => {
-      if (!isOtpPass) {
-        router.replace("/registration/otp");
-      }
-    }, [isOtpPass]);
+  useEffect(() => {
+    if (!isOtpPass) {
+      router.replace("/registration/otp");
+    }
+  }, [isOtpPass]);
   const { mutate: addNewMember, isPending } = useMutation({
     mutationFn: async (userInfo: userInfoType) => {
       const res = await axiosInstance.post(
@@ -56,7 +61,8 @@ export default function OnboardingStep3() {
       if (data?.status === "success") {
         toast({
           title: data.details || "Employee Added",
-          description: data.message || "New employee has been successfully added.",
+          description:
+            data.message || "New employee has been successfully added.",
           variant: "default",
         });
         setIsSuccess(true);
@@ -64,7 +70,7 @@ export default function OnboardingStep3() {
       }
       console.log("New Pass Chenge successfully:", data);
     },
-    onError: (error:any) => {
+    onError: (error: any) => {
       console.error("Error In Regestaration :", error);
       const { message, errors, details } = error?.response.data;
       if (errors) {
@@ -81,7 +87,6 @@ export default function OnboardingStep3() {
           variant: "destructive",
         });
       }
-
     },
   });
 
@@ -120,7 +125,9 @@ export default function OnboardingStep3() {
               </div>
 
               <h1 className="text-2xl font-bold">
-                Employee <span className="text-blue-600">{registeredUsername}</span> has been added
+                Employee{" "}
+                <span className="text-blue-600">{registeredUsername}</span> has
+                been added
               </h1>
               <p className="text-gray-700 text-sm">
                 An employee with given username has been successfully added
@@ -130,7 +137,7 @@ export default function OnboardingStep3() {
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => router.push("/registration/email")}
             >
-              <UserPlus /> Add more 
+              <UserPlus /> Add more
             </Button>
           </CardContent>
         </Card>
@@ -148,8 +155,7 @@ export default function OnboardingStep3() {
               <UserCog className="w-12 h-12 text-blue-600" />
             </div>
             <div className="text-center space-y-2">
-              <h1 className="text-2xl font-bold">
-                Employee Details</h1>
+              <h1 className="text-2xl font-bold">Employee Details</h1>
               <p className="text-sm inline-block px-2 text-blue-600 font-medium border-2 p-1 rounded-md bg-blue-50 border-blue-700">
                 {email}
               </p>
@@ -204,7 +210,9 @@ export default function OnboardingStep3() {
             </div>
             <div className="flex flex-col sm:flex-row gap-2 w-full">
               <div className="space-y-2 w-full">
-                <Label htmlFor="newPassword">A default password for this account</Label>
+                <Label htmlFor="newPassword">
+                  A default password for this account
+                </Label>
                 <div className="relative">
                   <Input
                     id="newPassword"

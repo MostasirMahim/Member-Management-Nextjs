@@ -6,12 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Mails } from "lucide-react";
 import { useForgetPassStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
-import { ForgetSendOtp } from "@/actions/authentication/actions";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
 
@@ -32,16 +30,11 @@ function EmailStep() {
       return res.data;
     },
     onSuccess: (data) => {
-      console.log(data);
-
       toast({
-        title: data.details || "OTP Sent",
-        description: data.message || "Check your email for the OTP code.",
+        title: "Otp Send",
+        description: "Check your email",
         variant: "default",
       });
-      router.push("/forget-password/otp");
-      formik.resetForm();
-
       router.push("/forget-password/otp");
       formik.resetForm();
     },
@@ -51,7 +44,7 @@ function EmailStep() {
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
         toast({
-          title: details ||  "Login Failed",
+          title: details || "Login Failed",
           description: allErrors,
           variant: "destructive",
         });

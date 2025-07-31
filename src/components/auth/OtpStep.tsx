@@ -1,5 +1,4 @@
 "use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +16,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useForgetPassStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
-import { ForgetVerifyOtp } from "@/actions/authentication/actions";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "@/hooks/use-toast";
 
@@ -41,12 +39,14 @@ export default function OtpStep() {
   });
 
   const { mutate: verifyOtp, isPending } = useMutation({
-    mutationFn: async ({ email, otp }: { email: string; otp: number }) =>{
-      const res = await axiosInstance.post("/api/account/v1/verify_otp/", { email, otp });
+    mutationFn: async ({ email, otp }: { email: string; otp: number }) => {
+      const res = await axiosInstance.post("/api/account/v1/verify_otp/", {
+        email,
+        otp,
+      });
       return res.data;
     },
     onSuccess: (data) => {
-       console.log("OTP verify successfully:", data);
       if (data?.token) {
         setToken(data?.token);
         toast({
@@ -56,11 +56,10 @@ export default function OtpStep() {
         });
         router.push("/forget-password/reset");
       }
-     
     },
-    onError: (error:any) => {
+    onError: (error: any) => {
       console.error("Error verifying OTP:", error);
-      const { message, errors,details } = error?.response.data;
+      const { message, errors, details } = error?.response.data;
 
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
@@ -117,7 +116,6 @@ export default function OtpStep() {
     setToken("");
     router.push("/forget-password/email");
   };
-
 
   useEffect(() => {
     if (OTP) {

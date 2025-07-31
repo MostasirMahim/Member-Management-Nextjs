@@ -8,12 +8,11 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react"; // To manage success state
 import { Eye, EyeOff, PartyPopper } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForgetPassStore } from "@/store/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { resetPass } from "@/actions/authentication/actions";
 import { toast } from "@/hooks/use-toast";
+import axiosInstance from "@/lib/axiosInstance";
 const validationSchema = Yup.object({
   newPassword: Yup.string()
     .min(8, "Password must be at least 8 characters")
@@ -42,7 +41,13 @@ export default function SetNewPasswordForm() {
       email: string;
       password: string;
       token: string;
-    }) => await resetPass(userInfo),
+    }) => {
+      const res = await axiosInstance.post(
+        "/api/account/v1/reset_password/",
+        userInfo
+      );
+      return res.data;
+    },
     onSuccess: (data) => {
       if (data?.status === "success") {
         setIsSuccess(true);
@@ -125,7 +130,7 @@ export default function SetNewPasswordForm() {
             </div>
             <Button
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => router.push("/")}
+              onClick={() => router.replace("/")}
             >
               Go to Home
             </Button>

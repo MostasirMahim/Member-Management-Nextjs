@@ -14,8 +14,8 @@ import useAuthUser from "@/hooks/data/useAuthUser";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LoadingDots } from "@/components/ui/loading";
-import { toast } from "@/hooks/use-toast";
 import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "react-toastify";
 
 const validationSchema = Yup.object({
   username: Yup.string().required("Username is required"),
@@ -46,13 +46,9 @@ export default function page() {
     },
     onSuccess: (data) => {
       if (data.code === 200 && data.status === "success") {
-        toast({
-          title: data.details || "Login Successful",
-          description: data.message,
-          variant: "default",
-        });
-        queryClient.invalidateQueries({ queryKey: ["authUser"] });
         router.replace("/");
+        toast.success(data.message || "You have been logged in successfully.");
+        queryClient.invalidateQueries({ queryKey: ["authUser"] });
       }
     },
     onError: (error: any) => {
@@ -60,18 +56,11 @@ export default function page() {
       const { message, errors, details } = error?.response.data;
 
       if (errors) {
-        const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Login Failed",
-          description: allErrors,
-          variant: "destructive",
+        errors?.map((error: any) => {
+          toast.error(error?.message);
         });
       } else {
-        toast({
-          title: details || "Login Failed",
-          description: message || "An error occurred during login",
-          variant: "destructive",
-        });
+        toast.error(details || "Logout Failed");
       }
     },
   });
