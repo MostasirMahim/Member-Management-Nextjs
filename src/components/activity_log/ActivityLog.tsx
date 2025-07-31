@@ -19,44 +19,81 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 function ActivityLog({ data }: { data: any }) {
-  const [activityLogs, setActivityLogs] = useState([]);
-  const [paginationData, setPaginationData] = useState({});
+  const activityLogs = data?.data;
+  const paginationData = data?.pagination;
+  const router = useRouter();
+  const currentPage = paginationData?.current_page || 1;
+  const totalPages = paginationData?.total_pages || 1;
 
-  useEffect(() => {
-    setActivityLogs(data?.data);
-    setPaginationData(data?.pagination);
-  }, []);
-  console.log("data", activityLogs);
-  console.log("pagination", paginationData);
+  const goToPage = (page: number) => {
+    if (page !== currentPage) {
+      router.push(`?page=${page}`);
+      router.refresh();
+    }
+  };
+
+  const renderPageLinks = () => {
+    const pagesToShow = [];
+
+    for (let i = 1; i <= totalPages; i++) {
+      pagesToShow.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => goToPage(i)}
+            isActive={i === currentPage}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return pagesToShow;
+  };
+
   return (
-    <div className="max-h-full overflow-y-auto">
+    <div>
       <Table>
         <TableCaption>All user activity logs. </TableCaption>
         <TableHeader>
-          <TableRow>
-            <TableHead className="text-center ">User</TableHead>
-            <TableHead className="text-center">Timestamp</TableHead>
+          <TableRow className="bg-gray-100 dark:bg-gray-700 ">
+            <TableHead className="text-center  font-bold">User</TableHead>
+            <TableHead className="text-center font-bold">Timestamp</TableHead>
             <TableHead className="text-center">Ip address</TableHead>
-            <TableHead className="text-center m-w-[300px]">Location</TableHead>
-            <TableHead className="text-center">User Agent</TableHead>
-            <TableHead className="text-center">Request Method</TableHead>
-            <TableHead className="text-center">Referrer Url</TableHead>
-            <TableHead className="text-center">Device</TableHead>
-            <TableHead className="text-center">Path</TableHead>
-            <TableHead className="text-center">Verb</TableHead>
-            <TableHead className="text-center">Severity Level</TableHead>
-            <TableHead className="text-center">Description</TableHead>
+            <TableHead className="text-center m-w-[300px] font-bold">
+              Location
+            </TableHead>
+            <TableHead className="text-center font-bold">User Agent</TableHead>
+            <TableHead className="text-center font-bold">
+              Request Method
+            </TableHead>
+            <TableHead className="text-center font-bold">
+              Referrer Url
+            </TableHead>
+            <TableHead className="text-center font-bold">Device</TableHead>
+            <TableHead className="text-center font-bold">Path</TableHead>
+            <TableHead className="text-center font-bold">Verb</TableHead>
+            <TableHead className="text-center font-bold">
+              Severity Level
+            </TableHead>
+            <TableHead className="text-center font-bold">Description</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {activityLogs?.map((log: any, indx) => (
+          {activityLogs?.map((log: any, indx: number) => (
             <TableRow key={indx} className="">
               <TableCell className="text-center font-medium ">
                 {log.user || "None"}
               </TableCell>
-              <TableCell className="text-center ">{log.timestamp}</TableCell>
+              <TableCell className="text-center ">
+                {new Date(log.timestamp).toLocaleString("en-US", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </TableCell>
               <TableCell className="text-center ">{log.ip_address}</TableCell>
               <TableCell className="text-center m-w-[300px]">
                 {log.location}
@@ -103,31 +140,40 @@ function ActivityLog({ data }: { data: any }) {
           ))}
         </TableBody>
       </Table>
-      <div className="mt-4">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#" isActive>
-                2
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">3</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+      <div className="my-5 pb-11">
+        {/* -- PAGINATION -- */}
+        <div className=" flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              {/* Previous Button */}
+              {paginationData?.previous && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={(e) => {
+                      e.preventDefault();
+                      goToPage(currentPage - 1);
+                    }}
+                  />
+                </PaginationItem>
+              )}
+
+              {/* Page Numbers */}
+              {renderPageLinks()}
+
+              {/* Next Button */}
+              {paginationData?.next && (
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={(e) => {
+                      e.preventDefault();
+                      goToPage(currentPage + 1);
+                    }}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     </div>
   );

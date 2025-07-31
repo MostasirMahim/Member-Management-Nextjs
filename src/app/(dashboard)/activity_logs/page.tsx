@@ -1,16 +1,22 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 import ActivityLog from "@/components/activity_log/ActivityLog";
 import axiosInstance from "@/lib/axiosInstance";
 import { cookies } from "next/headers";
 
-import React from "react";
+interface Props {
+  searchParams: Promise<{ page?: string }>;
+}
 
-async function ActivityLogPage() {
+async function ActivityLogPage({ searchParams }: Props) {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
+  let { page } = await searchParams;
+  page = page || "1";
   let responseData = {};
   try {
     const { data } = await axiosInstance.get(
-      "/api/activity_log/v1/activity/all_user_activity/",
+      `/api/activity_log/v1/activity/all_user_activity/?page=${page}`,
       {
         headers: {
           Cookie: `access_token=${authToken}`,
@@ -26,7 +32,7 @@ async function ActivityLogPage() {
   }
 
   return (
-    <div className="max-h-full overflow-y-auto bg-slate-500">
+    <div className="max-h-full">
       <ActivityLog data={responseData} />
     </div>
   );
