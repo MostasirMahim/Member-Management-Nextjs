@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
+import { Bounce, toast } from "react-toastify";
 
 export default function AddMailConfigForm() {
   const form = useForm<any>({});
@@ -27,7 +28,17 @@ export default function AddMailConfigForm() {
       );
       const data = response.data;
       if (data.code == 201) {
-        alert("Added config");
+        toast.success("Config added successfully", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
         router.push("/emails/configurations/");
       } else {
         alert("Something went wrong");
@@ -53,6 +64,17 @@ export default function AddMailConfigForm() {
             message: errors.non_field_errors.join(" "),
           });
         }
+        toast.error("Something went wrong!!", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       } else {
         console.error("Form submission error", error);
       }
