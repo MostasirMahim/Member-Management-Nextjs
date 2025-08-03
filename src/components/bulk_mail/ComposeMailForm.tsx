@@ -25,7 +25,12 @@ import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
-export default function ComposeMailForm() {
+interface Props {
+  configData: any;
+  groupData: any;
+}
+
+export default function ComposeMailForm({ configData, groupData }: Props) {
   const [value, setValue] = useState("");
 
   const handleChange = (content: string) => {
