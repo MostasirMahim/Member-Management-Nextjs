@@ -23,6 +23,8 @@ import {
 import { useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { Bounce } from "react-toastify";
 interface Props {
   data: any;
 }
@@ -38,7 +40,17 @@ function EmailConfigTable({ data }: Props) {
         `/api/mails/v1/configs/${deleteConfigId}/`
       );
       const data = response.data;
-      alert("Deleted successfully");
+      toast.success("Config deleted successfully", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
       router.refresh();
     } catch (error) {
       console.log(error);
