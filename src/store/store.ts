@@ -174,3 +174,55 @@ export const useRegUserStore = create<RegUserState>((set, get) => ({
       isOtpPass: false,
     }),
 }));
+
+
+
+
+interface StepStore {
+  currentStep: number
+  completedSteps: number[]
+  totalSteps: number
+  setCurrentStep: (step: number) => void
+  nextStep: () => void
+  prevStep: () => void
+  markStepCompleted: (step: number) => void
+  resetSteps: () => void
+}
+
+export const useStepStore = create<StepStore>((set, get) => ({
+  currentStep: 0,
+  completedSteps: [],
+  totalSteps: 11,
+
+  setCurrentStep: (step: number) => {
+    const { totalSteps } = get()
+    if (step >= 0 && step < totalSteps) {
+      set({ currentStep: step })
+    }
+  },
+
+  nextStep: () => {
+    const { currentStep, totalSteps } = get()
+    if (currentStep < totalSteps - 1) {
+      set({ currentStep: currentStep + 1 })
+    }
+  },
+
+  prevStep: () => {
+    const { currentStep } = get()
+    if (currentStep > 0) {
+      set({ currentStep: currentStep - 1 })
+    }
+  },
+
+  markStepCompleted: (step: number) => {
+    const { completedSteps } = get()
+    if (!completedSteps.includes(step)) {
+      set({ completedSteps: [...completedSteps, step] })
+    }
+  },
+
+  resetSteps: () => {
+    set({ currentStep: 0, completedSteps: [] })
+  },
+}))
