@@ -77,7 +77,7 @@ function EmailConfigTable({ data }: Props) {
               onClick={() => handleDelete()}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete Group
+              Delete Config
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
