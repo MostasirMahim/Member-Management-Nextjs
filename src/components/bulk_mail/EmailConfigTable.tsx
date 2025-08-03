@@ -205,7 +205,9 @@ function EmailConfigTable({ data }: Props) {
                 })}
               </TableCell>
               <TableCell>
-                <Button variant="default">Update</Button>
+                <Button variant="default" disabled>
+                  Update
+                </Button>
               </TableCell>
               <TableCell>
                 <Button

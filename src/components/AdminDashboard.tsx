@@ -23,6 +23,7 @@ import {
   Logs,
   Mails,
   MailPlus,
+  UserRound,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -196,6 +197,11 @@ const navigation = [
         icon: <MailPlus className="h-4 w-4" />,
         label: "Configurations",
         href: "/emails/configurations/",
+      },
+      {
+        icon: <UserRound className="h-4 w-4" />,
+        label: "Groups",
+        href: "/emails/groups/",
       },
     ],
   },
