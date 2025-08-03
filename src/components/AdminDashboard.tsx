@@ -23,10 +23,13 @@ import {
   Logs,
   Mails,
   MailPlus,
+  Package, List, BadgeDollarSign, Image, Tag
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -198,6 +201,33 @@ const navigation = [
         href: "/emails/configurations/",
       },
     ],
+  },
+  {
+  icon: <Package className="h-5 w-5" />,
+  label: "Products",
+  href: "#",
+  subItems: [
+    {
+      icon: <List className="h-4 w-4" />,
+      label: "Categories",
+      href: "/products/categories/",
+    },
+    {
+      icon: <Tag className="h-4 w-4" />,
+      label: "Brands",
+      href: "/products/brands/",
+    },
+    {
+      icon: <Image className="h-4 w-4" />,
+      label: "Media",
+      href: "/products/media/",
+    },
+    {
+      icon: <BadgeDollarSign className="h-4 w-4" />,
+      label: "Prices",
+      href: "/products/prices/",
+    },
+  ],
   },
 ];
 
