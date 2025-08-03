@@ -24,6 +24,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bounce, toast } from "react-toastify";
+import Link from "next/link";
 
 interface Props {
   data: any;
@@ -139,7 +140,9 @@ function EmailGroupsTable({ data }: Props) {
                 })}
               </TableCell>
               <TableCell>
-                <Button variant="outline">View</Button>
+                <Button variant="outline">
+                  <Link href={`/emails/groups/${group.id}`}>View</Link>
+                </Button>
               </TableCell>
               <TableCell>
                 <Button variant="default" disabled>
