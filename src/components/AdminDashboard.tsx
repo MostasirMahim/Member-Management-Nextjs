@@ -23,6 +23,9 @@ import {
   Logs,
   Mails,
   MailPlus,
+  UserRound,
+  BetweenHorizonalStart,
+  SquarePen,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -196,6 +199,21 @@ const navigation = [
         icon: <MailPlus className="h-4 w-4" />,
         label: "Configurations",
         href: "/emails/configurations/",
+      },
+      {
+        icon: <UserRound className="h-4 w-4" />,
+        label: "Groups",
+        href: "/emails/groups/",
+      },
+      {
+        icon: <BetweenHorizonalStart className="h-4 w-4" />,
+        label: "Add email to group",
+        href: "/emails/add_email/",
+      },
+      {
+        icon: <SquarePen className="h-4 w-4" />,
+        label: "Compose email",
+        href: "/emails/compose/",
       },
     ],
   },
