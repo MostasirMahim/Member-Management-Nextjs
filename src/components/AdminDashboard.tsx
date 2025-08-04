@@ -30,6 +30,9 @@ import {
   Tag,
   UserRound,
   BetweenHorizonalStart,
+  SquarePen,
+  ExternalLink,
+  Settings,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -214,6 +217,21 @@ const navigation = [
         icon: <BetweenHorizonalStart className="h-4 w-4" />,
         label: "Add email to group",
         href: "/emails/add_email/",
+      },
+      {
+        icon: <SquarePen className="h-4 w-4" />,
+        label: "Compose email",
+        href: "/emails/compose/",
+      },
+      {
+        icon: <ExternalLink className="h-4 w-4" />,
+        label: "Outbox",
+        href: "/emails/outbox/",
+      },
+      {
+        icon: <Settings className="h-4 w-4" />,
+        label: "View all composes",
+        href: "/emails/compose/view/",
       },
     ],
   },

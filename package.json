@@ -40,6 +40,7 @@
     "react-day-picker": "^9.8.0",
     "react-dom": "^18",
     "react-hook-form": "^7.61.1",
+    "react-quill": "^2.0.0",
     "react-resizable-panels": "^3.0.4",
     "react-toastify": "^11.0.5",
     "sonner": "^2.0.6",
