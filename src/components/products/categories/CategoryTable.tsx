@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -22,8 +23,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical, Layers, Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { MoreVertical, Pencil, Trash2, Layers } from "lucide-react";
+import { usePathname } from "next/navigation";
+import EditCategoryModal from "@/components/products/categories/EditCategoryModal";
+import DeleteCategoryDialog from "@/components/products/categories/DeleteCategoryDialog";
 
 interface Category {
   id: number;
@@ -45,7 +48,11 @@ interface Props {
 }
 
 export default function CategoryTable({ categories }: Props) {
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const pathname = usePathname();
 
   const formatBDTime = (isoString: string) => {
     const date = new Date(isoString);
@@ -62,8 +69,8 @@ export default function CategoryTable({ categories }: Props) {
   return (
     <Card className="shadow-md border rounded-2xl bg-white">
       <CardHeader className="flex flex-row items-center gap-2">
-        <Layers className=" h-6 w-6" />
-        <CardTitle className="text-xl font-bold opacity-75 ">
+        <Layers className="text-indigo-600 h-6 w-6" />
+        <CardTitle className="text-xl font-bold text-indigo-600">
           All Product Categories
         </CardTitle>
       </CardHeader>
@@ -88,7 +95,7 @@ export default function CategoryTable({ categories }: Props) {
                 className="hover:bg-indigo-50 transition-all duration-200"
               >
                 <TableCell className="font-medium text-gray-700">
-                  {index + 1}
+                  {cat.id}
                 </TableCell>
                 <TableCell className="font-semibold text-gray-900">
                   {cat.name}
@@ -97,7 +104,7 @@ export default function CategoryTable({ categories }: Props) {
                   <Badge
                     className={
                       cat.is_active
-                        ? "bg-green-400 text-black"
+                        ? "bg-green-500 text-white"
                         : "bg-red-500 text-white"
                     }
                   >
@@ -122,11 +129,24 @@ export default function CategoryTable({ categories }: Props) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem className="text-indigo-600 hover:bg-indigo-100">
-                        <Pencil className="w-4 h-4 mr-2" /> Edit
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedCategory(cat);
+                          setEditModalOpen(true);
+                        }}
+                        className="text-indigo-600 hover:bg-indigo-100 cursor-pointer"
+                      >
+                        <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600 hover:bg-red-100">
-                        <Trash2 className="w-4 h-4 mr-2" /> Delete
+
+                      <DropdownMenuItem
+                        className="text-red-600 hover:bg-red-100 cursor-pointer"
+                        onClick={() => {
+                          setSelectedCategory(cat);
+                          setDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" /> Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -136,6 +156,23 @@ export default function CategoryTable({ categories }: Props) {
           </TableBody>
         </Table>
       </CardContent>
+
+      {/* Edit Modal */}
+      {selectedCategory && (
+        <EditCategoryModal
+          open={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          category={selectedCategory}
+        />
+      )}
+      {/* {Delete Dialog} */}
+      {selectedCategory && (
+        <DeleteCategoryDialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          categoryId={selectedCategory.id}
+        />
+      )}
     </Card>
   );
 }
