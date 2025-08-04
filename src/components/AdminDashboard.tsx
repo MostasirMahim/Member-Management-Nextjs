@@ -23,14 +23,17 @@ import {
   Logs,
   Mails,
   MailPlus,
-  Package, List, BadgeDollarSign, Image, Tag,
+  Package,
+  List,
+  BadgeDollarSign,
+  Image,
+  Tag,
   UserRound,
   BetweenHorizonalStart,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 
 import {
   DropdownMenu,
@@ -215,31 +218,44 @@ const navigation = [
     ],
   },
   {
-  icon: <Package className="h-5 w-5" />,
-  label: "Products",
-  href: "#",
-  subItems: [
-    {
-      icon: <List className="h-4 w-4" />,
-      label: "Categories",
-      href: "/products/categories/",
-    },
-    {
-      icon: <Tag className="h-4 w-4" />,
-      label: "Brands",
-      href: "/products/brands/",
-    },
-    {
-      icon: <Image className="h-4 w-4" />,
-      label: "Media",
-      href: "/products/media/",
-    },
-    {
-      icon: <BadgeDollarSign className="h-4 w-4" />,
-      label: "Prices",
-      href: "/products/prices/",
-    },
-  ],
+    icon: <Package className="h-5 w-5" />,
+    label: "Products Management",
+    href: "#",
+    subItems: [
+      {
+        icon: <List className="h-4 w-4" />,
+        label: "Categories",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Category",
+            href: "/products/categories/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Categories",
+            href: "/products/categories/",
+          },
+        ],
+      },
+
+      {
+        icon: <Tag className="h-4 w-4" />,
+        label: "Brands",
+        href: "/products/brands/",
+      },
+      {
+        icon: <Image className="h-4 w-4" />,
+        label: "Media",
+        href: "/products/media/",
+      },
+      {
+        icon: <BadgeDollarSign className="h-4 w-4" />,
+        label: "Prices",
+        href: "/products/prices/",
+      },
+    ],
   },
 ];
 
@@ -256,6 +272,92 @@ interface NavItemProps {
   }>;
 }
 
+// const NavItem = ({
+//   icon,
+//   label,
+//   href,
+//   active,
+//   badge,
+//   subItems,
+// }: NavItemProps) => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const pathname = usePathname();
+
+//   // Check if any sub-item is active
+//   const hasActiveSubItem = subItems?.some(
+//     (subItem) => pathname === subItem.href
+//   );
+//   const isParentActive = active || hasActiveSubItem;
+
+//   if (subItems && subItems.length > 0) {
+//     return (
+//       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+//         <CollapsibleTrigger asChild>
+//           <Button
+//             variant="ghost"
+//             className={cn(
+//               "w-full justify-start gap-3 h-10 px-3",
+//               isParentActive && "bg-accent text-accent-foreground"
+//             )}
+//           >
+//             {icon}
+//             <span className="flex-1 text-left">{label}</span>
+//             {badge && (
+//               <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+//                 {badge}
+//               </span>
+//             )}
+//             {isOpen ? (
+//               <ChevronDown className="h-4 w-4" />
+//             ) : (
+//               <ChevronRight className="h-4 w-4" />
+//             )}
+//           </Button>
+//         </CollapsibleTrigger>
+//         <CollapsibleContent className="space-y-1">
+//           <div className="ml-6 space-y-1">
+//             {subItems.map((subItem) => (
+//               <Link key={subItem.href} href={subItem.href}>
+//                 <Button
+//                   variant="ghost"
+//                   className={cn(
+//                     "w-full justify-start gap-3 h-9 px-3 text-sm",
+//                     pathname === subItem.href &&
+//                       "bg-accent text-accent-foreground"
+//                   )}
+//                 >
+//                   {subItem.icon}
+//                   <span>{subItem.label}</span>
+//                 </Button>
+//               </Link>
+//             ))}
+//           </div>
+//         </CollapsibleContent>
+//       </Collapsible>
+//     );
+//   }
+
+//   return (
+//     <Link href={href}>
+//       <Button
+//         variant="ghost"
+//         className={cn(
+//           "w-full justify-start gap-3 h-10 px-3",
+//           active && "bg-accent text-accent-foreground"
+//         )}
+//       >
+//         {icon}
+//         <span className="flex-1 text-left">{label}</span>
+//         {badge && (
+//           <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+//             {badge}
+//           </span>
+//         )}
+//       </Button>
+//     </Link>
+//   );
+// };
+
 const NavItem = ({
   icon,
   label,
@@ -267,11 +369,73 @@ const NavItem = ({
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  // Check if any sub-item is active
   const hasActiveSubItem = subItems?.some(
-    (subItem) => pathname === subItem.href
+    (subItem) =>
+      pathname === subItem.href ||
+      subItem.subItems?.some((nested) => pathname === nested.href)
   );
   const isParentActive = active || hasActiveSubItem;
+
+  const renderSubItems = (items: any[], level: number = 1) => {
+    return (
+      <div className={`ml-${level * 4} space-y-1`}>
+        {items.map((item, index) => {
+          const hasNested = item.subItems && item.subItems.length > 0;
+          const isActive =
+            pathname === item.href ||
+            item.subItems?.some((nested) => pathname === nested.href);
+          const [nestedOpen, setNestedOpen] = useState(false);
+
+          if (hasNested) {
+            return (
+              <Collapsible
+                key={item.label + index}
+                open={nestedOpen}
+                onOpenChange={setNestedOpen}
+              >
+                <CollapsibleTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start gap-3 h-9 px-3 text-sm",
+                      isActive && "bg-accent text-accent-foreground"
+                    )}
+                  >
+                    {item.icon}
+                    <span className="flex-1 text-left">{item.label}</span>
+                    {nestedOpen ? (
+                      <ChevronDown className="h-3 w-3" />
+                    ) : (
+                      <ChevronRight className="h-3 w-3" />
+                    )}
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  {renderSubItems(item.subItems, level + 1)}
+                </CollapsibleContent>
+              </Collapsible>
+            );
+          } else {
+            return (
+              <Link key={item.href} href={item.href}>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start gap-3 h-9 px-3 text-sm",
+                    pathname === item.href &&
+                      "bg-accent text-accent-foreground"
+                  )}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Button>
+              </Link>
+            );
+          }
+        })}
+      </div>
+    );
+  };
 
   if (subItems && subItems.length > 0) {
     return (
@@ -298,25 +462,7 @@ const NavItem = ({
             )}
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-1">
-          <div className="ml-6 space-y-1">
-            {subItems.map((subItem) => (
-              <Link key={subItem.href} href={subItem.href}>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start gap-3 h-9 px-3 text-sm",
-                    pathname === subItem.href &&
-                      "bg-accent text-accent-foreground"
-                  )}
-                >
-                  {subItem.icon}
-                  <span>{subItem.label}</span>
-                </Button>
-              </Link>
-            ))}
-          </div>
-        </CollapsibleContent>
+        <CollapsibleContent>{renderSubItems(subItems)}</CollapsibleContent>
       </Collapsible>
     );
   }
@@ -341,6 +487,9 @@ const NavItem = ({
     </Link>
   );
 };
+
+
+
 
 function AdminDashboard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

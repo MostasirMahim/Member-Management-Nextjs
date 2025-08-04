@@ -23,6 +23,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
 import { Layers } from "lucide-react";
+import { useState } from "react";
+import { Plus } from "lucide-react";
+
 
 interface Category {
   id: number;
@@ -41,8 +44,14 @@ interface Props {
 }
 
 export default function CategoryTable({ categories }: Props) {
+    const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
   return (
+
+   
     <Card className="shadow-md border rounded-2xl bg-white">
+
+      
       <CardHeader className="flex flex-row items-center gap-2">
         <Layers className="text-indigo-600 h-6 w-6" />
         <CardTitle className="text-xl font-bold text-indigo-600">
