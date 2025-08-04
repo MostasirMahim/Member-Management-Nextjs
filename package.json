@@ -39,10 +39,6 @@
     "react": "^18",
     "react-day-picker": "^9.8.0",
     "react-dom": "^18",
-<<<<<<< HEAD
-    "react-toastify": "^11.0.5",
-=======
->>>>>>> 5996160a30e4734053ef62b6f91c3627bf29ad2b
     "react-hook-form": "^7.61.1",
     "react-quill": "^2.0.0",
     "react-resizable-panels": "^3.0.4",

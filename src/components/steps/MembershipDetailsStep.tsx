@@ -82,7 +82,6 @@ export default function MembershipDetailsStep() {
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-        console.log("New Pass Chenge successfully:", data);
         const member_ID = data?.data?.next_available;
         if (member_ID) {
           formik.setFieldValue("member_ID", member_ID);
@@ -119,7 +118,7 @@ export default function MembershipDetailsStep() {
       const formData = new FormData();
 
       Object.entries(userData).forEach(([key, value]) => {
-        formData.append(key, value as any); 
+        formData.append(key, value as any);
       });
       console.log("formData", formData);
       const res = await axiosInstance.post(
@@ -189,12 +188,10 @@ export default function MembershipDetailsStep() {
     },
     validationSchema,
     onSubmit: (values) => {
-      console.log("Form submitted with values:", values);
       createMember(values);
     },
   });
-  console.log("Form values:", formik.values);
-  console.log("Form errors:", formik.errors);
+
   useEffect(() => {
     if (formik.values.membership_type && formik.values.institute_name) {
       const data = {
@@ -204,15 +201,6 @@ export default function MembershipDetailsStep() {
       generateID(data);
     }
   }, [formik.values.membership_type, formik.values.institute_name]);
-
-  // const handleProfilePictureUpload = (
-  //   event: React.ChangeEvent<HTMLInputElement>
-  // ) => {
-  //   const file = event.target.files?.[0];
-  //   if (file) {
-  //     formik.setFieldValue("profile_photo", file);
-  //   }
-  // };
 
   const imgRef = useRef<HTMLInputElement>(null);
   const handleProfilePictureUpload = (
@@ -224,17 +212,6 @@ export default function MembershipDetailsStep() {
     if (file) {
       formik.setFieldValue("profile_photo", file);
     }
-    // if (file) {
-    //   const reader = new FileReader();
-    //   reader.onload = () => {
-    //      formik.setFieldValue("profile_photo", reader.result as string);
-
-    //     if (imgRef.current) {
-    //       imgRef.current.value = "";
-    //     }
-    //   };
-    //   reader.readAsDataURL(file);
-    // }
   };
 
   const handleMembershipDocUpload = (
