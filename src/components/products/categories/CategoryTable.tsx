@@ -21,15 +21,16 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical } from "lucide-react";
-import { Layers } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { MoreVertical, Layers, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Plus } from "lucide-react";
-
 
 interface Category {
   id: number;
   name: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 interface CategoryResponse {
@@ -44,17 +45,25 @@ interface Props {
 }
 
 export default function CategoryTable({ categories }: Props) {
-    const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
+  const formatBDTime = (isoString: string) => {
+    const date = new Date(isoString);
+    return date.toLocaleString("en-BD", {
+      timeZone: "Asia/Dhaka",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
-
-   
     <Card className="shadow-md border rounded-2xl bg-white">
-
-      
       <CardHeader className="flex flex-row items-center gap-2">
-        <Layers className="text-indigo-600 h-6 w-6" />
-        <CardTitle className="text-xl font-bold text-indigo-600">
+        <Layers className=" h-6 w-6" />
+        <CardTitle className="text-xl font-bold opacity-75 ">
           All Product Categories
         </CardTitle>
       </CardHeader>
@@ -62,8 +71,11 @@ export default function CategoryTable({ categories }: Props) {
         <Table className="w-full text-sm text-gray-700">
           <TableHeader className="bg-gray-100">
             <TableRow className="bg-gray-100 font-bold text-sm">
-              <TableHead className="w-10 text-gray-500 ">Id</TableHead>
+              <TableHead className="w-10 text-gray-500">Id</TableHead>
               <TableHead className="text-gray-600">Category Name</TableHead>
+              <TableHead className="text-gray-600">Is Active</TableHead>
+              <TableHead className="text-gray-600">Created At</TableHead>
+              <TableHead className="text-gray-600">Updated At</TableHead>
               <TableHead className="text-right text-gray-500">
                 Actions
               </TableHead>
@@ -81,6 +93,23 @@ export default function CategoryTable({ categories }: Props) {
                 <TableCell className="font-semibold text-gray-900">
                   {cat.name}
                 </TableCell>
+                <TableCell>
+                  <Badge
+                    className={
+                      cat.is_active
+                        ? "bg-green-400 text-black"
+                        : "bg-red-500 text-white"
+                    }
+                  >
+                    {cat.is_active ? "Active" : "Inactive"}
+                  </Badge>
+                </TableCell>
+                <TableCell className="font-semibold text-gray-900">
+                  {formatBDTime(cat.created_at)}
+                </TableCell>
+                <TableCell className="font-semibold text-gray-900">
+                  {formatBDTime(cat.updated_at)}
+                </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -94,10 +123,10 @@ export default function CategoryTable({ categories }: Props) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem className="text-indigo-600 hover:bg-indigo-100">
-                        ✏️ Edit
+                        <Pencil className="w-4 h-4 mr-2" /> Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem className="text-red-600 hover:bg-red-100">
-                        🗑️ Delete
+                        <Trash2 className="w-4 h-4 mr-2" /> Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
