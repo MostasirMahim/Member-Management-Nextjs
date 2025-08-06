@@ -21,7 +21,7 @@ async function AddEmailToGroupPage() {
   }
 
   return (
-    <div>
+    <div className="shadow-md rounded-md p-4 border">
       <div className="mb-4">
         <h4 className="text-center text-4xl font-bold">
           Add emails to a specific group

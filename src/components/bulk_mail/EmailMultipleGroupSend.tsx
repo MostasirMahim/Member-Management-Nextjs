@@ -66,7 +66,7 @@ function EmailMultipleGroupSend({ data, composeId }: Props) {
     form.clearErrors();
   }
   return (
-    <div>
+    <div className="shadow-md rounded-md p-4 border">
       <div className=" mb-4">
         <h4 className="text-center font-bold text-3xl">Send email</h4>
         <p className="text-center">
