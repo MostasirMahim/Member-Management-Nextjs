@@ -365,7 +365,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   }
 
   const Sidebar = () => (
-    <div className="flex flex-col h-full font-primary">
+    <div className="flex flex-col h-full max-h-screen overflow-hidden font-primary">
       <div className="p-4">
         <div className="flex items-center justify-center">
           <img
@@ -396,7 +396,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
   if (isPending) return <LoadingDots />;
   return (
-    <div className="min-h-screen h-screen max-h-screen overflow-y-auto flex bg-muted/30">
+    <div className="min-h-screen h-screen max-h-screen overflow-hidden flex bg-muted/30">
       <aside className="hidden lg:block w-64 border-r bg-background h-screen sticky top-0">
         <Sidebar />
       </aside>

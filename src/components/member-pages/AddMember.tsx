@@ -1,10 +1,7 @@
 "use client";
-//@ts-nocheck
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import ContactDetailsStep from "../steps/ContactDetailsStep";
 import CompanionDetailsStep from "../steps/CompanionDetailsStep";
@@ -17,136 +14,44 @@ import SpouseDetailsStep from "../steps/SpouseDetailsStep";
 import MembershipDetailsStep from "../steps/MembershipDetailsStep";
 import DescendantsDetailsStep from "../steps/DescendantsDetailsStep";
 import SpecialDaysStep from "../steps/SpecialDaysStep";
-import { useStepStore } from "@/store/store";
+import { useAddMemberStore } from "@/store/store";
 
 const stepTitles = [
   "Membership Details",
   "Member Contact Details",
-  "Companion Details",
-  "Emergency Contact Details",
-  "Member Certificate Details",
-  "Member Documents Details",
   "Member Emails Details",
   "Member Address Details",
   "Member Spouse Details",
   "Member Descendants Details",
+  "Companion Details",
+  "Emergency Contact Details",
+  "Member Documents Details",
+  "Member Certificate Details",
   "Special Days",
 ];
 
 export default function AddMember() {
-  const {
-    currentStep,
-    completedSteps,
-    totalSteps,
-    setCurrentStep,
-    nextStep,
-    prevStep,
-    markStepCompleted,
-  } = useStepStore();
-
-  const handleNext = () => {
-    console.log(
-      `Moving from step ${currentStep + 1} to step ${currentStep + 2}`
-    );
-    markStepCompleted(currentStep);
-    nextStep();
-  };
-
-  const handleBack = () => {
-    console.log(
-      `Moving back from step ${currentStep + 1} to step ${currentStep}`
-    );
-    prevStep();
-  };
-
-  const handleSkip = () => {
-    console.log(`Skipping step ${currentStep + 1}`);
-    nextStep();
-  };
-
-  const handleSaveAndExit = () => {
-    console.log("Saving and exiting at step:", currentStep + 1);
-    // Handle save and exit logic
-  };
+  const { currentStep, completedSteps, totalSteps, setCurrentStep } =
+    useAddMemberStore();
 
   const handleStepClick = (stepIndex: number) => {
-    console.log(`Jumping to step ${stepIndex + 1}`);
     setCurrentStep(stepIndex);
   };
 
+  //MAY COUSE HIEGHT OVERFLOW CAUSES --CHECKED NOT
   const renderStep = () => {
     const stepComponents = [
       <MembershipDetailsStep key="membership" />,
-      <ContactDetailsStep
-        key="contact"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
-      <CompanionDetailsStep
-        key="companion"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
-      <EmergencyContactStep
-        key="emergency"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
-      <CertificateDetailsStep
-        key="certificate"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
-      <DocumentDetailsStep
-        key="document"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
-      <EmailDetailsStep
-        key="email"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
-      <AddressDetailsStep
-        key="address"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
-      <SpouseDetailsStep
-        key="spouse"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
-      <DescendantsDetailsStep
-        key="descendants"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
-      <SpecialDaysStep
-        key="special-days"
-        values={null}
-        errors={null}
-        touched={null}
-        setFieldValue={() => {}}
-      />,
+      <ContactDetailsStep key="contact" />,
+      <EmailDetailsStep key="email" />,
+      <AddressDetailsStep key="address" />,
+      <SpouseDetailsStep key="spouse" />,
+      <DescendantsDetailsStep key="descendants" />,
+      <CompanionDetailsStep key="companion" />,
+      <EmergencyContactStep key="emergency" />,
+      <DocumentDetailsStep key="document" />,
+      <CertificateDetailsStep key="certificate" />,
+      <SpecialDaysStep key="special-days" />,
     ];
     return stepComponents[currentStep];
   };
@@ -156,7 +61,6 @@ export default function AddMember() {
   return (
     <div className="text-foreground">
       <div className="mx-auto">
-        {/* Progress Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold">Add New Member</h1>
@@ -171,8 +75,6 @@ export default function AddMember() {
             </div>
             <Progress value={progressPercentage} className="h-2" />
           </div>
-
-          {/* Step indicators for larger screens */}
           <div className="hidden lg:flex justify-between mt-4 overflow-x-auto">
             {stepTitles.map((title, index) => (
               <div
@@ -200,8 +102,6 @@ export default function AddMember() {
             ))}
           </div>
         </div>
-
-        {/* Form Card */}
         <Card className="shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl text-primary">
@@ -209,9 +109,7 @@ export default function AddMember() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              {renderStep()}
-            </div>
+            <div className="space-y-6">{renderStep()}</div>
           </CardContent>
         </Card>
       </div>
