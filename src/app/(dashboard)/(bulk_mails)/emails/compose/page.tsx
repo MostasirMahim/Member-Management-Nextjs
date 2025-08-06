@@ -22,7 +22,6 @@ export default async function EmailEditor() {
         },
       }),
     ]);
-
     configsData = configsRes.data;
     groupsData = groupsRes.data;
   } catch (error: any) {
@@ -31,8 +30,6 @@ export default async function EmailEditor() {
     const errorMsg = error?.response?.data?.message || "Something went wrong";
     throw new Error(errorMsg);
   }
-  console.log(configsData);
-  console.log(groupsData);
   return (
     <div className="border rounded-md p-2">
       <div>

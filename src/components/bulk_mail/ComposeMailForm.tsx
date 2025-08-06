@@ -23,6 +23,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
+import { toast } from "react-toastify";
+import axiosInstance from "@/lib/axiosInstance";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 interface Props {
@@ -31,7 +33,11 @@ interface Props {
 }
 
 export default function ComposeMailForm({ configData, groupData }: Props) {
+  const configs = configData?.data;
+  const groups = groupData?.data;
+
   const [value, setValue] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (content: string) => {
     setValue(content);
@@ -46,14 +52,92 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
       mail_config_selector: "",
       attachment_input: "",
       group_selector: "",
-      "textarea-0": "",
+      notes: "",
       "reset-button-0": "",
       "submit-button-0": "",
     },
   });
 
-  function onSubmit(values: any) {
-    console.log(values);
+  async function onSubmit(values: any) {
+    setLoading(true);
+
+    if (value == "") {
+      toast.error("Mail body is required", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("subject", values.mail_subject);
+    formData.append("configurations", values.mail_config_selector);
+    formData.append("body", value);
+
+    if (values.attachment_input?.[0]) {
+      formData.append("attachments", values.attachment_input[0]);
+    }
+    try {
+      const response = await axiosInstance.post(
+        "/api/mails/v1/email/composes/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        if (values.group_selector && values.group_selector !== "none") {
+          const sendMailData = {
+            group: values.group_selector,
+            notes: values.notes,
+            email_compose: response?.data?.data?.id,
+          };
+
+          const sendMailResponse = await axiosInstance.post(
+            "/api/mails/v1/emails/send/",
+            sendMailData
+          );
+
+          if (sendMailResponse.status === 201) {
+            toast.success("Mail sent successfully", {
+              position: "top-center",
+              autoClose: 3000,
+            });
+            form.reset();
+            form.clearErrors();
+          } else {
+            toast.warn("Mail composed but couldn't send to group!", {
+              position: "top-center",
+              autoClose: 3000,
+            });
+          }
+        } else {
+          toast.success("Mail compose created", {
+            position: "top-center",
+            autoClose: 3000,
+          });
+          form.reset();
+          form.clearErrors();
+        }
+      } else {
+        toast.error("Something went wrong", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+        console.log(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   function onReset() {
@@ -81,6 +165,7 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
           <FormField
             control={form.control}
             name="mail_subject"
+            rules={{ required: "Subject is required" }}
             render={({ field }) => (
               <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                 <FormLabel className="flex shrink-0">Subject</FormLabel>
@@ -114,6 +199,7 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
           <FormField
             control={form.control}
             name="mail_config_selector"
+            rules={{ required: "Email configuration is required" }}
             render={({ field }) => (
               <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                 <FormLabel className="flex shrink-0">
@@ -133,13 +219,11 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
                         <SelectValue placeholder="Select a configuration" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem key="option1" value="option1">
-                          Option 1
-                        </SelectItem>
-
-                        <SelectItem key="option2" value="option2">
-                          Option 2
-                        </SelectItem>
+                        {configs.map((config: any) => (
+                          <SelectItem key={config.id} value={`${config.id}`}>
+                            {config.username}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -157,23 +241,20 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
             render={({ field }) => (
               <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                 <FormLabel className="flex shrink-0">Attachments</FormLabel>
-
                 <div className="w-full">
                   <FormControl>
                     <div className="relative w-full">
                       <Input
-                        key="file-input-0"
-                        placeholder=""
                         type="file"
                         id="attachment_input"
-                        className=" ps-9"
-                        {...field}
+                        className="ps-9"
+                        onChange={(e) => {
+                          field.onChange(e.target.files);
+                        }}
+                        name={field.name}
+                        ref={field.ref}
                       />
-                      <div
-                        className={
-                          "text-muted-foreground pointer-events-none absolute inset-y-0 flex items-center justify-center  peer-disabled:opacity-50 start-0 ps-3"
-                        }
-                      >
+                      <div className="text-muted-foreground pointer-events-none absolute inset-y-0 flex items-center justify-center peer-disabled:opacity-50 start-0 ps-3">
                         <FilePlus2 className="size-4" strokeWidth={2} />
                       </div>
                     </div>
@@ -201,15 +282,16 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger className="w-full ">
-                        <SelectValue placeholder="selelct a group" />
+                        <SelectValue placeholder="select a group" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem key="option1" value="option1">
-                          Option 1
-                        </SelectItem>
-
-                        <SelectItem key="option2" value="option2">
-                          Option 2
+                        {groups.map((group: any) => (
+                          <SelectItem key={group.id} value={`${group.id}`}>
+                            {group.name}
+                          </SelectItem>
+                        ))}
+                        <SelectItem key="none" value="none">
+                          None
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -225,7 +307,7 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
           />
           <FormField
             control={form.control}
-            name="textarea-0"
+            name="notes"
             render={({ field }) => (
               <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                 <FormLabel className="flex shrink-0">Notes</FormLabel>
@@ -233,16 +315,16 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
                 <div className="w-full">
                   <FormControl>
                     <Textarea
-                      key="textarea-0"
-                      id="textarea-0"
-                      placeholder="eg: mail sending perpose"
+                      key="notes"
+                      id="notes"
+                      placeholder="eg: mail sending purpose"
                       className=""
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
                     You can write notes if you are sending mail now and selected
-                    a groupo
+                    a group
                   </FormDescription>
                   <FormMessage />
                 </div>
@@ -291,8 +373,9 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
                       className="w-full"
                       type="submit"
                       variant="default"
+                      disabled={loading}
                     >
-                      Submit
+                      {loading ? "please wait..." : "submit"}
                     </Button>
                   </FormControl>
 
