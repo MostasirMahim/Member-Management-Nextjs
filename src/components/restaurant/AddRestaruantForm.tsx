@@ -20,18 +20,11 @@ import {
   AlarmClock,
   Shuffle,
   LockKeyholeOpen,
-  CalendarIcon,
   CircleDollarSign,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
+
 import {
   Select,
   SelectTrigger,
@@ -40,7 +33,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function AddRestaurantForm() {
+interface Props {
+  cuisinesData: any;
+  categoriesData: any;
+}
+
+export default function AddRestaurantForm({
+  cuisinesData,
+  categoriesData,
+}: Props) {
   const form = useForm({
     defaultValues: {
       name: "",
@@ -60,6 +61,9 @@ export default function AddRestaurantForm() {
       restaurant_type: "",
     },
   });
+
+  const cuisines = cuisinesData?.data;
+  const categories = categoriesData?.data;
 
   function onSubmit(values: any) {
     console.log(values);
@@ -459,7 +463,6 @@ export default function AddRestaurantForm() {
                 <FormLabel className="flex shrink-0">
                   Booking fees per seat
                 </FormLabel>
-
                 <div className="w-full">
                   <FormControl>
                     <div className="relative w-full">
@@ -489,6 +492,7 @@ export default function AddRestaurantForm() {
           <FormField
             control={form.control}
             name="cuisine_type"
+            rules={{ required: true }}
             render={({ field }) => (
               <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                 <FormLabel className="flex shrink-0">Cuisine type</FormLabel>
@@ -506,13 +510,14 @@ export default function AddRestaurantForm() {
                         <SelectValue placeholder="select cuisine type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem key="option1" value="option1">
-                          Option 1
-                        </SelectItem>
-
-                        <SelectItem key="option2" value="option2">
-                          Option 2
-                        </SelectItem>
+                        {cuisines?.map((cuisine: any) => (
+                          <SelectItem
+                            key={`${cuisine.id}`}
+                            value={`${cuisine.id}`}
+                          >
+                            {cuisine.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -527,6 +532,7 @@ export default function AddRestaurantForm() {
           <FormField
             control={form.control}
             name="restaurant_type"
+            rules={{ required: true }}
             render={({ field }) => (
               <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                 <FormLabel className="flex shrink-0">Restaurant type</FormLabel>
@@ -544,13 +550,14 @@ export default function AddRestaurantForm() {
                         <SelectValue placeholder="select restaurant type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem key="option1" value="option1">
-                          Option 1
-                        </SelectItem>
-
-                        <SelectItem key="option2" value="option2">
-                          Option 2
-                        </SelectItem>
+                        {categories.map((category: any) => (
+                          <SelectItem
+                            key={category.id}
+                            value={`${category.id}`}
+                          >
+                            {category.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
