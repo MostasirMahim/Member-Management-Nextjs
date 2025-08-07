@@ -14,7 +14,7 @@ async function RestaurantViewPage({ searchParams }: Props) {
   let data = {};
   try {
     const response = await axiosInstance.get(
-      `/api/restaurants/v1/restaurants/?page=${page}&page_size=5`,
+      `/api/restaurants/v1/restaurants/?page=${page}`,
       {
         headers: {
           Cookie: `access_token=${authToken}`,

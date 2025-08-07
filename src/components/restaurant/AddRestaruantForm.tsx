@@ -32,6 +32,10 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
+import axiosInstance from "@/lib/axiosInstance";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 interface Props {
   cuisinesData: any;
@@ -62,11 +66,55 @@ export default function AddRestaurantForm({
     },
   });
 
+  const { setError } = form;
+
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
   const cuisines = cuisinesData?.data;
   const categories = categoriesData?.data;
 
-  function onSubmit(values: any) {
-    console.log(values);
+  async function onSubmit(values: any) {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.post(
+        "/api/restaurants/v1/restaurants/",
+        values
+      );
+      if (response.status == 201) {
+        toast.success("Restaurant added successfully");
+        form.reset();
+        form.clearErrors();
+        router.push("/restaurants/");
+        router.refresh();
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.response?.data?.errors) {
+        const errors = error.response.data.errors;
+
+        // Field specific errors
+        for (const key in errors) {
+          if (key !== "non_field_errors") {
+            setError(key as any, {
+              type: "server",
+              message: errors[key][0],
+            });
+          }
+        }
+
+        // Non-field errors (e.g. general form errors)
+        if (errors.non_field_errors) {
+          setError("root", {
+            type: "server",
+            message: errors.non_field_errors.join(" "),
+          });
+        }
+      }
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   }
 
   function onReset() {
@@ -609,8 +657,9 @@ export default function AddRestaurantForm({
                       className="w-full"
                       type="submit"
                       variant="default"
+                      disabled={loading}
                     >
-                      Submit
+                      {loading ? "loading..." : "submit"}
                     </Button>
                   </FormControl>
 
