@@ -28,6 +28,8 @@ import {
   SquarePen,
   ExternalLink,
   Settings,
+  HandPlatter,
+  Soup,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -226,6 +228,18 @@ const navigation = [
         icon: <Settings className="h-4 w-4" />,
         label: "View all composes",
         href: "/emails/compose/view/",
+      },
+    ],
+  },
+  {
+    icon: <HandPlatter className="h-5 w-5" />,
+    label: "Restaurant management",
+    href: "#",
+    subItems: [
+      {
+        icon: <Soup className="h-4 w-4" />,
+        label: "Restaurants",
+        href: "/restaurants/",
       },
     ],
   },
