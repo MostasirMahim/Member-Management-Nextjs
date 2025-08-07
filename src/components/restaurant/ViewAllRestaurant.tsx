@@ -19,6 +19,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import Link from "next/link";
 
 interface Props {
   data: any;
@@ -68,9 +69,11 @@ function ViewAllRestaurant({ data }: Props) {
           <p>Viewing all restaurants</p>
         </div>
         <div>
-          <Button variant="default">
-            <Plus /> Add
-          </Button>
+          <Link href="restaurants/add/">
+            <Button variant="default">
+              <Plus /> Add
+            </Button>
+          </Link>
         </div>
       </div>
       <RestaurantTable restaurants={restaurants} />
