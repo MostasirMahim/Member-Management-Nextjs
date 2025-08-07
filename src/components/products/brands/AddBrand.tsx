@@ -25,7 +25,7 @@ const formSchema = z.object({
     .max(255, { message: "Must be at most 255 characters" }),
 });
 
-export default function AddCategory() {
+export default function AddBrand() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,10 +36,10 @@ export default function AddCategory() {
   const router = useRouter();
   const { reset, setError } = form;
 
-  const { mutate: addCategory, isPending } = useMutation({
+  const { mutate: addBrand, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
       const response = await axiosInstance.post(
-        "/api/product/v1/products/categories/",
+        "/api/product/v1/products/brands/",
         values
       );
       return response;
@@ -84,15 +84,16 @@ export default function AddCategory() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    addCategory(values);
-  };
+  addBrand(values); 
+};
+
 
   return (
     <>
       <div className="flex justify-center items-center bg-gray-100 px-4 py-16 bg-opacity-0">
         <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg">
           <h2 className="text-center md:text-2xl font-bold mb-6 text-gray-800">
-            Add Product Category
+            Add Product Brand
           </h2>
 
           <Form {...form}>
@@ -107,7 +108,7 @@ export default function AddCategory() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base text-gray-700">
-                      Category Name
+                      Brand Name
                     </FormLabel>
                     <FormControl>
                       <Input

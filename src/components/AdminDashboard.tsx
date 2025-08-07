@@ -259,9 +259,21 @@ const navigation = [
       },
 
       {
-        icon: <Tag className="h-4 w-4" />,
+        icon: <List className="h-4 w-4" />,
         label: "Brands",
-        href: "/products/brands/",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add brand",
+            href: "/products/brands/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Brands",
+            href: "/products/brands/",
+          },
+        ],
       },
       {
         icon: <Image className="h-4 w-4" />,

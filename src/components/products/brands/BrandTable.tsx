@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableHeader,
@@ -25,33 +20,33 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MoreVertical, Pencil, Trash2, Layers } from "lucide-react";
 import { usePathname } from "next/navigation";
-import EditCategoryModal from "@/components/products/categories/EditCategoryModal";
-import DeleteCategoryDialog from "@/components/products/categories/DeleteCategoryDialog";
+import EditBrandModal from "@/components/products/brands/EditBrandModal";
+import DeleteBrandDialog from "@/components/products/brands/DeleteBrandDialog";
 
-interface Category {
-  id: number;
+interface Brand {
+  readonly id: number;
   name: string;
   is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  readonly created_at: string;
+  readonly updated_at: string;
 }
 
-interface CategoryResponse {
+interface BrandResponse {
   code: number;
   message: string;
   status: string;
-  data: Category[];
+  data: Brand[];
 }
 
 interface Props {
-  categories: CategoryResponse;
+  brands: BrandResponse;
 }
 
-export default function CategoryTable({ categories }: Props) {
+export default function BrandTable({ brands }: Props) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
 
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const pathname = usePathname();
 
   const formatBDTime = (isoString: string) => {
@@ -69,53 +64,51 @@ export default function CategoryTable({ categories }: Props) {
   return (
     <Card className="shadow-md border rounded-2xl bg-white">
       <CardHeader className="flex flex-row items-center gap-2">
-        <Layers className=" h-6 w-6 opacity-75" />
+        <Layers className="h-6 w-6 opacity-75" />
         <CardTitle className="text-xl font-bold opacity-75">
-          All Product Categories
+          All Product Brands
         </CardTitle>
       </CardHeader>
       <CardContent>
         <Table className="w-full text-sm text-gray-700">
           <TableHeader className="bg-gray-100">
             <TableRow className="bg-gray-100 font-bold text-sm">
-              <TableHead className="w-10 text-gray-500">Id</TableHead>
-              <TableHead className="text-gray-600">Category Name</TableHead>
-              <TableHead className="text-gray-600">Is Active</TableHead>
+              <TableHead className="w-10 text-gray-500">ID</TableHead>
+              <TableHead className="text-gray-600">Brand Name</TableHead>
+              <TableHead className="text-gray-600">Status</TableHead>
               <TableHead className="text-gray-600">Created At</TableHead>
               <TableHead className="text-gray-600">Updated At</TableHead>
-              <TableHead className="text-right text-gray-500">
-                Actions
-              </TableHead>
+              <TableHead className="text-right text-gray-500">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.data?.map((cat, index) => (
+            {brands.data?.map((brand) => (
               <TableRow
-                key={cat.id}
+                key={brand.id}
                 className="hover:bg-indigo-50 transition-all duration-200"
               >
                 <TableCell className="font-medium text-gray-700">
-                  {cat.id}
+                  {brand.id}
                 </TableCell>
                 <TableCell className="font-semibold text-gray-900">
-                  {cat.name}
+                  {brand.name}
                 </TableCell>
                 <TableCell>
                   <Badge
                     className={
-                      cat.is_active
+                      brand.is_active
                         ? "bg-green-500 text-white"
                         : "bg-red-500 text-white"
                     }
                   >
-                    {cat.is_active ? "Active" : "Inactive"}
+                    {brand.is_active ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
                 <TableCell className="font-semibold text-gray-900">
-                  {formatBDTime(cat.created_at)}
+                  {formatBDTime(brand.created_at)}
                 </TableCell>
                 <TableCell className="font-semibold text-gray-900">
-                  {formatBDTime(cat.updated_at)}
+                  {formatBDTime(brand.updated_at)}
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -131,7 +124,7 @@ export default function CategoryTable({ categories }: Props) {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
                         onClick={() => {
-                          setSelectedCategory(cat);
+                          setSelectedBrand(brand);
                           setEditModalOpen(true);
                         }}
                         className="text-indigo-600 hover:bg-indigo-100 cursor-pointer"
@@ -142,7 +135,7 @@ export default function CategoryTable({ categories }: Props) {
                       <DropdownMenuItem
                         className="text-red-600 hover:bg-red-100 cursor-pointer"
                         onClick={() => {
-                          setSelectedCategory(cat);
+                          setSelectedBrand(brand);
                           setDeleteDialogOpen(true);
                         }}
                       >
@@ -158,19 +151,21 @@ export default function CategoryTable({ categories }: Props) {
       </CardContent>
 
       {/* Edit Modal */}
-      {selectedCategory && (
-        <EditCategoryModal
-          open={editModalOpen}
-          onClose={() => setEditModalOpen(false)}
-          category={selectedCategory}
-        />
+      {selectedBrand && (
+       <EditBrandModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        brand={selectedBrand}
+      />
+
       )}
-      {/* {Delete Dialog} */}
-      {selectedCategory && (
-        <DeleteCategoryDialog
+
+      {/* Delete Confirmation Dialog */}
+      {selectedBrand && (
+        <DeleteBrandDialog
           open={deleteDialogOpen}
           onClose={() => setDeleteDialogOpen(false)}
-          categoryId={selectedCategory.id}
+          brandId={selectedBrand.id}
         />
       )}
     </Card>

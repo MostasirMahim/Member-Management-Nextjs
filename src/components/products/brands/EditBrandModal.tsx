@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,6 +26,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
+// ✅ Schema with name optional and blank string filtered out
 const formSchema = z.object({
   name: z
     .string()
@@ -34,41 +36,50 @@ const formSchema = z.object({
   is_active: z.boolean().optional(),
 });
 
-
 type FormValues = z.infer<typeof formSchema>;
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  category: {
+  brand: {
     id: number;
     name: string;
     is_active: boolean;
   };
 }
 
-export default function EditCategoryModal({ open, onClose, category }: Props) {
+export default function EditBrandModal({ open, onClose, brand }: Props) {
   const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: category.name,
-      is_active: category.is_active,
+      name: undefined,
+      is_active: false,
     },
   });
 
-  const { setError } = form;
+  const { setError, reset } = form;
 
-  const { mutate: updateCategory, isPending } = useMutation({
+  // ✅ Populate form values when brand changes
+  useEffect(() => {
+    if (brand) {
+      reset({
+        name: brand.name || undefined,
+        is_active: brand.is_active,
+      });
+    }
+  }, [brand, reset]);
+
+  const { mutate: updateBrand, isPending } = useMutation({
     mutationFn: async (data: FormValues) => {
       return await axiosInstance.patch(
-        `/api/product/v1/products/categories/${category.id}/`,
+        `/api/product/v1/products/brands/${brand.id}/`,
         data
       );
     },
     onSuccess: (res) => {
-      toast.success(res.data.message || "Category updated successfully", {
+      toast.success(res.data.message || "Brand updated successfully", {
         position: "top-center",
         autoClose: 3000,
       });
@@ -98,14 +109,14 @@ export default function EditCategoryModal({ open, onClose, category }: Props) {
   });
 
   const onSubmit = (data: FormValues) => {
-    updateCategory(data);
+    updateBrand(data);
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Category</DialogTitle>
+          <DialogTitle>Edit Brand</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -114,9 +125,9 @@ export default function EditCategoryModal({ open, onClose, category }: Props) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category Name</FormLabel>
+                  <FormLabel>Brand Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter category name" {...field} />
+                    <Input placeholder="Enter brand name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
