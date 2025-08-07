@@ -175,54 +175,56 @@ export const useRegUserStore = create<RegUserState>((set, get) => ({
     }),
 }));
 
-
-
-
 interface StepStore {
-  currentStep: number
-  completedSteps: number[]
-  totalSteps: number
-  setCurrentStep: (step: number) => void
-  nextStep: () => void
-  prevStep: () => void
-  markStepCompleted: (step: number) => void
-  resetSteps: () => void
+  currentStep: number;
+  completedSteps: number[];
+  totalSteps: number;
+  memberID: string;
+  setMemberID: (memberID: string) => void;
+  setCurrentStep: (step: number) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  markStepCompleted: (step: number) => void;
+  resetSteps: () => void;
 }
 
-export const useStepStore = create<StepStore>((set, get) => ({
+export const useAddMemberStore = create<StepStore>((set, get) => ({
   currentStep: 0,
   completedSteps: [],
   totalSteps: 11,
+  memberID: "",
+
+  setMemberID: (memberID: string) => set({ memberID }),
 
   setCurrentStep: (step: number) => {
-    const { totalSteps } = get()
+    const { totalSteps } = get();
     if (step >= 0 && step < totalSteps) {
-      set({ currentStep: step })
+      set({ currentStep: step });
     }
   },
 
   nextStep: () => {
-    const { currentStep, totalSteps } = get()
+    const { currentStep, totalSteps } = get();
     if (currentStep < totalSteps - 1) {
-      set({ currentStep: currentStep + 1 })
+      set({ currentStep: currentStep + 1 });
     }
   },
 
   prevStep: () => {
-    const { currentStep } = get()
+    const { currentStep } = get();
     if (currentStep > 0) {
-      set({ currentStep: currentStep - 1 })
+      set({ currentStep: currentStep - 1 });
     }
   },
 
   markStepCompleted: (step: number) => {
-    const { completedSteps } = get()
+    const { completedSteps } = get();
     if (!completedSteps.includes(step)) {
-      set({ completedSteps: [...completedSteps, step] })
+      set({ completedSteps: [...completedSteps, step] });
     }
   },
 
   resetSteps: () => {
-    set({ currentStep: 0, completedSteps: [] })
+    set({ currentStep: 0, completedSteps: [] });
   },
-}))
+}));
