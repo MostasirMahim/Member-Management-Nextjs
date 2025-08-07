@@ -11,16 +11,22 @@ async function RestaurantAddPage() {
 
   try {
     const [cuisinesRes, categoriesRes] = await Promise.all([
-      axiosInstance.get("/api/restaurants/v1/restaurants/cusines/", {
-        headers: {
-          Cookie: `access_token=${authToken}`,
-        },
-      }),
-      axiosInstance.get("/api/restaurants/v1/restaurants/categories/", {
-        headers: {
-          Cookie: `access_token=${authToken}`,
-        },
-      }),
+      axiosInstance.get(
+        "/api/restaurants/v1/restaurants/cusines/?page_size=200",
+        {
+          headers: {
+            Cookie: `access_token=${authToken}`,
+          },
+        }
+      ),
+      axiosInstance.get(
+        "/api/restaurants/v1/restaurants/categories/?page_size=200",
+        {
+          headers: {
+            Cookie: `access_token=${authToken}`,
+          },
+        }
+      ),
     ]);
     cuisinesData = cuisinesRes.data;
     categoriesData = categoriesRes.data;

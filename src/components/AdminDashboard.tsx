@@ -30,6 +30,7 @@ import {
   Settings,
   HandPlatter,
   Soup,
+  BookCheck,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -240,6 +241,11 @@ const navigation = [
         icon: <Soup className="h-4 w-4" />,
         label: "Restaurants",
         href: "/restaurants/",
+      },
+      {
+        icon: <BookCheck className="h-4 w-4" />,
+        label: "Add restaurants choices",
+        href: "/restaurants/choices/",
       },
     ],
   },
