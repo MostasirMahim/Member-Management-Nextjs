@@ -36,7 +36,6 @@ import { useAddMemberStore } from "@/store/store";
 import { useRouter } from "next/navigation";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
 
-// Validation Schema
 const validationSchema = Yup.object({
   data: Yup.array()
     .of(
@@ -69,32 +68,71 @@ export default function DescendantsDetailsStep() {
 
   const { mutate: addDescendantFunc, isPending } = useMutation({
     mutationFn: async (userData: any[]) => {
-      const allRequests = userData.map((descendant) => {
-        const formData = new FormData();
+      const errors: Record<string, string> = {};
 
-        Object.entries(descendant).forEach(([key, value]) => {
-          if (value instanceof File || value instanceof Blob) {
-            formData.append(key, value);
-          } else if (typeof value === "boolean" || typeof value === "number") {
-            formData.append(key, String(value)); // convert to string
-          } else if (value !== null && value !== undefined) {
-            formData.append(key, value as any);
-          }
-        });
+      const responses = await Promise.allSettled(
+        userData.map(async (descendant, index) => {
+          try {
+            const formData = new FormData();
 
-        return axiosInstance.post(
-          "/api/member/v1/members/descendants/",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
+            Object.entries(descendant).forEach(([key, value]) => {
+              if (value instanceof File || value instanceof Blob) {
+                formData.append(key, value);
+              } else if (
+                typeof value === "boolean" ||
+                typeof value === "number"
+              ) {
+                formData.append(key, String(value));
+              } else if (value !== null && value !== undefined) {
+                formData.append(key, value as any);
+              }
+            });
+
+            const res = await axiosInstance.post(
+              "/api/member/v1/members/descendants/",
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+
+            return res.data;
+          } catch (err: any) {
+            const { errors: resErrors } = err?.response?.data || {};
+            console.log(err?.response?.data);
+            if (resErrors && typeof resErrors === "object") {
+              for (const [fieldName, messages] of Object.entries(resErrors)) {
+                if (Array.isArray(messages) && messages.length > 0) {
+                  const fieldPath = `data.${index}.${fieldName}`;
+                  errors[fieldPath] = messages[0];
+                }
+              }
+            }
+
+            return null;
           }
-        );
+        })
+      );
+
+      Object.entries(errors).forEach(([fieldPath, message]) => {
+        formik.setFieldError(fieldPath, message);
       });
 
-      const responses = await Promise.all(allRequests);
-      return responses.map((res) => res.data);
+      const successfulData = responses
+        .map((res) => (res.status === "fulfilled" ? res.value : null))
+        .filter((val) => val !== null);
+
+      const anyFailed = responses.some(
+        (res) => res.status === "rejected" || res.value === null
+      );
+
+      if (anyFailed) {
+        throw new Error("Some descendants failed to submit.");
+      }
+
+      return successfulData;
     },
 
     onSuccess: (dataArray) => {
@@ -108,17 +146,7 @@ export default function DescendantsDetailsStep() {
 
     onError: (error: any) => {
       console.error("Descendant submit error:", error);
-      const { errors } = error?.response?.data || {};
-
-      if (errors && typeof errors === "object") {
-        Object.entries(errors).forEach(([field, messages]) => {
-          if (Array.isArray(messages) && messages.length > 0) {
-            formik.setFieldError(`descendants.${field}`, messages[0]);
-          }
-        });
-      }
-
-      toast.error("Failed to submit descendant data.");
+      toast.error(error?.message || "Some descendants failed to submit.");
     },
   });
 

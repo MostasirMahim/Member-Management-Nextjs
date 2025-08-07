@@ -15,6 +15,7 @@ import MembershipDetailsStep from "../steps/MembershipDetailsStep";
 import DescendantsDetailsStep from "../steps/DescendantsDetailsStep";
 import SpecialDaysStep from "../steps/SpecialDaysStep";
 import { useAddMemberStore } from "@/store/store";
+import JobDetailsStep from "../steps/JobDetailsStep";
 
 const stepTitles = [
   "Membership Details",
@@ -27,7 +28,8 @@ const stepTitles = [
   "Emergency Contact Details",
   "Member Documents Details",
   "Member Certificate Details",
-  "Special Days",
+  "Member Job Details",
+  "Member Special Days",
 ];
 
 export default function AddMember() {
@@ -51,6 +53,7 @@ export default function AddMember() {
       <EmergencyContactStep key="emergency" />,
       <DocumentDetailsStep key="document" />,
       <CertificateDetailsStep key="certificate" />,
+      <JobDetailsStep key="job" />,
       <SpecialDaysStep key="special-days" />,
     ];
     return stepComponents[currentStep];

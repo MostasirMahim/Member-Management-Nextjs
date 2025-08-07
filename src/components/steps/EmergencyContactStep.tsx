@@ -75,17 +75,30 @@ export default function EmergencyContactStep() {
               contactErrorObj
             )) {
               if (Array.isArray(messages) && messages.length > 0) {
-                const fieldPath = `contacts.${contactIndex}.${fieldName}`;
+                const fieldPath = `data.${contactIndex}.${fieldName}`;
                 formik.setFieldError(fieldPath, messages[0]);
               }
             }
           }
         });
-
-        toast.error("Submission Failed");
-      } else {
-        toast.error(detail || message || "Submission Failed");
       }
+      if (errors && typeof errors === "object") {
+        const otherErrorKeys = Object.keys(errors).filter(
+          (key) => key !== "data"
+        );
+
+        if (otherErrorKeys.length > 0) {
+          const firstKey = otherErrorKeys[0];
+          const messages = errors[firstKey];
+
+          if (Array.isArray(messages) && messages.length > 0) {
+            toast.error(messages[0]);
+            return;
+          }
+        }
+      }
+
+      toast.error(detail || message || "Submission Failed");
     },
   });
 

@@ -191,7 +191,7 @@ interface StepStore {
 export const useAddMemberStore = create<StepStore>((set, get) => ({
   currentStep: 0,
   completedSteps: [],
-  totalSteps: 11,
+  totalSteps: 12,
   memberID: "",
 
   setMemberID: (memberID: string) => set({ memberID }),
