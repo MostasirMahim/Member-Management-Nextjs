@@ -1,10 +1,16 @@
-import EmailAddToGroupForm from "@/components/bulk_mail/AddEmailToGroup";
+import EmailMultipleGroupSend from "@/components/bulk_mail/EmailMultipleGroupSend";
 import axiosInstance from "@/lib/axiosInstance";
 import { cookies } from "next/headers";
+import React from "react";
 
-async function AddEmailToGroupPage() {
+interface Props {
+  params: Promise<{ id: string }>;
+}
+
+async function EmailSendMultipleGroupPage({ params }: Props) {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
+  const { id } = await params;
   let responseData = {};
   try {
     const { data } = await axiosInstance.get(`/api/mails/v1/email/groups/`, {
@@ -19,18 +25,11 @@ async function AddEmailToGroupPage() {
     const errorMsg = error?.response?.data?.message || "Something went wrong";
     throw new Error(errorMsg);
   }
-
   return (
-    <div className="shadow-md rounded-md p-4 border">
-      <div className="mb-4">
-        <h4 className="text-center text-4xl font-bold">
-          Add emails to a specific group
-        </h4>
-      </div>
-
-      <EmailAddToGroupForm data={responseData} />
+    <div>
+      <EmailMultipleGroupSend data={responseData} composeId={id} />
     </div>
   );
 }
 
-export default AddEmailToGroupPage;
+export default EmailSendMultipleGroupPage;
