@@ -32,6 +32,7 @@ import {
   Soup,
   BookCheck,
   ShoppingCart,
+  ListTodo,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -252,6 +253,11 @@ const navigation = [
         icon: <ShoppingCart className="h-4 w-4" />,
         label: "Add restaurant item",
         href: "/restaurants/items/add/",
+      },
+      {
+        icon: <ListTodo className="h-4 w-4" />,
+        label: "Add item category",
+        href: "/restaurants/items/add/category/",
       },
     ],
   },
