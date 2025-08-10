@@ -29,7 +29,7 @@ interface PaginationProps {
 }
 
 function PaginationForItems({ data }: PaginationProps) {
-  const paginationData = data.pagination;
+  const paginationData = data;
   const router = useRouter();
   const currentPage = paginationData?.current_page || 1;
   const totalPages = paginationData?.total_pages || 1;
