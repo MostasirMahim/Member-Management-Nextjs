@@ -5,12 +5,11 @@ import {
   Search,
   Filter,
   MoreHorizontal,
-  ArrowUpDown,
   Check,
   X,
   Pencil,
   Trash2,
-  UserPlus,
+  FileSpreadsheet,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -40,139 +39,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-
-
-import { useQuery } from "@tanstack/react-query";
-import { formatJoinedDate } from "@/lib/date_modify";
-import { LoadingPage } from "@/components/ui/loading";
-import { DummyUsers } from "@/lib/dummy";
+import { LoadingDots, LoadingPage } from "@/components/ui/loading";
+import useGetAllMembers from "@/hooks/data/useGetAllMembers";
+import { useRouter } from "next/navigation";
 
 function AllMembers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-
-  // const { data: allUsers, isLoading: user_isLoading } = useQuery({
-  //   queryKey: ["all_Users"],
-  //   queryFn: () => getAllUsers(),
-  // });
+  const { data: allMembersReq, isLoading: user_isLoading } = useGetAllMembers();
+  const allMembers = allMembersReq?.data;
+  const allMembersPages = allMembersReq?.pagination;
 
   const filteredUsers =
-    DummyUsers?.filter((user) => {
+    allMembers?.filter((user: any) => {
       const matchesSearch =
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesRole = "author";
-
-      return matchesSearch && matchesRole;
+        user.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.member_ID.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch;
     }) || [];
-
-  // if (user_isLoading) return <LoadingPage />;
+  const router = useRouter();
+  const handleMemberClick = (member_ID: string) => {
+    router.push(`/member/${member_ID}`);
+  };
+  if (user_isLoading) return <LoadingDots />;
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+          <h1 className="text-3xl font-bold tracking-tight">ALL Members</h1>
           <p className="text-muted-foreground">
-            Manage user accounts and permissions
+            Total {allMembers?.length} Members
           </p>
         </div>
 
-        <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-1">
-              <UserPlus className="h-4 w-4" /> Add User
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New User</DialogTitle>
-              <DialogDescription>
-                Create a new user account. The user will receive an email with
-                login instructions.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input id="name" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
-                  Username
-                </Label>
-                <Input id="username" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="email" className="text-right">
-                  Email
-                </Label>
-                <Input id="email" type="email" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="role" className="text-right">
-                  Role
-                </Label>
-                <Select defaultValue="reader">
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrator</SelectItem>
-                    <SelectItem value="editor">Editor</SelectItem>
-                    <SelectItem value="author">Author</SelectItem>
-                    <SelectItem value="reader">Reader</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="col-start-2 col-span-3 flex items-center space-x-2">
-                  <Checkbox id="send-email" />
-                  <label
-                    htmlFor="send-email"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Send welcome email
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  console.log("Adding new user");
-                  setIsAddUserOpen(false);
-                }}
-              >
-                Create User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div>
+          <Button className="gap-1">
+            <FileSpreadsheet className="h-4 w-4" />
+            Export
+          </Button>
+        </div>
       </div>
-
-      {/* Filters and Search */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 flex gap-2">
           <div className="relative flex-1">
@@ -247,23 +156,15 @@ function AllMembers() {
           </DropdownMenu>
         </div>
       </div>
-
-      {/* Users Table */}
-      <div className="rounded-md border">
+      <div className="rounded-md border my-2">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[300px]">
-                <div className="flex items-center gap-1">
-                  User
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <ArrowUpDown className="h-3 w-3" />
-                  </Button>
-                </div>
-              </TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Joined</TableHead>
+            <TableRow className="bg-muted/50  text-center">
+              <TableHead className=" text-center">ID</TableHead>
+              <TableHead className=" text-center">User</TableHead>
+              <TableHead className=" text-center">Type</TableHead>
+              <TableHead className=" text-center">Status</TableHead>
+              <TableHead className=" text-center">Batch No.</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -278,37 +179,50 @@ function AllMembers() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
+              filteredUsers.map((user: any) => (
+                <TableRow
+                  key={user.member_ID}
+                  onClick={() => handleMemberClick(user.member_ID)}
+                  className=" text-center cursor-pointer hover:translate-y-1 transition-transform duration-300 ease-in-out "
+                >
+                  <TableCell className="font-medium">
+                    {user.member_ID}
+                  </TableCell>
+                  <TableCell className="flex justify-center items-center">
+                    <div></div>
+                    <div className="flex items-center justify-start  gap-3">
                       <Avatar className="h-8 w-8">
                         <AvatarImage
-                          src={user.avatar || "user.png"}
-                          alt={user.name}
+                          src={user.profile_photo || "/user.png"}
+                          alt={user.first_name + " " + user.last_name}
                         />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>
+                          {user.first_name.charAt(0) +
+                            user.last_name.charAt(0) || "U"}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
+                        <p className="font-medium">
+                          {user.first_name + " " + user.last_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground text-left">
+                          {user.institute_name}
                         </p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">auther</Badge>
+                    <p>{user.membership_type}</p>
                   </TableCell>
                   <TableCell>
                     <Badge
                       variant={"default"}
                       className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
                     >
-                      Active
+                      {user.membership_status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{formatJoinedDate(user.createdAt)}</TableCell>
+                  <TableCell>{user.batch_number || "-"}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
