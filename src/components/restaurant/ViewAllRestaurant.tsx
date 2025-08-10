@@ -168,7 +168,9 @@ export function RestaurantTable({ restaurants }: RestaurantTableProps) {
               <TableCell>{restaurant?.cuisine_type?.name} </TableCell>
               <TableCell>{restaurant?.restaurant_type?.name} </TableCell>
               <TableCell>
-                <Button>View</Button>
+                <Link href={`/restaurants/${restaurant.id}`}>
+                  <Button>View</Button>
+                </Link>
               </TableCell>
             </TableRow>
           ))}
