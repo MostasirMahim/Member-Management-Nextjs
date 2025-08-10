@@ -31,6 +31,7 @@ import {
   HandPlatter,
   Soup,
   BookCheck,
+  ShoppingCart,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -246,6 +247,11 @@ const navigation = [
         icon: <BookCheck className="h-4 w-4" />,
         label: "Add restaurants choices",
         href: "/restaurants/choices/",
+      },
+      {
+        icon: <ShoppingCart className="h-4 w-4" />,
+        label: "Add restaurant item",
+        href: "/restaurants/items/add/",
       },
     ],
   },
