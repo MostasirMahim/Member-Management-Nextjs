@@ -241,6 +241,17 @@ const navigation = [
     href: "#",
     subItems: [
       {
+        icon: <Plus className="h-3 w-3" />,
+        label: "Add Product",
+        href: "/products/add/",
+      },
+      {
+        icon: <Eye className="h-3 w-3" />,
+        label: "View Products",
+        href: "/products",
+      },
+      
+      {
         icon: <List className="h-4 w-4" />,
         label: "Categories",
         href: "#",
