@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -17,20 +17,47 @@ import { ALargeSmall } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "react-toastify";
 
 function AddChoiceForRestaurant() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const state = searchParams.get("state");
   const form = useForm({
     defaultValues: {
       name: "",
     },
   });
+  const { reset } = form;
 
-  function onSubmit(values: any) {
-    // if (state == "category") {
-    //   const response = await axiosInstance.post();
-    // }
+  async function onSubmit(values: any) {
+    try {
+      if (state == "category") {
+        const response = await axiosInstance.post(
+          "/api/restaurants/v1/restaurants/categories/",
+          values
+        );
+        if (response.status == 201) {
+          toast.success("Category added successfully");
+          reset();
+        }
+      } else if (state == "cuisine") {
+        const response = await axiosInstance.post(
+          "/api/restaurants/v1/restaurants/cusines/",
+          values
+        );
+        if (response.status == 201) {
+          toast.success("cuisine added successfully");
+          reset();
+        }
+      } else {
+        toast.error("Something went wrong");
+        router.back();
+      }
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    }
   }
 
   function onReset() {
