@@ -28,7 +28,6 @@ import { useMutation } from "@tanstack/react-query";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
 import { useAddMemberStore } from "@/store/store";
 import { useRouter } from "next/navigation";
-import { se } from "date-fns/locale";
 
 const validationSchema = Yup.object({
   spouse_name: Yup.string().required("Spouse name is required"),
@@ -285,7 +284,6 @@ export default function SpouseDetailsStep() {
                 size="sm"
                 onClick={() => {
                   updateField("image", null);
-                  console.log("Removed spouse picture");
                 }}
               >
                 <X className="w-4 h-4" />
@@ -297,7 +295,6 @@ export default function SpouseDetailsStep() {
               variant="ghost"
               onClick={() => {
                 fileInputRef.current?.click();
-                console.log("Clicked to upload spouse picture");
               }}
               className="w-full"
             >

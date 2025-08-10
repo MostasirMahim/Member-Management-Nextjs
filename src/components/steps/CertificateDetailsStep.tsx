@@ -42,60 +42,86 @@ export default function CertificateDetailsStep() {
     setMemberID,
   } = useAddMemberStore();
 
-  const { mutate: addDocumentFunc, isPending } = useMutation({
-    mutationFn: async (userData: any[]) => {
-      const allRequests = userData.map((document) => {
-        const formData = new FormData();
+ const { mutate: addCertificateFunc, isPending } = useMutation({
+  mutationFn: async (userData: any[]) => {
+    const errors: Record<string, string> = {};
 
-        Object.entries(document).forEach(([key, value]) => {
-          if (value instanceof File || value instanceof Blob) {
-            formData.append(key, value);
-          } else if (typeof value === "boolean" || typeof value === "number") {
-            formData.append(key, String(value));
-          } else if (value !== null && value !== undefined) {
-            formData.append(key, value as any);
+    const responses = await Promise.allSettled(
+      userData.map(async (document, index) => {
+        try {
+          const formData = new FormData();
+
+          Object.entries(document).forEach(([key, value]) => {
+            if (value instanceof File || value instanceof Blob) {
+              formData.append(key, value);
+            } else if (typeof value === "boolean" || typeof value === "number") {
+              formData.append(key, String(value));
+            } else if (value !== null && value !== undefined) {
+              formData.append(key, value as any);
+            }
+          });
+
+          const res = await axiosInstance.post(
+            "/api/member/v1/members/certificate/",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+
+          return res.data;
+        } catch (err: any) {
+          const { errors: resErrors } = err?.response?.data || {};
+          console.log(err?.response?.data);
+          if (resErrors && typeof resErrors === "object") {
+            for (const [fieldName, messages] of Object.entries(resErrors)) {
+              if (Array.isArray(messages) && messages.length > 0) {
+                const fieldPath = `data.${index}.${fieldName}`;
+                errors[fieldPath] = messages[0];
+              }
+            }
           }
-        });
 
-        return axiosInstance.post(
-          "/api/member/v1/members/certificate/",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-      });
+          return null;
+        }
+      })
+    );
+    Object.entries(errors).forEach(([fieldPath, message]) => {
+      formik.setFieldError(fieldPath, message);
+    });
 
-      const responses = await Promise.all(allRequests);
-      return responses.map((res) => res.data);
-    },
+    const successfulData = responses
+      .map((res) => (res.status === "fulfilled" ? res.value : null))
+      .filter((val) => val !== null);
 
-    onSuccess: (dataArray) => {
-      if (Array.isArray(dataArray) && dataArray.length > 0) {
-        formik.resetForm();
-        toast.success("All Certificates have been successfully added.");
-        markStepCompleted(currentStep);
-        nextStep();
-      }
-    },
+    const anyFailed = responses.some(
+      (res) => res.status === "rejected" || res.value === null
+    );
 
-    onError: (error: any) => {
-      console.error("Documents submit error:", error);
-      const { errors } = error?.response?.data || {};
+    if (anyFailed) {
+      throw new Error("Some certificates failed to submit.");
+    }
 
-      if (errors && typeof errors === "object") {
-        Object.entries(errors).forEach(([field, messages]) => {
-          if (Array.isArray(messages) && messages.length > 0) {
-            formik.setFieldError(`descendants.${field}`, messages[0]);
-          }
-        });
-      }
+    return successfulData;
+  },
 
-      toast.error("Failed to submit data.");
-    },
-  });
+  onSuccess: (dataArray) => {
+    if (Array.isArray(dataArray) && dataArray.length > 0) {
+      formik.resetForm();
+      toast.success("All Certificates have been successfully added.");
+      markStepCompleted(currentStep);
+      nextStep();
+    }
+  },
+
+  onError: (error: any) => {
+    console.error("Certificate submit error:", error);
+    toast.error(error?.message || "Some certificates failed to submit.");
+  },
+});
+
 
   const formik = useFormik({
     initialValues: {
@@ -110,8 +136,7 @@ export default function CertificateDetailsStep() {
     },
     validationSchema,
     onSubmit: (values) => {
-      console.log("Certificate Details Form submitted:", values);
-      addDocumentFunc(values.data);
+      addCertificateFunc(values.data);
     },
   });
 

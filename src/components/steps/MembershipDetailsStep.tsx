@@ -31,10 +31,11 @@ import { cn } from "@/lib/utils";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
 import axiosInstance from "@/lib/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "@/hooks/use-toast";
+
 import { LoadingCard, LoadingDots } from "../ui/loading";
 import { useAddMemberStore } from "@/store/store";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const validationSchema = Yup.object({
   member_ID: Yup.string().required("Member ID is required"),
@@ -96,12 +97,7 @@ export default function MembershipDetailsStep() {
           formik.setFieldValue("member_ID", member_ID);
           setMemberID(member_ID);
         }
-        toast({
-          title: data?.details || "Permissions Added successfully",
-          description:
-            data?.message || "Permissions has been successfully added.",
-          variant: "default",
-        });
+        toast.success("Member ID generated successfully");
       }
     },
     onError: (error: any) => {
@@ -114,18 +110,10 @@ export default function MembershipDetailsStep() {
               formik.setFieldError(field, messages[0]);
             }
           });
-          toast({
-            title: "Generate ID Failed",
-            description: "Please check the highlighted fields.",
-            variant: "destructive",
-          });
+          toast.error(detail || message || "Generate ID Failed");
         }
       } else {
-        toast({
-          title: detail || "Generate ID Failed",
-          description: message || "An error occurred during Generate ID",
-          variant: "destructive",
-        });
+        toast.error(detail || message || "Generate ID Failed");
       }
     },
   });
@@ -150,12 +138,9 @@ export default function MembershipDetailsStep() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         formik.resetForm();
-        toast({
-          title: data?.details || "Membership Added successfully",
-          description:
-            data?.message || "Permissions has been successfully added.",
-          variant: "default",
-        });
+        toast.success(
+          data.message || "Membership has been successfully added."
+        );
         markStepCompleted(currentStep);
         nextStep();
       }
@@ -163,19 +148,18 @@ export default function MembershipDetailsStep() {
     onError: (error: any) => {
       console.log("error", error?.response);
       const { message, errors, detail } = error?.response.data;
-      if (errors) {
-        const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Membership Added Failed",
-          description: allErrors,
-          variant: "destructive",
+        console.log(errors);
+      if (errors && typeof errors === "object") {
+        Object.entries(errors).forEach(([field, messages]) => {
+          if (Array.isArray(messages)) {
+            formik.setFieldError(field, messages[0]);
+          }
         });
+        toast.error(message || detail || "Validation failed.");
       } else {
-        toast({
-          title: detail || "Membership Added Failed",
-          description: message || "An error occurred during Added",
-          variant: "destructive",
-        });
+        toast.error(
+          detail || message || "An error occurred during submission."
+        );
       }
     },
   });
@@ -201,7 +185,7 @@ export default function MembershipDetailsStep() {
       subscriptionFee: "",
       membershipFeeDocument: null as File | null,
       blood_group: "",
-      nationality: "BD",
+      nationality: "Unknown",
     },
     validationSchema,
     onSubmit: (values) => {
@@ -256,597 +240,610 @@ export default function MembershipDetailsStep() {
   return (
     <div className="">
       <form onSubmit={formik.handleSubmit} className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left Column */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label
-              htmlFor="member_ID"
-              className="text-sm font-medium text-gray-700"
-            >
-              Member ID
-            </Label>
-            <Input
-              id="member_ID"
-              name="member_ID"
-              disabled
-              value={formik.values.member_ID}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="w-full"
-              readOnly
-            />
-            {formik.touched.member_ID && formik.errors.member_ID && (
-              <p className="text-sm text-red-600">{formik.errors.member_ID}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Membership Type
-            </Label>
-            <Select
-              value={formik.values.membership_type}
-              disabled={formik.values.member_ID !== ""}
-              onValueChange={(value) =>
-                formik.setFieldValue("membership_type", value)
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="What's Member Type?" />
-              </SelectTrigger>
-              <SelectContent>
-                {membership_type?.map((choice: any, index: number) => (
-                  <SelectItem key={index} value={choice.name}>
-                    {choice.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {formik.touched.membership_type &&
-              formik.errors.membership_type && (
-                <p className="text-sm text-red-600">
-                  {formik.errors.membership_type}
-                </p>
-              )}
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Institute Name
-            </Label>
-            <Select
-              disabled={formik.values.member_ID !== ""}
-              value={formik.values.institute_name}
-              onValueChange={(value) =>
-                formik.setFieldValue("institute_name", value)
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choose Institute" />
-              </SelectTrigger>
-              <SelectContent>
-                {institute_name?.map((choice: any, index: number) => (
-                  <SelectItem key={index} value={choice.name}>
-                    {choice.name} - {choice.code}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {formik.touched.institute_name && formik.errors.institute_name && (
-              <p className="text-sm text-red-600">
-                {formik.errors.institute_name}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="first_name"
-              className="text-sm font-medium text-gray-700"
-            >
-              First Name
-            </Label>
-            <Input
-              id="first_name"
-              name="first_name"
-              value={formik.values.first_name}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter first name"
-              className="w-full"
-            />
-            {formik.touched.first_name && formik.errors.first_name && (
-              <p className="text-sm text-red-600">{formik.errors.first_name}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="last_name"
-              className="text-sm font-medium text-gray-700"
-            >
-              Last Name
-            </Label>
-            <Input
-              id="last_name"
-              name="last_name"
-              value={formik.values.last_name}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter last name"
-              className="w-full"
-            />
-            {formik.touched.last_name && formik.errors.last_name && (
-              <p className="text-sm text-red-600">{formik.errors.last_name}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">Gender</Label>
-            <Select
-              value={formik.values.gender}
-              onValueChange={(value) => formik.setFieldValue("gender", value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Gender" />
-              </SelectTrigger>
-              <SelectContent>
-                {gender?.map((choice: any, index: number) => (
-                  <SelectItem key={index} value={choice.name}>
-                    {choice.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {formik.touched.gender && formik.errors.gender && (
-              <p className="text-sm text-red-600">{formik.errors.gender}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Date of Birth
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !formik.values.date_of_birth && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formik.values.date_of_birth
-                    ? format(formik.values.date_of_birth, "PPP")
-                    : "Select Date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={
-                    formik.values.date_of_birth
-                      ? new Date(formik.values.date_of_birth)
-                      : undefined
-                  }
-                  onSelect={(date) => {
-                    if (date) {
-                      const formatted = format(date, "yyyy-MM-dd");
-                      formik.setFieldValue("date_of_birth", formatted);
-                    }
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            {formik.touched.date_of_birth && formik.errors.date_of_birth && (
-              <p className="text-sm text-red-600">
-                {formik.errors.date_of_birth}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="batch_number"
-              className="text-sm font-medium text-gray-700"
-            >
-              Batch Number
-            </Label>
-            <Input
-              id="batch_number"
-              name="batch_number"
-              value={formik.values.batch_number}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter batch year"
-              className="w-full"
-            />
-            {formik.touched.batch_number && formik.errors.batch_number && (
-              <p className="text-sm text-red-600">
-                {formik.errors.batch_number}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Membership Status
-            </Label>
-            <Select
-              value={formik.values.membership_status}
-              onValueChange={(value) =>
-                formik.setFieldValue("membership_status", value)
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="What's Member Status?" />
-              </SelectTrigger>
-              <SelectContent>
-                {membership_status?.map((choice: any, index: number) => (
-                  <SelectItem key={index} value={choice.name}>
-                    {choice.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {formik.touched.membership_status &&
-              formik.errors.membership_status && (
-                <p className="text-sm text-red-600">
-                  {formik.errors.membership_status}
-                </p>
-              )}
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Profile Picture
-            </Label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-              <input
-                ref={imgRef}
-                type="file"
-                accept="image/*"
-                onChange={handleProfilePictureUpload}
-                className="hidden"
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Left Column */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label
+                htmlFor="member_ID"
+                className="text-sm font-medium text-gray-700"
+              >
+                Member ID
+              </Label>
+              <Input
+                id="member_ID"
+                name="member_ID"
+                disabled
+                value={formik.values.member_ID}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="w-full"
+                readOnly
               />
-              {formik.values.profile_photo ? (
-                <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <span className="text-sm text-gray-700">
-                    {formik.values.profile_photo.name}
-                  </span>
+              {formik.touched.member_ID && formik.errors.member_ID && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.member_ID}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Membership Type
+              </Label>
+              <Select
+                value={formik.values.membership_type}
+                disabled={formik.values.member_ID !== ""}
+                onValueChange={(value) =>
+                  formik.setFieldValue("membership_type", value)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="What's Member Type?" />
+                </SelectTrigger>
+                <SelectContent>
+                  {membership_type?.map((choice: any, index: number) => (
+                    <SelectItem key={index} value={choice.name}>
+                      {choice.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formik.touched.membership_type &&
+                formik.errors.membership_type && (
+                  <p className="text-sm text-red-600">
+                    {formik.errors.membership_type}
+                  </p>
+                )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Institute Name
+              </Label>
+              <Select
+                disabled={formik.values.member_ID !== ""}
+                value={formik.values.institute_name}
+                onValueChange={(value) =>
+                  formik.setFieldValue("institute_name", value)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Choose Institute" />
+                </SelectTrigger>
+                <SelectContent>
+                  {institute_name?.map((choice: any, index: number) => (
+                    <SelectItem key={index} value={choice.name}>
+                      {choice.name} - {choice.code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formik.touched.institute_name &&
+                formik.errors.institute_name && (
+                  <p className="text-sm text-red-600">
+                    {formik.errors.institute_name}
+                  </p>
+                )}
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="first_name"
+                className="text-sm font-medium text-gray-700"
+              >
+                First Name
+              </Label>
+              <Input
+                id="first_name"
+                name="first_name"
+                value={formik.values.first_name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter first name"
+                className="w-full"
+              />
+              {formik.touched.first_name && formik.errors.first_name && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.first_name}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="last_name"
+                className="text-sm font-medium text-gray-700"
+              >
+                Last Name
+              </Label>
+              <Input
+                id="last_name"
+                name="last_name"
+                value={formik.values.last_name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter last name"
+                className="w-full"
+              />
+              {formik.touched.last_name && formik.errors.last_name && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.last_name}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Gender
+              </Label>
+              <Select
+                value={formik.values.gender}
+                onValueChange={(value) => formik.setFieldValue("gender", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  {gender?.map((choice: any, index: number) => (
+                    <SelectItem key={index} value={choice.name}>
+                      {choice.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formik.touched.gender && formik.errors.gender && (
+                <p className="text-sm text-red-600">{formik.errors.gender}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Date of Birth
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !formik.values.date_of_birth && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formik.values.date_of_birth
+                      ? format(formik.values.date_of_birth, "PPP")
+                      : "Select Date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={
+                      formik.values.date_of_birth
+                        ? new Date(formik.values.date_of_birth)
+                        : undefined
+                    }
+                    onSelect={(date) => {
+                      if (date) {
+                        const formatted = format(date, "yyyy-MM-dd");
+                        formik.setFieldValue("date_of_birth", formatted);
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              {formik.touched.date_of_birth && formik.errors.date_of_birth && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.date_of_birth}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="batch_number"
+                className="text-sm font-medium text-gray-700"
+              >
+                Batch Number
+              </Label>
+              <Input
+                id="batch_number"
+                name="batch_number"
+                value={formik.values.batch_number}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter batch year"
+                className="w-full"
+              />
+              {formik.touched.batch_number && formik.errors.batch_number && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.batch_number}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Membership Status
+              </Label>
+              <Select
+                value={formik.values.membership_status}
+                onValueChange={(value) =>
+                  formik.setFieldValue("membership_status", value)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="What's Member Status?" />
+                </SelectTrigger>
+                <SelectContent>
+                  {membership_status?.map((choice: any, index: number) => (
+                    <SelectItem key={index} value={choice.name}>
+                      {choice.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formik.touched.membership_status &&
+                formik.errors.membership_status && (
+                  <p className="text-sm text-red-600">
+                    {formik.errors.membership_status}
+                  </p>
+                )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Profile Picture
+              </Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                <input
+                  ref={imgRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePictureUpload}
+                  className="hidden"
+                />
+                {formik.values.profile_photo ? (
+                  <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-700">
+                      {formik.values.profile_photo.name}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        formik.setFieldValue("profile_photo", null)
+                      }
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
-                    onClick={() => formik.setFieldValue("profile_photo", null)}
+                    onClick={() => imgRef.current?.click()}
+                    className="w-full"
                   >
-                    <X className="w-4 h-4" />
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose File
                   </Button>
-                </div>
-              ) : (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => imgRef.current?.click()}
-                  className="w-full"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Choose File
-                </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Marital Status
+              </Label>
+              <Select
+                value={formik.values.marital_status}
+                onValueChange={(value) =>
+                  formik.setFieldValue("marital_status", value)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="What's Marital Status?" />
+                </SelectTrigger>
+                <SelectContent>
+                  {marital_status?.map((choice: any, index: number) => (
+                    <SelectItem key={index} value={choice.name}>
+                      {choice.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formik.touched.marital_status &&
+                formik.errors.marital_status && (
+                  <p className="text-sm text-red-600">
+                    {formik.errors.marital_status}
+                  </p>
+                )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Anniversary Date
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !formik.values.anniversary_date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formik.values.anniversary_date
+                      ? format(formik.values.anniversary_date, "PPP")
+                      : "Select Date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={
+                      formik.values.anniversary_date
+                        ? new Date(formik.values.anniversary_date)
+                        : undefined
+                    }
+                    onSelect={(date) => {
+                      if (date) {
+                        const formatted = format(date, "yyyy-MM-dd");
+                        formik.setFieldValue("anniversary_date", formatted);
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Blood Group
+              </Label>
+              <Select
+                value={formik.values.blood_group}
+                onValueChange={(value) =>
+                  formik.setFieldValue("blood_group", value)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="What is his/her blood type?" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A+">A+</SelectItem>
+                  <SelectItem value="A-">A-</SelectItem>
+                  <SelectItem value="B+">B+</SelectItem>
+                  <SelectItem value="B-">B-</SelectItem>
+                  <SelectItem value="AB+">AB+</SelectItem>
+                  <SelectItem value="AB-">AB-</SelectItem>
+                  <SelectItem value="O+">O+</SelectItem>
+                  <SelectItem value="O-">O-</SelectItem>
+                </SelectContent>
+              </Select>
+              {formik.touched.blood_group && formik.errors.blood_group && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.blood_group}
+                </p>
               )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Nationality
+              </Label>
+              <Select
+                value={formik.values.nationality}
+                disabled
+                onValueChange={(value) =>
+                  formik.setFieldValue("nationality", value)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="What is his/her Nationality?" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bangladeshi">Bangladeshi</SelectItem>
+                  <SelectItem value="indian">Indian</SelectItem>
+                  <SelectItem value="pakistani">Pakistani</SelectItem>
+                  <SelectItem value="american">American</SelectItem>
+                  <SelectItem value="british">British</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              {formik.touched.nationality && formik.errors.nationality && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.nationality}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="dueLimit"
+                className="text-sm font-medium text-gray-700"
+              >
+                Due Limit
+              </Label>
+              <Input
+                id="dueLimit"
+                name="dueLimit"
+                type="number"
+                value={formik.values.dueLimit}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="w-full"
+              />
+              {formik.touched.dueLimit && formik.errors.dueLimit && (
+                <p className="text-sm text-red-600">{formik.errors.dueLimit}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="membershipFee"
+                className="text-sm font-medium text-gray-700"
+              >
+                Membership Fee
+              </Label>
+              <Input
+                id="membershipFee"
+                name="membershipFee"
+                type="number"
+                value={formik.values.membershipFee}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter membership fee"
+                className="w-full"
+              />
+              {formik.touched.membershipFee && formik.errors.membershipFee && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.membershipFee}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="initialPayment"
+                className="text-sm font-medium text-gray-700"
+              >
+                Initial Payment Received
+              </Label>
+              <Input
+                id="initialPayment"
+                name="initialPayment"
+                type="number"
+                value={formik.values.initialPayment}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter initial payment"
+                className="w-full"
+              />
+              {formik.touched.initialPayment &&
+                formik.errors.initialPayment && (
+                  <p className="text-sm text-red-600">
+                    {formik.errors.initialPayment}
+                  </p>
+                )}
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="remainingFee"
+                className="text-sm font-medium text-gray-700"
+              >
+                Remaining Fee
+              </Label>
+              <Input
+                id="remainingFee"
+                name="remainingFee"
+                type="number"
+                value={formik.values.remainingFee}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter remaining fee"
+                className="w-full"
+              />
+              {formik.touched.remainingFee && formik.errors.remainingFee && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.remainingFee}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="subscriptionFee"
+                className="text-sm font-medium text-gray-700"
+              >
+                Subscription Fee
+              </Label>
+              <Input
+                id="subscriptionFee"
+                name="subscriptionFee"
+                type="number"
+                value={formik.values.subscriptionFee}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter subscription fee"
+                className="w-full"
+              />
+              {formik.touched.subscriptionFee &&
+                formik.errors.subscriptionFee && (
+                  <p className="text-sm text-red-600">
+                    {formik.errors.subscriptionFee}
+                  </p>
+                )}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Membership Fee Payment Document
+              </Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                <input
+                  ref={membershipDocRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  onChange={handleMembershipDocUpload}
+                  className="hidden"
+                />
+                {formik.values.membershipFeeDocument ? (
+                  <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-700">
+                      {formik.values.membershipFeeDocument.name}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        formik.setFieldValue("membershipFeeDocument", null)
+                      }
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => membershipDocRef.current?.click()}
+                    className="w-full"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose File
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Marital Status
-            </Label>
-            <Select
-              value={formik.values.marital_status}
-              onValueChange={(value) =>
-                formik.setFieldValue("marital_status", value)
-              }
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
+          <div className="flex gap-3 flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleSaveAndExit()}
+              className="flex-1 sm:flex-none bg-transparent"
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="What's Marital Status?" />
-              </SelectTrigger>
-              <SelectContent>
-                {marital_status?.map((choice: any, index: number) => (
-                  <SelectItem key={index} value={choice.name}>
-                    {choice.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {formik.touched.marital_status && formik.errors.marital_status && (
-              <p className="text-sm text-red-600">
-                {formik.errors.marital_status}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Anniversary Date
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !formik.values.anniversary_date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formik.values.anniversary_date
-                    ? format(formik.values.anniversary_date, "PPP")
-                    : "Select Date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={
-                    formik.values.anniversary_date
-                      ? new Date(formik.values.anniversary_date)
-                      : undefined
-                  }
-                  onSelect={(date) => {
-                    if (date) {
-                      const formatted = format(date, "yyyy-MM-dd");
-                      formik.setFieldValue("anniversary_date", formatted);
-                    }
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Blood Group
-            </Label>
-            <Select
-              value={formik.values.blood_group}
-              onValueChange={(value) =>
-                formik.setFieldValue("blood_group", value)
-              }
+              Exit
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => handleSkip()}
+              className="flex-1 sm:flex-none"
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="What is his/her blood type?" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="A+">A+</SelectItem>
-                <SelectItem value="A-">A-</SelectItem>
-                <SelectItem value="B+">B+</SelectItem>
-                <SelectItem value="B-">B-</SelectItem>
-                <SelectItem value="AB+">AB+</SelectItem>
-                <SelectItem value="AB-">AB-</SelectItem>
-                <SelectItem value="O+">O+</SelectItem>
-                <SelectItem value="O-">O-</SelectItem>
-              </SelectContent>
-            </Select>
-            {formik.touched.blood_group && formik.errors.blood_group && (
-              <p className="text-sm text-red-600">
-                {formik.errors.blood_group}
-              </p>
-            )}
+              Skip
+            </Button>
           </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Nationality
-            </Label>
-            <Select
-              value={formik.values.nationality}
-              disabled
-              onValueChange={(value) =>
-                formik.setFieldValue("nationality", value)
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="What is his/her Nationality?" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bangladeshi">Bangladeshi</SelectItem>
-                <SelectItem value="indian">Indian</SelectItem>
-                <SelectItem value="pakistani">Pakistani</SelectItem>
-                <SelectItem value="american">American</SelectItem>
-                <SelectItem value="british">British</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-            {formik.touched.nationality && formik.errors.nationality && (
-              <p className="text-sm text-red-600">
-                {formik.errors.nationality}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label
-              htmlFor="dueLimit"
-              className="text-sm font-medium text-gray-700"
-            >
-              Due Limit
-            </Label>
-            <Input
-              id="dueLimit"
-              name="dueLimit"
-              type="number"
-              value={formik.values.dueLimit}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="w-full"
-            />
-            {formik.touched.dueLimit && formik.errors.dueLimit && (
-              <p className="text-sm text-red-600">{formik.errors.dueLimit}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="membershipFee"
-              className="text-sm font-medium text-gray-700"
-            >
-              Membership Fee
-            </Label>
-            <Input
-              id="membershipFee"
-              name="membershipFee"
-              type="number"
-              value={formik.values.membershipFee}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter membership fee"
-              className="w-full"
-            />
-            {formik.touched.membershipFee && formik.errors.membershipFee && (
-              <p className="text-sm text-red-600">
-                {formik.errors.membershipFee}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="initialPayment"
-              className="text-sm font-medium text-gray-700"
-            >
-              Initial Payment Received
-            </Label>
-            <Input
-              id="initialPayment"
-              name="initialPayment"
-              type="number"
-              value={formik.values.initialPayment}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter initial payment"
-              className="w-full"
-            />
-            {formik.touched.initialPayment && formik.errors.initialPayment && (
-              <p className="text-sm text-red-600">
-                {formik.errors.initialPayment}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="remainingFee"
-              className="text-sm font-medium text-gray-700"
-            >
-              Remaining Fee
-            </Label>
-            <Input
-              id="remainingFee"
-              name="remainingFee"
-              type="number"
-              value={formik.values.remainingFee}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter remaining fee"
-              className="w-full"
-            />
-            {formik.touched.remainingFee && formik.errors.remainingFee && (
-              <p className="text-sm text-red-600">
-                {formik.errors.remainingFee}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="subscriptionFee"
-              className="text-sm font-medium text-gray-700"
-            >
-              Subscription Fee
-            </Label>
-            <Input
-              id="subscriptionFee"
-              name="subscriptionFee"
-              type="number"
-              value={formik.values.subscriptionFee}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter subscription fee"
-              className="w-full"
-            />
-            {formik.touched.subscriptionFee &&
-              formik.errors.subscriptionFee && (
-                <p className="text-sm text-red-600">
-                  {formik.errors.subscriptionFee}
-                </p>
-              )}
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Membership Fee Payment Document
-            </Label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-              <input
-                ref={membershipDocRef}
-                type="file"
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                onChange={handleMembershipDocUpload}
-                className="hidden"
-              />
-              {formik.values.membershipFeeDocument ? (
-                <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <span className="text-sm text-gray-700">
-                    {formik.values.membershipFeeDocument.name}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      formik.setFieldValue("membershipFeeDocument", null)
-                    }
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => membershipDocRef.current?.click()}
-                  className="w-full"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Choose File
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
-        <div className="flex gap-3 flex-1">
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleSaveAndExit()}
-            className="flex-1 sm:flex-none bg-transparent"
+            type="submit"
+            disabled={isPendingMember}
+            className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
           >
-            Exit
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => handleSkip()}
-            className="flex-1 sm:flex-none"
-          >
-            Skip
+            {isPendingMember ? "Saving..." : "Save & Next"}
+            <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
-        <Button
-          type="submit"
-          disabled={isPendingMember}
-          className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
-        >
-          {isPendingMember ? "Saving..." : "Save & Next"}
-          <ChevronRight className="w-4 h-4 ml-2" />
-        </Button>
-      </div>
-    </form>
+      </form>
     </div>
   );
 }

@@ -90,6 +90,10 @@ export default function CompanionDetailsStep() {
         for (const [fieldName, messages] of Object.entries(errors)) {
           if (Array.isArray(messages) && messages.length > 0) {
             formik.setFieldError(fieldName, messages[0]);
+            if (fieldName === "member_ID") {
+              toast.error(messages[0]);
+              return;
+            }
           }
         }
         toast.error("Submission Failed");

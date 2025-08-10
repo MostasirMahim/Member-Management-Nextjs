@@ -1,5 +1,5 @@
 
-export function formatJoinedDate(date: Date) {
+export function formatJoinedDate(date: Date | string) {
   const parsedDate = typeof date === 'string' ? new Date(date) : date;
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
