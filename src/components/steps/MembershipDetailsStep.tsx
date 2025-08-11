@@ -52,12 +52,6 @@ const validationSchema = Yup.object({
     .nullable()
     .required("Anniversary date is required"),
   profile_photo: Yup.mixed().required("Profile picture is required"),
-  dueLimit: Yup.number(),
-  membershipFee: Yup.number(),
-  initialPayment: Yup.number(),
-  remainingFee: Yup.number(),
-  subscriptionFee: Yup.number(),
-  membershipFeeDocument: Yup.mixed().nullable().notRequired(),
   blood_group: Yup.string(),
   nationality: Yup.string(),
 });
@@ -148,7 +142,7 @@ export default function MembershipDetailsStep() {
     onError: (error: any) => {
       console.log("error", error?.response);
       const { message, errors, detail } = error?.response.data;
-        console.log(errors);
+      console.log(errors);
       if (errors && typeof errors === "object") {
         Object.entries(errors).forEach(([field, messages]) => {
           if (Array.isArray(messages)) {
@@ -178,12 +172,6 @@ export default function MembershipDetailsStep() {
       marital_status: "",
       anniversary_date: null as Date | null,
       profile_photo: null as File | null,
-      dueLimit: "",
-      membershipFee: "",
-      initialPayment: "",
-      remainingFee: "",
-      subscriptionFee: "",
-      membershipFeeDocument: null as File | null,
       blood_group: "",
       nationality: "Unknown",
     },
@@ -212,15 +200,6 @@ export default function MembershipDetailsStep() {
     if (!file) return;
     if (file) {
       formik.setFieldValue("profile_photo", file);
-    }
-  };
-
-  const handleMembershipDocUpload = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      formik.setFieldValue("membershipFeeDocument", file);
     }
   };
 
@@ -391,6 +370,52 @@ export default function MembershipDetailsStep() {
                 <p className="text-sm text-red-600">{formik.errors.gender}</p>
               )}
             </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Profile Picture
+              </Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                <input
+                  ref={imgRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePictureUpload}
+                  className="hidden"
+                />
+                {formik.values.profile_photo ? (
+                  <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-700">
+                      {formik.values.profile_photo.name}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        formik.setFieldValue("profile_photo", null)
+                      }
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => imgRef.current?.click()}
+                    className="w-full"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose File
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">
                 Date of Birth
@@ -484,52 +509,6 @@ export default function MembershipDetailsStep() {
                   </p>
                 )}
             </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
-                Profile Picture
-              </Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                <input
-                  ref={imgRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfilePictureUpload}
-                  className="hidden"
-                />
-                {formik.values.profile_photo ? (
-                  <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span className="text-sm text-gray-700">
-                      {formik.values.profile_photo.name}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        formik.setFieldValue("profile_photo", null)
-                      }
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => imgRef.current?.click()}
-                    className="w-full"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Choose File
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">
                 Marital Status
@@ -654,162 +633,6 @@ export default function MembershipDetailsStep() {
                   {formik.errors.nationality}
                 </p>
               )}
-            </div>
-
-            <div className="space-y-2">
-              <Label
-                htmlFor="dueLimit"
-                className="text-sm font-medium text-gray-700"
-              >
-                Due Limit
-              </Label>
-              <Input
-                id="dueLimit"
-                name="dueLimit"
-                type="number"
-                value={formik.values.dueLimit}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className="w-full"
-              />
-              {formik.touched.dueLimit && formik.errors.dueLimit && (
-                <p className="text-sm text-red-600">{formik.errors.dueLimit}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label
-                htmlFor="membershipFee"
-                className="text-sm font-medium text-gray-700"
-              >
-                Membership Fee
-              </Label>
-              <Input
-                id="membershipFee"
-                name="membershipFee"
-                type="number"
-                value={formik.values.membershipFee}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Enter membership fee"
-                className="w-full"
-              />
-              {formik.touched.membershipFee && formik.errors.membershipFee && (
-                <p className="text-sm text-red-600">
-                  {formik.errors.membershipFee}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label
-                htmlFor="initialPayment"
-                className="text-sm font-medium text-gray-700"
-              >
-                Initial Payment Received
-              </Label>
-              <Input
-                id="initialPayment"
-                name="initialPayment"
-                type="number"
-                value={formik.values.initialPayment}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Enter initial payment"
-                className="w-full"
-              />
-              {formik.touched.initialPayment &&
-                formik.errors.initialPayment && (
-                  <p className="text-sm text-red-600">
-                    {formik.errors.initialPayment}
-                  </p>
-                )}
-            </div>
-            <div className="space-y-2">
-              <Label
-                htmlFor="remainingFee"
-                className="text-sm font-medium text-gray-700"
-              >
-                Remaining Fee
-              </Label>
-              <Input
-                id="remainingFee"
-                name="remainingFee"
-                type="number"
-                value={formik.values.remainingFee}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Enter remaining fee"
-                className="w-full"
-              />
-              {formik.touched.remainingFee && formik.errors.remainingFee && (
-                <p className="text-sm text-red-600">
-                  {formik.errors.remainingFee}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label
-                htmlFor="subscriptionFee"
-                className="text-sm font-medium text-gray-700"
-              >
-                Subscription Fee
-              </Label>
-              <Input
-                id="subscriptionFee"
-                name="subscriptionFee"
-                type="number"
-                value={formik.values.subscriptionFee}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Enter subscription fee"
-                className="w-full"
-              />
-              {formik.touched.subscriptionFee &&
-                formik.errors.subscriptionFee && (
-                  <p className="text-sm text-red-600">
-                    {formik.errors.subscriptionFee}
-                  </p>
-                )}
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
-                Membership Fee Payment Document
-              </Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                <input
-                  ref={membershipDocRef}
-                  type="file"
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                  onChange={handleMembershipDocUpload}
-                  className="hidden"
-                />
-                {formik.values.membershipFeeDocument ? (
-                  <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span className="text-sm text-gray-700">
-                      {formik.values.membershipFeeDocument.name}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        formik.setFieldValue("membershipFeeDocument", null)
-                      }
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => membershipDocRef.current?.click()}
-                    className="w-full"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Choose File
-                  </Button>
-                )}
-              </div>
             </div>
           </div>
         </div>

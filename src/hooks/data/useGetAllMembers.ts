@@ -2,12 +2,12 @@ import axiosInstance from "@/lib/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-function useGetAllMembers() {
+function useGetAllMembers(page: number) {
   return useQuery({
-    queryKey: ["getAllMembers"],
+    queryKey: ["getAllMembers", page],
     queryFn: async () => {
       try {
-        const res = await axiosInstance.get("/api/member/v1/members/list/");
+        const res = await axiosInstance.get(`/api/member/v1/members/list/?page=${page}`);
         if (res?.data?.status == "success") {
           const result = res.data;
           return result;

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Search,
@@ -30,7 +29,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -42,15 +40,27 @@ import {
 import { Label } from "@/components/ui/label";
 import { LoadingDots, LoadingPage } from "@/components/ui/loading";
 import useGetAllMembers from "@/hooks/data/useGetAllMembers";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination";
 
 function AllMembers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const { data: allMembersReq, isLoading: user_isLoading } = useGetAllMembers();
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page")) || 1;
+  const { data: allMembersReq, isLoading: user_isLoading } =
+    useGetAllMembers(page);
   const allMembers = allMembersReq?.data;
-  const allMembersPages = allMembersReq?.pagination;
+  const paginationData = allMembersReq?.pagination;
+  const { current_page, total_pages } = paginationData || {};
 
   const filteredUsers =
     allMembers?.filter((user: any) => {
@@ -64,14 +74,41 @@ function AllMembers() {
   const handleMemberClick = (member_ID: string) => {
     router.push(`/member/${member_ID}`);
   };
+
+  const goToPage = (page: number) => {
+    if (page !== current_page) {
+      router.push(`?page=${page}`);
+      router.refresh();
+    }
+  };
+
+  const renderPageLinks = () => {
+    const pagesToShow = [];
+
+    for (let i = 1; i <= total_pages; i++) {
+      pagesToShow.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => goToPage(i)}
+            isActive={i === current_page}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return pagesToShow;
+  };
+
   if (user_isLoading) return <LoadingDots />;
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">ALL Members</h1>
           <p className="text-muted-foreground">
-            Total {allMembers?.length} Members
+            A list of all members in the system.
           </p>
         </div>
 
@@ -156,16 +193,40 @@ function AllMembers() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="rounded-md border my-2">
-        <Table>
+      <div className="rounded-md border my-2 font-secondary">
+        <Table className="">
           <TableHeader>
-            <TableRow className="bg-muted/50  text-center">
-              <TableHead className=" text-center">ID</TableHead>
-              <TableHead className=" text-center">User</TableHead>
-              <TableHead className=" text-center">Type</TableHead>
-              <TableHead className=" text-center">Status</TableHead>
-              <TableHead className=" text-center">Batch No.</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+            <TableRow className=" text-center font-bold h-14 bg-[#f9fafb] ">
+              <TableHead className=" text-black dark:text-white font-bold  ">
+                ID
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
+                Member
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
+                Type
+              </TableHead>
+              <TableHead className=" text-black dark:text-white font-bold">
+                Status
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
+                Batch
+              </TableHead>
+              <TableHead className=" text-black dark:text-white font-bold text-center">
+                Martial St.
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold text-center">
+                DOB
+              </TableHead>
+              <TableHead className=" text-black dark:text-white font-bold">
+                Blood Group
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold ">
+                Nationality
+              </TableHead>
+              <TableHead className="text-black dark:text-white text-right font-bold">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -183,32 +244,19 @@ function AllMembers() {
                 <TableRow
                   key={user.member_ID}
                   onClick={() => handleMemberClick(user.member_ID)}
-                  className=" text-center cursor-pointer hover:translate-y-1 transition-transform duration-300 ease-in-out "
+                  className="  cursor-pointer hover:translate-y-1 transition-transform duration-300 ease-in-out "
                 >
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium ">
                     {user.member_ID}
                   </TableCell>
-                  <TableCell className="flex justify-center items-center">
-                    <div></div>
-                    <div className="flex items-center justify-start  gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={user.profile_photo || "/user.png"}
-                          alt={user.first_name + " " + user.last_name}
-                        />
-                        <AvatarFallback>
-                          {user.first_name.charAt(0) +
-                            user.last_name.charAt(0) || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">
-                          {user.first_name + " " + user.last_name}
-                        </p>
-                        <p className="text-xs text-muted-foreground text-left">
-                          {user.institute_name}
-                        </p>
-                      </div>
+                  <TableCell className="flex justify-start items-center">
+                    <div className="space-y-1 ">
+                      <p className="font-medium text-left">
+                        {user.first_name + " " + user.last_name}
+                      </p>
+                      <p className="text-xs text-muted-foreground text-left">
+                        {user.institute_name}
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -223,6 +271,14 @@ function AllMembers() {
                     </Badge>
                   </TableCell>
                   <TableCell>{user.batch_number || "-"}</TableCell>
+                  <TableCell className="text-center">
+                    {user.marital_status || "-"}
+                  </TableCell>
+                  <TableCell>{user.date_of_birth || "-"}</TableCell>
+                  <TableCell className="text-center">
+                    {user.blood_group || "-"}
+                  </TableCell>
+                  <TableCell>{user.nationality || "-"}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -261,21 +317,38 @@ function AllMembers() {
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing <strong>1</strong> to <strong>{filteredUsers.length}</strong>{" "}
-          of <strong>{filteredUsers.length}</strong> users
-        </p>
+      {/* -- PAGINATION -- */}
+      <div className=" flex justify-center">
+        <Pagination>
+          <PaginationContent>
+            {/* Previous Button */}
+            {paginationData?.previous && (
+              <PaginationItem className="cursor-pointer">
+                <PaginationPrevious
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goToPage(current_page - 1);
+                  }}
+                />
+              </PaginationItem>
+            )}
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" disabled>
-            Next
-          </Button>
-        </div>
+            {/* Page Numbers */}
+            {renderPageLinks()}
+
+            {/* Next Button */}
+            {paginationData?.next && (
+              <PaginationItem>
+                <PaginationNext
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goToPage(current_page + 1);
+                  }}
+                />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );
