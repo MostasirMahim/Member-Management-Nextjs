@@ -28,6 +28,12 @@ import {
   SquarePen,
   ExternalLink,
   Settings,
+  HandPlatter,
+  Soup,
+  BookCheck,
+  ShoppingCart,
+  ListTodo,
+  Upload,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -226,6 +232,38 @@ const navigation = [
         icon: <Settings className="h-4 w-4" />,
         label: "View all composes",
         href: "/emails/compose/view/",
+      },
+    ],
+  },
+  {
+    icon: <HandPlatter className="h-5 w-5" />,
+    label: "Restaurant management",
+    href: "#",
+    subItems: [
+      {
+        icon: <Soup className="h-4 w-4" />,
+        label: "Restaurants",
+        href: "/restaurants/",
+      },
+      {
+        icon: <BookCheck className="h-4 w-4" />,
+        label: "Add restaurants choices",
+        href: "/restaurants/choices/",
+      },
+      {
+        icon: <ShoppingCart className="h-4 w-4" />,
+        label: "Add restaurant item",
+        href: "/restaurants/items/add/",
+      },
+      {
+        icon: <ListTodo className="h-4 w-4" />,
+        label: "Add item category",
+        href: "/restaurants/items/add/category/",
+      },
+      {
+        icon: <Upload className="h-4 w-4" />,
+        label: "Upload restaurant sales",
+        href: "/restaurants/sales/upload/",
       },
     ],
   },
