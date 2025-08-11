@@ -33,7 +33,7 @@ async function SpecificRestaurantView({ params, searchParams }: Props) {
   }
   return (
     <div>
-      <ItemTable itemsData={data} />
+      <ItemTable restaurantId={id} itemsData={data} />
     </div>
   );
 }

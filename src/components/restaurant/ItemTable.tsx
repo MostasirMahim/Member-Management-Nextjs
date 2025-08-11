@@ -28,12 +28,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, ShoppingCart, XCircle } from "lucide-react";
 import { Button } from "../ui/button";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { useRestaurantCartStore } from "@/store/restaurantStore";
 
 interface Props {
   itemsData: any;
+  restaurantId: any;
 }
 
 interface PaginationProps {
@@ -112,16 +117,89 @@ function PaginationForItems({ data }: PaginationProps) {
   );
 }
 
-function ItemTable({ itemsData }: Props) {
+function ItemTable({ itemsData, restaurantId }: Props) {
+  const [openAlert, setOpenAlert] = useState(false);
+  const [quantityInput, setQuantityInput] = useState(0);
+  const [currentItemId, setCurrentItemId] = useState(null);
+  const cart = useRestaurantCartStore((state) => state.cart);
+  const setRestaurantCart = useRestaurantCartStore(
+    (state) => state.setRestaurantCart
+  );
+  const setRestaurant = useRestaurantCartStore((state) => state.setRestaurant);
+  setRestaurant(restaurantId);
+
   const items = itemsData.data;
   const paginationData = itemsData.pagination;
 
+  const handleOpenAddToCartBox = (id: any, availability: any) => {
+    if (!availability) {
+      toast.warn("This item is not available now!");
+      return;
+    } else {
+      setCurrentItemId(id);
+      setOpenAlert(true);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (quantityInput <= 0) {
+      toast.warning("No quantity added!");
+      return;
+    }
+    const is_added = cart.find((item: any) => item.id === currentItemId);
+    if (is_added) {
+      toast.warning("Item already added!");
+      return;
+    }
+    setRestaurantCart({
+      id: currentItemId,
+      quantity: quantityInput,
+    });
+    setOpenAlert(false);
+    setQuantityInput(0);
+    toast.success("Item added to cart!");
+  };
+
   return (
     <div>
-      <div>
-        <h4 className="text-center text-2xl font-bold mb-4">
-          Items of the restaurant
-        </h4>
+      <AlertDialog open={openAlert} onOpenChange={setOpenAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Please add quantity!</AlertDialogTitle>
+            <AlertDialogDescription>
+              <Input
+                type="number"
+                placeholder="Quantity"
+                onChange={(e: any) => setQuantityInput(e.target.value)}
+              />
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleAddToCart}
+            >
+              <ShoppingCart /> Add to cart
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h4 className="text-center text-2xl font-bold mb-4">
+            Items of the restaurant
+          </h4>
+        </div>
+        <div>
+          {cart.length > 0 && (
+            <Button>
+              {" "}
+              <ShoppingCart />
+              Checkout ({cart.length})
+            </Button>
+          )}
+        </div>
       </div>
       <div className="grid w-full [&>div]:max-h-[300px] [&>div]:border [&>div]:rounded">
         <Table>
@@ -167,7 +245,13 @@ function ItemTable({ itemsData }: Props) {
                 <TableCell>${item.unit_cost}</TableCell>
                 <TableCell>${item.selling_price}</TableCell>
                 <TableCell>
-                  <Button>Buy</Button>
+                  <Button
+                    onClick={() =>
+                      handleOpenAddToCartBox(item.id, item.availability)
+                    }
+                  >
+                    Buy
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
