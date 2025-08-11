@@ -49,11 +49,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../ui/pagination";
+import { useAddMemberStore } from "@/store/store";
 
 function AllMembers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const {setMemberID} = useAddMemberStore()
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page")) || 1;
   const { data: allMembersReq, isLoading: user_isLoading } =
@@ -72,7 +74,7 @@ function AllMembers() {
     }) || [];
   const router = useRouter();
   const handleMemberClick = (member_ID: string) => {
-    router.push(`/member/${member_ID}`);
+    router.push(`/member/view/${member_ID}`);
   };
 
   const goToPage = (page: number) => {
@@ -99,6 +101,10 @@ function AllMembers() {
     }
 
     return pagesToShow;
+  };
+  const handleUpdate = (member_ID: string) => {
+    setMemberID(member_ID);
+    router.push(`/member/update/${member_ID}`);
   };
 
   if (user_isLoading) return <LoadingDots />;
@@ -243,13 +249,18 @@ function AllMembers() {
               filteredUsers.map((user: any) => (
                 <TableRow
                   key={user.member_ID}
-                  onClick={() => handleMemberClick(user.member_ID)}
                   className="  cursor-pointer hover:translate-y-1 transition-transform duration-300 ease-in-out "
                 >
-                  <TableCell className="font-medium ">
+                  <TableCell
+                    className="font-medium "
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
                     {user.member_ID}
                   </TableCell>
-                  <TableCell className="flex justify-start items-center">
+                  <TableCell
+                    className="flex justify-start items-center"
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
                     <div className="space-y-1 ">
                       <p className="font-medium text-left">
                         {user.first_name + " " + user.last_name}
@@ -259,10 +270,10 @@ function AllMembers() {
                       </p>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
                     <p>{user.membership_type}</p>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
                     <Badge
                       variant={"default"}
                       className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
@@ -270,15 +281,27 @@ function AllMembers() {
                       {user.membership_status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{user.batch_number || "-"}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    {user.batch_number || "-"}
+                  </TableCell>
+                  <TableCell
+                    className="text-center"
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
                     {user.marital_status || "-"}
                   </TableCell>
-                  <TableCell>{user.date_of_birth || "-"}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    {user.date_of_birth || "-"}
+                  </TableCell>
+                  <TableCell
+                    className="text-center"
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
                     {user.blood_group || "-"}
                   </TableCell>
-                  <TableCell>{user.nationality || "-"}</TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    {user.nationality || "-"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -289,8 +312,11 @@ function AllMembers() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="gap-2">
-                          <Pencil className="h-4 w-4" /> Edit
+                        <DropdownMenuItem
+                          className="gap-2"
+                          onClick={() => handleUpdate(user.member_ID)}
+                        >
+                          <Pencil className="h-4 w-4" /> Update
                         </DropdownMenuItem>
                         <DropdownMenuItem className="gap-2">
                           {true ? (

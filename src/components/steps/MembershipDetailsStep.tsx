@@ -34,8 +34,9 @@ import { useMutation } from "@tanstack/react-query";
 
 import { LoadingCard, LoadingDots } from "../ui/loading";
 import { useAddMemberStore } from "@/store/store";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
   member_ID: Yup.string().required("Member ID is required"),
@@ -57,7 +58,6 @@ const validationSchema = Yup.object({
 });
 
 export default function MembershipDetailsStep() {
-  const membershipDocRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const {
     currentStep,
@@ -65,9 +65,14 @@ export default function MembershipDetailsStep() {
     nextStep,
     markStepCompleted,
     setMemberID,
+    memberID,
   } = useAddMemberStore();
-
+  const path = usePathname();
+  const isUpdateMode = path?.startsWith("/member/update/");
   const { data: choiceSections, isLoading } = useGetAllChoice();
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID);
+  const { member_info: memberData } = data ?? {};
+
   const {
     membership_type,
     institute_name,
@@ -157,39 +162,95 @@ export default function MembershipDetailsStep() {
       }
     },
   });
+  const { mutate: updateMember, isPending: isUpdating } = useMutation({
+    mutationFn: async (userData: any) => {
+      const formData = new FormData();
+      Object.entries(userData).forEach(([key, value]) => {
+        formData.append(key, value as any);
+      });
+
+      const res = await axiosInstance.patch(
+        `/api/member/v1/members/${memberID}/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Member updated successfully");
+    },
+    onError: (error: any) => {
+      toast.error("Update failed");
+    },
+  });
 
   const formik = useFormik({
-    initialValues: {
-      member_ID: "",
-      first_name: "",
-      last_name: "",
-      gender: "",
-      date_of_birth: null as Date | null,
-      institute_name: "",
-      batch_number: "",
-      membership_status: "",
-      membership_type: "",
-      marital_status: "",
-      anniversary_date: null as Date | null,
-      profile_photo: null as File | null,
-      blood_group: "",
-      nationality: "Unknown",
-    },
+    enableReinitialize: true,
+    initialValues:
+      isUpdateMode && memberData
+        ? {
+            member_ID: memberData.member_ID || "",
+            first_name: memberData.first_name || "",
+            last_name: memberData.last_name || "",
+            gender: memberData.gender?.name || "",
+            date_of_birth: memberData.date_of_birth || null,
+            institute_name: memberData.institute_name?.name || "",
+            batch_number: memberData.batch_number || "",
+            membership_status: memberData.membership_status?.name || "",
+            membership_type: memberData.membership_type?.name || "",
+            marital_status: memberData.marital_status?.name || "",
+            anniversary_date: memberData.anniversary_date || null,
+            profile_photo: null,
+            blood_group: memberData.blood_group || "",
+            nationality: memberData.nationality || "Unknown",
+          }
+        : {
+            member_ID: "",
+            first_name: "",
+            last_name: "",
+            gender: "",
+            date_of_birth: null,
+            institute_name: "",
+            batch_number: "",
+            membership_status: "",
+            membership_type: "",
+            marital_status: "",
+            anniversary_date: null,
+            profile_photo: null,
+            blood_group: "",
+            nationality: "Unknown",
+          },
     validationSchema,
     onSubmit: (values) => {
-      createMember(values);
+      if (isUpdateMode) {
+        updateMember(values);
+      } else {
+        createMember(values);
+      }
     },
   });
 
   useEffect(() => {
-    if (formik.values.membership_type && formik.values.institute_name) {
+    if (
+      formik.values.membership_type &&
+      formik.values.institute_name &&
+      !isUpdateMode
+    ) {
       const data = {
         membership_type: formik.values.membership_type,
         institute_name: formik.values.institute_name,
       };
       generateID(data);
     }
-  }, [formik.values.membership_type, formik.values.institute_name]);
+  }, [
+    formik.values.membership_type,
+    formik.values.institute_name,
+    isUpdateMode,
+  ]);
 
   const imgRef = useRef<HTMLInputElement>(null);
   const handleProfilePictureUpload = (
@@ -241,7 +302,7 @@ export default function MembershipDetailsStep() {
               />
               {formik.touched.member_ID && formik.errors.member_ID && (
                 <p className="text-sm text-red-600">
-                  {formik.errors.member_ID}
+                  {formik.errors.member_ID as string}
                 </p>
               )}
             </div>
@@ -270,7 +331,7 @@ export default function MembershipDetailsStep() {
               {formik.touched.membership_type &&
                 formik.errors.membership_type && (
                   <p className="text-sm text-red-600">
-                    {formik.errors.membership_type}
+                    {formik.errors.membership_type as string}
                   </p>
                 )}
             </div>
@@ -299,7 +360,7 @@ export default function MembershipDetailsStep() {
               {formik.touched.institute_name &&
                 formik.errors.institute_name && (
                   <p className="text-sm text-red-600">
-                    {formik.errors.institute_name}
+                    {formik.errors.institute_name as string}
                   </p>
                 )}
             </div>
@@ -321,7 +382,7 @@ export default function MembershipDetailsStep() {
               />
               {formik.touched.first_name && formik.errors.first_name && (
                 <p className="text-sm text-red-600">
-                  {formik.errors.first_name}
+                  {formik.errors.first_name as string}
                 </p>
               )}
             </div>
@@ -343,7 +404,7 @@ export default function MembershipDetailsStep() {
               />
               {formik.touched.last_name && formik.errors.last_name && (
                 <p className="text-sm text-red-600">
-                  {formik.errors.last_name}
+                  {formik.errors.last_name as string}
                 </p>
               )}
             </div>
@@ -367,7 +428,9 @@ export default function MembershipDetailsStep() {
                 </SelectContent>
               </Select>
               {formik.touched.gender && formik.errors.gender && (
-                <p className="text-sm text-red-600">{formik.errors.gender}</p>
+                <p className="text-sm text-red-600">
+                  {formik.errors.gender as string}
+                </p>
               )}
             </div>
 
@@ -386,7 +449,9 @@ export default function MembershipDetailsStep() {
                 {formik.values.profile_photo ? (
                   <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                     <span className="text-sm text-gray-700">
-                      {formik.values.profile_photo.name}
+                      {formik.values.profile_photo
+                        ? "File Chosen"
+                        : "No file chosen"}
                     </span>
                     <Button
                       type="button"
@@ -455,7 +520,7 @@ export default function MembershipDetailsStep() {
               </Popover>
               {formik.touched.date_of_birth && formik.errors.date_of_birth && (
                 <p className="text-sm text-red-600">
-                  {formik.errors.date_of_birth}
+                  {formik.errors.date_of_birth as string}
                 </p>
               )}
             </div>
@@ -477,7 +542,7 @@ export default function MembershipDetailsStep() {
               />
               {formik.touched.batch_number && formik.errors.batch_number && (
                 <p className="text-sm text-red-600">
-                  {formik.errors.batch_number}
+                  {formik.errors.batch_number as string}
                 </p>
               )}
             </div>
@@ -505,7 +570,7 @@ export default function MembershipDetailsStep() {
               {formik.touched.membership_status &&
                 formik.errors.membership_status && (
                   <p className="text-sm text-red-600">
-                    {formik.errors.membership_status}
+                    {formik.errors.membership_status as string}
                   </p>
                 )}
             </div>
@@ -533,7 +598,7 @@ export default function MembershipDetailsStep() {
               {formik.touched.marital_status &&
                 formik.errors.marital_status && (
                   <p className="text-sm text-red-600">
-                    {formik.errors.marital_status}
+                    {formik.errors.marital_status as string}
                   </p>
                 )}
             </div>
@@ -601,7 +666,7 @@ export default function MembershipDetailsStep() {
               </Select>
               {formik.touched.blood_group && formik.errors.blood_group && (
                 <p className="text-sm text-red-600">
-                  {formik.errors.blood_group}
+                  {formik.errors.blood_group as string}
                 </p>
               )}
             </div>
@@ -630,7 +695,7 @@ export default function MembershipDetailsStep() {
               </Select>
               {formik.touched.nationality && formik.errors.nationality && (
                 <p className="text-sm text-red-600">
-                  {formik.errors.nationality}
+                  {formik.errors.nationality as string}
                 </p>
               )}
             </div>

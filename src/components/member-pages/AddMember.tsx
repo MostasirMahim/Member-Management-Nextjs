@@ -16,6 +16,8 @@ import DescendantsDetailsStep from "../steps/DescendantsDetailsStep";
 import SpecialDaysStep from "../steps/SpecialDaysStep";
 import { useAddMemberStore } from "@/store/store";
 import JobDetailsStep from "../steps/JobDetailsStep";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const stepTitles = [
   "Membership Details",
@@ -33,14 +35,29 @@ const stepTitles = [
 ];
 
 export default function AddMember() {
-  const { currentStep, completedSteps, totalSteps, setCurrentStep } =
-    useAddMemberStore();
+  const {
+    currentStep,
+    completedSteps,
+    totalSteps,
+    memberID,
+    setCurrentStep,
+    setMemberID,
+  } = useAddMemberStore();
+  const router = useRouter();
+  const path = usePathname();
+  const params = useParams();
+  const isUpdatePage = path?.startsWith("/member/update/");
+
+  useEffect(() => {
+    if (!memberID && isUpdatePage && params.id) {
+      setMemberID(params.id as string);
+    }
+  }, [isUpdatePage, params.id, memberID]);
 
   const handleStepClick = (stepIndex: number) => {
     setCurrentStep(stepIndex);
   };
 
-  //MAY COUSE HIEGHT OVERFLOW CAUSES --CHECKED NOT
   const renderStep = () => {
     const stepComponents = [
       <MembershipDetailsStep key="membership" />,
@@ -66,7 +83,20 @@ export default function AddMember() {
       <div className="mx-auto">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Add New Member</h1>
+            <h1 className="text-2xl font-bold">
+              {isUpdatePage ? (
+                <p>
+                  Update Member{" "}
+                  <span className="font-secondary text-lg text-sky-500">
+                    #{memberID}
+                  </span>
+                </p>
+              ) : (
+                <p>
+                  Add New Member <span>{memberID}</span>
+                </p>
+              )}
+            </h1>
             <Badge variant="secondary" className="text-sm">
               Step {currentStep + 1} of {totalSteps}
             </Badge>
