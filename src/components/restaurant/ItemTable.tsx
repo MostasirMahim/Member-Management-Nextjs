@@ -32,9 +32,10 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { CheckCircle, ShoppingCart, XCircle } from "lucide-react";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRestaurantCartStore } from "@/store/restaurantStore";
+import Link from "next/link";
 
 interface Props {
   itemsData: any;
@@ -122,11 +123,16 @@ function ItemTable({ itemsData, restaurantId }: Props) {
   const [quantityInput, setQuantityInput] = useState(0);
   const [currentItemId, setCurrentItemId] = useState(null);
   const cart = useRestaurantCartStore((state) => state.cart);
+  const restaurant = useRestaurantCartStore((state) => state.restaurant);
   const setRestaurantCart = useRestaurantCartStore(
     (state) => state.setRestaurantCart
   );
+  const clearCart = useRestaurantCartStore((state) => state.clearCart);
   const setRestaurant = useRestaurantCartStore((state) => state.setRestaurant);
   setRestaurant(restaurantId);
+  if (restaurantId !== restaurant) {
+    clearCart();
+  }
 
   const items = itemsData.data;
   const paginationData = itemsData.pagination;
@@ -151,9 +157,14 @@ function ItemTable({ itemsData, restaurantId }: Props) {
       toast.warning("Item already added!");
       return;
     }
+    const selectedItem = items.find((item: any) => item.id === currentItemId);
+
     setRestaurantCart({
       id: currentItemId,
       quantity: quantityInput,
+      name: selectedItem.name,
+      unit_cost: selectedItem.unit_cost,
+      selling_price: selectedItem.selling_price,
     });
     setOpenAlert(false);
     setQuantityInput(0);
@@ -193,11 +204,12 @@ function ItemTable({ itemsData, restaurantId }: Props) {
         </div>
         <div>
           {cart.length > 0 && (
-            <Button>
-              {" "}
-              <ShoppingCart />
-              Checkout ({cart.length})
-            </Button>
+            <Link href="/restaurants/checkout/">
+              <Button>
+                <ShoppingCart />
+                Checkout ({cart.length})
+              </Button>
+            </Link>
           )}
         </div>
       </div>
