@@ -2,16 +2,21 @@ import RestaurantCheckoutForm from "@/components/restaurant/RestaurantCheckoutFo
 import axiosInstance from "@/lib/axiosInstance";
 import { cookies } from "next/headers";
 
-async function RestaurantItemCheckoutPage() {
+interface Props {
+  searchParams: Promise<{ page?: string }>;
+}
+
+async function RestaurantItemCheckoutPage({ searchParams }: Props) {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
-
+  let { page } = await searchParams;
+  page = page || "1";
   let memberData = {};
   let promoCodeData = {};
 
   try {
     const [memberRes, promoCodeRes] = await Promise.all([
-      axiosInstance.get("/api/member/v1/members/list/", {
+      axiosInstance.get(`/api/member/v1/members/list/?page=${page}`, {
         headers: {
           Cookie: `access_token=${authToken}`,
         },
