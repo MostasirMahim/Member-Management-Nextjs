@@ -30,13 +30,14 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { LoadingCard, LoadingDots } from "../ui/loading";
 import { useAddMemberStore } from "@/store/store";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import useGetMember from "@/hooks/data/useGetMember";
+import { getNames } from "country-list";
 
 const validationSchema = Yup.object({
   member_ID: Yup.string().required("Member ID is required"),
@@ -59,6 +60,7 @@ const validationSchema = Yup.object({
 
 export default function MembershipDetailsStep() {
   const router = useRouter();
+  const countries = getNames();
   const {
     currentStep,
     setCurrentStep,
@@ -72,6 +74,7 @@ export default function MembershipDetailsStep() {
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { data, isLoading: isLoadingMember } = useGetMember(memberID);
   const { member_info: memberData } = data ?? {};
+  const querClient = useQueryClient();
 
   const {
     membership_type,
@@ -136,10 +139,11 @@ export default function MembershipDetailsStep() {
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-        formik.resetForm();
+        querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(
           data.message || "Membership has been successfully added."
         );
+        formik.resetForm();
         markStepCompleted(currentStep);
         nextStep();
       }
@@ -181,53 +185,79 @@ export default function MembershipDetailsStep() {
       return res.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message || "Member updated successfully");
+      if (data?.status === "success") {
+        querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Membership Updated Successfully.");
+        formik.resetForm();
+      }
     },
     onError: (error: any) => {
-      toast.error("Update failed");
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response.data;
+      console.log(errors);
+      if (errors && typeof errors === "object") {
+        Object.entries(errors).forEach(([field, messages]) => {
+          if (Array.isArray(messages)) {
+            formik.setFieldError(field, messages[0]);
+          }
+        });
+        toast.error(message || detail || "Validation failed.");
+      } else {
+        toast.error(
+          detail || message || "An error occurred during submission."
+        );
+      }
     },
   });
+
+  console.log(memberData);
+  //Placholder ISSUE : Intial value not recieved Int id for String..
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
       isUpdateMode && memberData
         ? {
+            id: memberData.id,
             member_ID: memberData.member_ID || "",
             first_name: memberData.first_name || "",
             last_name: memberData.last_name || "",
-            gender: memberData.gender?.name || "",
+            gender: memberData.gender?.id || "",
             date_of_birth: memberData.date_of_birth || null,
             institute_name: memberData.institute_name?.name || "",
             batch_number: memberData.batch_number || "",
-            membership_status: memberData.membership_status?.name || "",
+            membership_status: memberData.membership_status?.id || "",
             membership_type: memberData.membership_type?.name || "",
-            marital_status: memberData.marital_status?.name || "",
+            marital_status: memberData.marital_status?.id || "",
             anniversary_date: memberData.anniversary_date || null,
-            profile_photo: null,
+            profile_photo: null as File | null,
             blood_group: memberData.blood_group || "",
-            nationality: memberData.nationality || "Unknown",
+            nationality: memberData.nationality || "",
           }
         : {
             member_ID: "",
             first_name: "",
             last_name: "",
             gender: "",
-            date_of_birth: null,
+            date_of_birth: null as Date | null,
             institute_name: "",
             batch_number: "",
             membership_status: "",
             membership_type: "",
             marital_status: "",
-            anniversary_date: null,
-            profile_photo: null,
+            anniversary_date: null as Date | null,
+            profile_photo: null as File | null,
             blood_group: "",
-            nationality: "Unknown",
+            nationality: "",
           },
-    validationSchema,
+    validationSchema: isUpdateMode ? Yup.object({}) : validationSchema,
     onSubmit: (values) => {
       if (isUpdateMode) {
-        updateMember(values);
+        if (values.id) {
+          updateMember(values);
+        } else {
+          toast.error("Updation ID not found");
+        }
       } else {
         createMember(values);
       }
@@ -251,6 +281,9 @@ export default function MembershipDetailsStep() {
     formik.values.institute_name,
     isUpdateMode,
   ]);
+
+  console.log("values", formik.values);
+  console.log("errors", formik.errors);
 
   const imgRef = useRef<HTMLInputElement>(null);
   const handleProfilePictureUpload = (
@@ -318,7 +351,9 @@ export default function MembershipDetailsStep() {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="What's Member Type?" />
+                  <SelectValue>
+                    {formik.values.membership_type || "Choose Membership Type"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {membership_type?.map((choice: any, index: number) => (
@@ -417,7 +452,13 @@ export default function MembershipDetailsStep() {
                 onValueChange={(value) => formik.setFieldValue("gender", value)}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Gender" />
+                  <SelectValue placeholder="Gender">
+                    {formik.values.gender
+                      ? gender?.find(
+                          (choice: any) => choice.id == formik.values.gender
+                        )?.name
+                      : "Choose Gender"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {gender?.map((choice: any, index: number) => (
@@ -450,7 +491,7 @@ export default function MembershipDetailsStep() {
                   <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                     <span className="text-sm text-gray-700">
                       {formik.values.profile_photo
-                        ? "File Chosen"
+                        ? formik.values.profile_photo?.name
                         : "No file chosen"}
                     </span>
                     <Button
@@ -476,6 +517,11 @@ export default function MembershipDetailsStep() {
                   </Button>
                 )}
               </div>
+              {formik.touched.profile_photo && formik.errors.profile_photo && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.profile_photo as string}
+                </p>
+              )}
             </div>
           </div>
 
@@ -676,21 +722,22 @@ export default function MembershipDetailsStep() {
               </Label>
               <Select
                 value={formik.values.nationality}
-                disabled
                 onValueChange={(value) =>
                   formik.setFieldValue("nationality", value)
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="What is his/her Nationality?" />
+                  <SelectValue>
+                    {formik.values.nationality ??
+                      "What is his/her Nationality?"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bangladeshi">Bangladeshi</SelectItem>
-                  <SelectItem value="indian">Indian</SelectItem>
-                  <SelectItem value="pakistani">Pakistani</SelectItem>
-                  <SelectItem value="american">American</SelectItem>
-                  <SelectItem value="british">British</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  {countries?.map((name: any, index: number) => (
+                    <SelectItem key={index} value={name}>
+                      {name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {formik.touched.nationality && formik.errors.nationality && (
@@ -724,10 +771,10 @@ export default function MembershipDetailsStep() {
           </div>
           <Button
             type="submit"
-            disabled={isPendingMember}
+            disabled={isPendingMember || isUpdating}
             className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
           >
-            {isPendingMember ? "Saving..." : "Save & Next"}
+            {isPendingMember || isUpdating ? "Saving..." : "Save & Next"}
             <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
