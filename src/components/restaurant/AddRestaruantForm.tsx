@@ -63,6 +63,8 @@ export default function AddRestaurantForm({
       booking_fees_per_seat: "",
       cuisine_type: "",
       restaurant_type: "",
+      "reset-button-0": "",
+      "submit-button-0": "",
     },
   });
 
@@ -549,8 +551,6 @@ export default function AddRestaurantForm({
                   <FormControl>
                     <Select
                       key="select-0"
-                      id="cuisine_type"
-                      className=""
                       {...field}
                       onValueChange={field.onChange}
                     >
@@ -589,8 +589,6 @@ export default function AddRestaurantForm({
                   <FormControl>
                     <Select
                       key="select-1"
-                      id="restaurant_type"
-                      className=""
                       {...field}
                       onValueChange={field.onChange}
                     >

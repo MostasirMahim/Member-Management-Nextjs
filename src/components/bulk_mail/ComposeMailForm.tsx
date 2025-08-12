@@ -210,8 +210,6 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
                   <FormControl>
                     <Select
                       key="select-0"
-                      id="mail_config_selector"
-                      className=""
                       {...field}
                       onValueChange={field.onChange}
                     >
@@ -276,8 +274,6 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
                   <FormControl>
                     <Select
                       key="select-1"
-                      id="group_selector"
-                      className=""
                       {...field}
                       onValueChange={field.onChange}
                     >
