@@ -4,42 +4,38 @@ import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CalendarIcon, ChevronRight, Plus, Trash2 } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { ChevronRight, Plus, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
+import axiosInstance from "@/lib/axiosInstance";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
-import { toast } from "react-toastify";
-import { useMutation } from "@tanstack/react-query";
-import axiosInstance from "@/lib/axiosInstance";
 
 const validationSchema = Yup.object({
   data: Yup.array()
     .of(
       Yup.object({
-        title: Yup.string().required("Special day title is required"),
-        date: Yup.date().required("Special day date is required"),
+        title: Yup.string().required("Job title is required"),
+        organization_name: Yup.string().required(
+          "Organization name is required"
+        ),
+        location: Yup.string().required("Location is required"),
       })
     )
-    .min(1, "At least one special day is required"),
+    .min(1, "At least one job detail is required"),
 });
 
 const initialValues = {
   data: [
     {
       title: "",
-      date: null as Date | null,
+      organization_name: "",
+      location: "",
     },
   ],
 };
 
-export default function SpecialDaysStep() {
+export default function JobDetailsStep() {
   const router = useRouter();
   const {
     currentStep,
@@ -50,10 +46,10 @@ export default function SpecialDaysStep() {
     setMemberID,
   } = useAddMemberStore();
 
-  const { mutate: addSpecialDayFunc, isPending } = useMutation({
+  const { mutate: addJobDetailsFunc, isPending } = useMutation({
     mutationFn: async (userData: any) => {
       const res = await axiosInstance.post(
-        `/api/member/v1/members/special_day/`,
+        `/api/member/v1/members/job/`,
         userData
       );
       return res.data;
@@ -61,9 +57,7 @@ export default function SpecialDaysStep() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         formik.resetForm();
-        toast.success(
-          data.message || "Special day has been successfully added."
-        );
+        toast.success(data.message || "Job Detail has been added.");
         markStepCompleted(currentStep);
         nextStep();
       }
@@ -110,36 +104,34 @@ export default function SpecialDaysStep() {
     initialValues,
     validationSchema,
     onSubmit: (values) => {
-      console.log("Special Days Form submitted:", values);
       const data = {
         member_ID: memberID || "GM0001-PU",
         data: values.data,
       };
-      addSpecialDayFunc(data);
+      addJobDetailsFunc(data);
     },
   });
 
-  const addSpecialDay = () => {
-    const newSpecialDay = {
+  const addJob = () => {
+    const newJob = {
       title: "",
-      date: null as Date | null,
+      organization_name: "",
+      location: "",
     };
-    const updatedSpecialDays = [...formik.values.data, newSpecialDay];
-    formik.setFieldValue("data", updatedSpecialDays);
+    const updatedJobs = [...formik.values.data, newJob];
+    formik.setFieldValue("data", updatedJobs);
   };
 
-  const removeSpecialDay = (index: number) => {
+  const removeJob = (index: number) => {
     if (formik.values.data.length > 1) {
-      const updatedSpecialDays = formik.values.data.filter(
-        (_, i) => i !== index
-      );
-      formik.setFieldValue("data", updatedSpecialDays);
+      const updatedJobs = formik.values.data.filter((_, i) => i !== index);
+      formik.setFieldValue("data", updatedJobs);
     } else {
-      toast.error("At least one special day is required");
+      toast.error("At least one job detail is required");
     }
   };
 
-  const updateSpecialDay = (index: number, field: string, value: any) => {
+  const updateJob = (index: number, field: string, value: any) => {
     formik.setFieldValue(`data.${index}.${field}`, value);
   };
 
@@ -157,18 +149,18 @@ export default function SpecialDaysStep() {
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <div className="space-y-6">
-        {formik.values.data.map((specialDay: any, index: number) => (
+        {formik.values.data.map((job: any, index: number) => (
           <div key={index} className="border rounded-lg p-4 space-y-4 relative">
             {formik.values.data.length > 1 && (
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-medium text-gray-900">
-                  Special Day {index + 1}
+                  Job Detail {index + 1}
                 </h3>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => removeSpecialDay(index)}
+                  onClick={() => removeJob(index)}
                   className="text-red-600 hover:text-red-700"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -176,16 +168,15 @@ export default function SpecialDaysStep() {
               </div>
             )}
             <div className="grid gap-4 md:grid-cols-1">
+              {/* Job Title */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700">
-                  Special Day Title
+                  Job Title
                 </Label>
                 <Input
-                  placeholder="Special Day Name"
-                  value={specialDay.title}
-                  onChange={(e) =>
-                    updateSpecialDay(index, "title", e.target.value)
-                  }
+                  placeholder="Enter Job Title"
+                  value={job.title}
+                  onChange={(e) => updateJob(index, "title", e.target.value)}
                   onBlur={formik.handleBlur}
                   name={`data.${index}.title`}
                   className="w-full"
@@ -198,48 +189,49 @@ export default function SpecialDaysStep() {
                     </p>
                   )}
               </div>
+
+              {/* Organization Name */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700">
-                  Select Special Day
+                  Organization Name
                 </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !specialDay.date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {specialDay.date
-                        ? format(specialDay.date, "PPP")
-                        : "Choose date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={
-                        formik.values.data[index].date
-                          ? new Date(formik.values.data[index].date)
-                          : undefined
-                      }
-                      onSelect={(date) => {
-                        if (date) {
-                          const formattedDate = format(date, "yyyy-MM-dd");
-                          updateSpecialDay(index, "date", formattedDate);
-                        }
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <Input
+                  placeholder="Enter Organization Name"
+                  value={job.organization_name}
+                  onChange={(e) =>
+                    updateJob(index, "organization_name", e.target.value)
+                  }
+                  onBlur={formik.handleBlur}
+                  name={`data.${index}.organization_name`}
+                  className="w-full"
+                />
                 {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index]?.date &&
-                  formik.touched.data?.[index]?.date && (
+                  formik.errors.data?.[index]?.organization_name &&
+                  formik.touched.data?.[index]?.organization_name && (
                     <p className="text-sm text-red-600">
-                      {formik.errors.data[index].date as string}
+                      {formik.errors.data[index].organization_name}
+                    </p>
+                  )}
+              </div>
+
+              {/* Location */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Location
+                </Label>
+                <Input
+                  placeholder="Enter Location"
+                  value={job.location}
+                  onChange={(e) => updateJob(index, "location", e.target.value)}
+                  onBlur={formik.handleBlur}
+                  name={`data.${index}.location`}
+                  className="w-full"
+                />
+                {typeof formik.errors.data?.[index] === "object" &&
+                  formik.errors.data?.[index]?.location &&
+                  formik.touched.data?.[index]?.location && (
+                    <p className="text-sm text-red-600">
+                      {formik.errors.data[index].location}
                     </p>
                   )}
               </div>
@@ -253,10 +245,10 @@ export default function SpecialDaysStep() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={addSpecialDay}
+            onClick={addJob}
             className="gap-2 bg-transparent"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 mr-2" />
             Add Another
           </Button>
         </div>
