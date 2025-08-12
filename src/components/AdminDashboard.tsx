@@ -260,7 +260,7 @@ const navigation = [
         label: "View Products",
         href: "/products",
       },
-      
+
       {
         icon: <List className="h-4 w-4" />,
         label: "Categories",
@@ -305,6 +305,10 @@ const navigation = [
         icon: <BadgeDollarSign className="h-4 w-4" />,
         label: "Prices",
         href: "/products/prices/",
+      },
+    ],
+  },
+  {
     icon: <HandPlatter className="h-5 w-5" />,
     label: "Restaurant management",
     href: "#",
@@ -363,9 +367,7 @@ const navigation = [
       },
     ],
   },
-]
-},
-]
+];
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -530,8 +532,7 @@ const NavItem = ({
                   variant="ghost"
                   className={cn(
                     "w-full justify-start gap-3 h-9 px-3 text-sm",
-                    pathname === item.href &&
-                      "bg-accent text-accent-foreground"
+                    pathname === item.href && "bg-accent text-accent-foreground"
                   )}
                 >
                   {item.icon}
@@ -595,9 +596,6 @@ const NavItem = ({
     </Link>
   );
 };
-
-
-
 
 function AdminDashboard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
