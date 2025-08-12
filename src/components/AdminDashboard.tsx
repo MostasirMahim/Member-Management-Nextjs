@@ -36,6 +36,8 @@ import {
   Upload,
   PercentCircle,
   Code,
+  TicketCheck,
+  TicketPlus,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -283,6 +285,16 @@ const navigation = [
         icon: <Code className="h-4 w-4" />,
         label: "View all promo codes",
         href: "/promo_codes/",
+      },
+      {
+        icon: <TicketCheck className="h-4 w-4" />,
+        label: "promo codes category",
+        href: "/promo_codes/categories/",
+      },
+      {
+        icon: <TicketPlus className="h-4 w-4" />,
+        label: "Add category",
+        href: "/promo_codes/categories/add/",
       },
     ],
   },
