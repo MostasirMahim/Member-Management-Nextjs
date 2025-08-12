@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -5,7 +6,7 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardContent
+  CardContent,
 } from "@/components/ui/card";
 import {
   Table,
@@ -13,26 +14,42 @@ import {
   TableRow,
   TableHead,
   TableBody,
-  TableCell
+  TableCell,
 } from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical, Pencil, Trash2, Eye, Package } from "lucide-react";
-
+import {
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Eye,
+  Package,
+} from "lucide-react";
+import { SearchFilterSection } from "@/components/products/SearchFilterSection";
 import Link from "next/link";
+import Image from "next/image";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Media {
   id: number;
   image: string;
   is_active: boolean;
 }
-
 
 interface Product {
   id: number;
@@ -62,28 +79,71 @@ interface Props {
 }
 
 export default function ProductTable({ products }: Props) {
-  
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const formatBDTime = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleString("en-BD", {
-      timeZone: "Asia/Dhaka",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  };
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const searchQuery = searchParams.get("search") || "";
+  const selectedCategory = searchParams.get("category") || "all";
+  const selectedBrand = searchParams.get("brand") || "all";
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
+
+  const itemsPerPage = 10;
+
+  // Filter products
+  const filteredProducts = products.data.filter((p) => {
+    if (
+      searchQuery &&
+      !p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+      return false;
+    if (selectedCategory !== "all" && p.category !== selectedCategory)
+      return false;
+    if (selectedBrand !== "all" && p.brand !== selectedBrand) return false;
+    return true;
+  });
+
+  // Pagination calc
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+  // currentPage validate
+  const currentPage = pageParam > totalPages ? 1 : pageParam;
+
+  // Slice data for current page
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const goToPage = (page: number) => {
+  if (page < 1 || page > totalPages) return;
+
+  const params = new URLSearchParams(Array.from(searchParams.entries()));
+  params.set("page", page.toString());
+
+  router.push(`?${params.toString()}`);
+};
 
   return (
     <Card className="shadow-md border rounded-2xl bg-white">
-      <CardHeader className="flex flex-row items-center gap-2">
-        <Package className="h-6 w-6 opacity-75" />
-        <CardTitle className="text-xl font-bold opacity-75">
-          All Products
-        </CardTitle>
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-row items-center gap-2">
+          <Package className="h-6 w-6 opacity-75" />
+          <CardTitle className="text-xl font-bold opacity-75">
+            All Products
+          </CardTitle>
+        </div>
+
+        {/* Filter & Search Section */}
+        <SearchFilterSection
+          filterOptions={{
+            categories: Array.from(
+              new Set(products.data.map((p) => p.category))
+            ),
+            brands: Array.from(new Set(products.data.map((p) => p.brand))),
+          }}
+        />
       </CardHeader>
+
       <CardContent>
         <Table className="w-full text-sm text-gray-700">
           <TableHeader className="bg-gray-100">
@@ -97,55 +157,33 @@ export default function ProductTable({ products }: Props) {
               <TableHead className="text-gray-600">Status</TableHead>
               <TableHead className="text-gray-600">Category</TableHead>
               <TableHead className="text-gray-600">Brand</TableHead>
-              <TableHead className="text-right text-gray-500">
-                Actions
-              </TableHead>
+              <TableHead className="text-right text-gray-500">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.data?.map((prod) => (
+            {paginatedProducts.map((prod) => (
               <TableRow
                 key={prod.id}
                 className="hover:bg-indigo-50 transition-all duration-200"
               >
-                {/* Product Image */}
-                {/* <TableCell className="flex gap-2">
-                    {prod.media && prod.media.length > 0 ? (
-                        prod.media.map((m) => (
-                        <img
-                            key={m.id}
-                            src={m.image }
-                            alt={prod.name}
-                            className="w-14 h-14 rounded-md object-cover border"
-                        />
-                        ))
-                    ) : (
-                        <img
-                        src="/placeholder.png"
-                        alt="No image"
-                        className="w-14 h-14 rounded-md object-cover border"
-                        />
-                    )}
-                </TableCell> */}
                 <TableCell>
-                  <img
-                    src={prod.media[0]?.image || "/placeholder.png"}
+                  <Image
+                    src={`http://127.0.0.1:8000/${prod.media[0]?.image}` || "/placeholder.png"}
                     alt={prod.name}
+                    width={56}
+                    height={56}
                     className="w-14 h-14 rounded-md object-cover border"
                   />
                 </TableCell>
 
-                {/* Name */}
                 <TableCell className="font-semibold text-gray-900">
                   {prod.name}
                 </TableCell>
 
-                {/* Price */}
                 <TableCell className="font-medium text-gray-800">
                   ${prod.price}
                 </TableCell>
 
-                {/* Discount */}
                 <TableCell>
                   {parseFloat(prod.discount_rate) > 0 ? (
                     <Badge className="bg-yellow-500 text-white">
@@ -158,23 +196,18 @@ export default function ProductTable({ products }: Props) {
                   )}
                 </TableCell>
 
-                {/* Stock */}
                 <TableCell>
                   {prod.quantity_in_stock > 0 ? (
                     <Badge className="bg-green-500 text-white">
                       {prod.quantity_in_stock} in stock
                     </Badge>
                   ) : (
-                    <Badge className="bg-red-500 text-white">
-                      Out of stock
-                    </Badge>
+                    <Badge className="bg-red-500 text-white">Out of stock</Badge>
                   )}
                 </TableCell>
 
-                {/* SKU */}
                 <TableCell className="text-gray-600">{prod.sku}</TableCell>
 
-                {/* Status */}
                 <TableCell>
                   <Badge
                     className={
@@ -187,17 +220,10 @@ export default function ProductTable({ products }: Props) {
                   </Badge>
                 </TableCell>
 
-                {/* Category */}
-                <TableCell>
-                    {prod.category}
-                </TableCell>
+                <TableCell>{prod.category}</TableCell>
 
-                {/* Brand */}
-                <TableCell>
-                    {prod.brand}
-                </TableCell>
+                <TableCell>{prod.brand}</TableCell>
 
-                {/* Actions */}
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -212,12 +238,12 @@ export default function ProductTable({ products }: Props) {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
                         <Link
-                            href={`/products/${prod.id}`} 
-                            className="flex items-center text-indigo-600 hover:bg-indigo-100 cursor-pointer"
+                          href={`/products/${prod.id}`}
+                          className="flex items-center text-indigo-600 hover:bg-indigo-100 cursor-pointer"
                         >
-                            <Eye className="mr-2 h-4 w-4" /> View
+                          <Eye className="mr-2 h-4 w-4" /> View
                         </Link>
-                    </DropdownMenuItem>
+                      </DropdownMenuItem>
                       <DropdownMenuItem className="text-indigo-600 hover:bg-indigo-100 cursor-pointer">
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
@@ -231,6 +257,32 @@ export default function ProductTable({ products }: Props) {
             ))}
           </TableBody>
         </Table>
+
+        {/* Pagination */}
+        <Pagination className="mt-4 justify-center flex">
+          <PaginationPrevious
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          />
+          <PaginationContent>
+            {Array.from({ length: totalPages }).map((_, i) => {
+              const page = i + 1;
+              return (
+                <PaginationItem
+                  key={page}
+                  onClick={() => goToPage(page)}
+                  active={page === currentPage}
+                >
+                  <PaginationLink>{page}</PaginationLink>
+                </PaginationItem>
+              );
+            })}
+          </PaginationContent>
+          <PaginationNext
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          />
+        </Pagination>
       </CardContent>
     </Card>
   );
