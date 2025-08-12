@@ -34,6 +34,10 @@ import {
   ShoppingCart,
   ListTodo,
   Upload,
+  PercentCircle,
+  Code,
+  TicketCheck,
+  TicketPlus,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -264,6 +268,33 @@ const navigation = [
         icon: <Upload className="h-4 w-4" />,
         label: "Upload restaurant sales",
         href: "/restaurants/sales/upload/",
+      },
+      {
+        icon: <ShoppingCart className="h-4 w-4" />,
+        label: "View cart",
+        href: "/restaurants/checkout/",
+      },
+    ],
+  },
+  {
+    icon: <PercentCircle className="h-5 w-5" />,
+    label: "Promo code management",
+    href: "#",
+    subItems: [
+      {
+        icon: <Code className="h-4 w-4" />,
+        label: "View all promo codes",
+        href: "/promo_codes/",
+      },
+      {
+        icon: <TicketCheck className="h-4 w-4" />,
+        label: "promo codes category",
+        href: "/promo_codes/categories/",
+      },
+      {
+        icon: <TicketPlus className="h-4 w-4" />,
+        label: "Add category",
+        href: "/promo_codes/categories/add/",
       },
     ],
   },

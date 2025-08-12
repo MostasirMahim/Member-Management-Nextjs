@@ -1,6 +1,4 @@
 "use client";
-
-import { useRouter, useSearchParams } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -15,48 +13,52 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { ALargeSmall } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "react-toastify";
 
-function AddChoiceForRestaurant() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const state = searchParams.get("state");
+export default function AddCategoryPage() {
   const form = useForm({
     defaultValues: {
       name: "",
       "submit-button-0": "",
     },
   });
-  const { reset } = form;
+  const { setError } = form;
 
   async function onSubmit(values: any) {
     try {
-      if (state == "category") {
-        const response = await axiosInstance.post(
-          "/api/restaurants/v1/restaurants/categories/",
-          values
-        );
-        if (response.status == 201) {
-          toast.success("Category added successfully");
-          reset();
-        }
-      } else if (state == "cuisine") {
-        const response = await axiosInstance.post(
-          "/api/restaurants/v1/restaurants/cusines/",
-          values
-        );
-        if (response.status == 201) {
-          toast.success("cuisine added successfully");
-          reset();
-        }
-      } else {
-        toast.error("Something went wrong");
-        router.back();
+      const response = await axiosInstance.post(
+        "/api/promo_code/v1/promo_codes/categories/",
+        values
+      );
+      if (response.status == 200) {
+        toast.success("Added promo code category successfully");
+        form.reset();
+        form.clearErrors();
       }
     } catch (error: any) {
       console.log(error);
+      if (error.response?.data?.errors) {
+        const errors = error.response.data.errors;
+
+        // Field specific errors
+        for (const key in errors) {
+          if (key !== "non_field_errors") {
+            setError(key as any, {
+              type: "server",
+              message: errors[key][0],
+            });
+          }
+        }
+
+        // Non-field errors (e.g. general form errors)
+        if (errors.non_field_errors) {
+          setError("root", {
+            type: "server",
+            message: errors.non_field_errors.join(" "),
+          });
+        }
+      }
       toast.error(error?.response?.data?.message || "Something went wrong");
     }
   }
@@ -69,7 +71,9 @@ function AddChoiceForRestaurant() {
   return (
     <div>
       <div>
-        <h4 className="text-center font-bold">Add choice of {state}</h4>
+        <h4 className="text-center font-bold text-3xl">
+          Add promo code category
+        </h4>
       </div>
       <Form {...form}>
         <form
@@ -81,16 +85,17 @@ function AddChoiceForRestaurant() {
             <FormField
               control={form.control}
               name="name"
+              rules={{ required: true }}
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                  <FormLabel className="flex shrink-0">Name</FormLabel>
+                  <FormLabel className="flex shrink-0">Category name</FormLabel>
 
                   <div className="w-full">
                     <FormControl>
                       <div className="relative w-full">
                         <Input
                           key="text-input-0"
-                          placeholder="Name"
+                          placeholder="Eg: event, restaurant"
                           type="text"
                           id="name"
                           className=" ps-9"
@@ -105,7 +110,7 @@ function AddChoiceForRestaurant() {
                         </div>
                       </div>
                     </FormControl>
-                    <FormDescription>Enter name of the choice</FormDescription>
+                    <FormDescription>Enter promo code category</FormDescription>
                     <FormMessage />
                   </div>
                 </FormItem>
@@ -143,5 +148,3 @@ function AddChoiceForRestaurant() {
     </div>
   );
 }
-
-export default AddChoiceForRestaurant;

@@ -25,24 +25,18 @@ import {
 import { Button } from "@/components/ui/button";
 
 export default function RestaurantSalesUploadPage() {
-  const formSchema = z.object({
-    excel_file: z.string().min(1, { message: "This field is required" }),
-    restaurant: z.string(),
-    income_particular: z.string(),
-    received_from: z.string(),
-  });
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
       excel_file: "",
       restaurant: "",
       income_particular: "",
       received_from: "",
+      "reset-button-0": "",
+      "submit-button-0": "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: any) {
     console.log(values);
   }
 
@@ -105,8 +99,6 @@ export default function RestaurantSalesUploadPage() {
                   <FormControl>
                     <Select
                       key="select-0"
-                      id="restaurant"
-                      className=""
                       {...field}
                       onValueChange={field.onChange}
                     >
@@ -143,8 +135,6 @@ export default function RestaurantSalesUploadPage() {
                   <FormControl>
                     <Select
                       key="select-1"
-                      id="income_particular"
-                      className=""
                       {...field}
                       onValueChange={field.onChange}
                     >
@@ -181,8 +171,6 @@ export default function RestaurantSalesUploadPage() {
                   <FormControl>
                     <Select
                       key="select-2"
-                      id="received_from"
-                      className=""
                       {...field}
                       onValueChange={field.onChange}
                     >
