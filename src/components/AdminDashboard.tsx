@@ -265,6 +265,11 @@ const navigation = [
         label: "Upload restaurant sales",
         href: "/restaurants/sales/upload/",
       },
+      {
+        icon: <ShoppingCart className="h-4 w-4" />,
+        label: "View cart",
+        href: "/restaurants/checkout/",
+      },
     ],
   },
 ];
