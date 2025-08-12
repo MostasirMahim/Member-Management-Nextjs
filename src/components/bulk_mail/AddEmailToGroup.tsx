@@ -194,8 +194,6 @@ export default function EmailAddToGroupForm({ data }: Props) {
                     <FormControl>
                       <Select
                         key="group"
-                        id="group"
-                        className=""
                         value={field.value}
                         onValueChange={field.onChange}
                         defaultValue={field.value}

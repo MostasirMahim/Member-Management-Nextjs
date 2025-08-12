@@ -46,6 +46,8 @@ function RestaurantItemAddForm({ restaurantData, categoriesData }: Props) {
       selling_price: 0,
       category: "",
       restaurant: "",
+      "reset-button-0": "",
+      "submit-button-0": "",
     },
   });
   const { setError } = form;
@@ -184,7 +186,6 @@ function RestaurantItemAddForm({ restaurantData, categoriesData }: Props) {
                       </div>
                       <Switch
                         id="availability"
-                        {...field}
                         checked={field.value}
                         onCheckedChange={field.onChange}
                       />
@@ -312,8 +313,6 @@ function RestaurantItemAddForm({ restaurantData, categoriesData }: Props) {
                   <FormControl>
                     <Select
                       key="select-0"
-                      id="category"
-                      className=""
                       {...field}
                       onValueChange={field.onChange}
                     >
@@ -350,8 +349,6 @@ function RestaurantItemAddForm({ restaurantData, categoriesData }: Props) {
                   <FormControl>
                     <Select
                       key="select-1"
-                      id="restaurant"
-                      className=""
                       {...field}
                       onValueChange={field.onChange}
                     >

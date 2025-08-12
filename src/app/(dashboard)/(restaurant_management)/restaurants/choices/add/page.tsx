@@ -26,6 +26,7 @@ function AddChoiceForRestaurant() {
   const form = useForm({
     defaultValues: {
       name: "",
+      "submit-button-0": "",
     },
   });
   const { reset } = form;
