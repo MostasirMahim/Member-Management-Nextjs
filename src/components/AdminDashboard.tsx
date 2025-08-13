@@ -38,6 +38,7 @@ import {
   Code,
   TicketCheck,
   TicketPlus,
+  CirclePlus,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -285,6 +286,11 @@ const navigation = [
         icon: <Code className="h-4 w-4" />,
         label: "View all promo codes",
         href: "/promo_codes/",
+      },
+      {
+        icon: <CirclePlus className="h-4 w-4" />,
+        label: "Add promo code",
+        href: "/promo_codes/add/",
       },
       {
         icon: <TicketCheck className="h-4 w-4" />,
