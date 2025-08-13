@@ -68,14 +68,14 @@ export default function MembershipDetailsStep() {
     markStepCompleted,
     setMemberID,
     memberID,
+    isUpdateMode,
   } = useAddMemberStore();
-  const path = usePathname();
-  const isUpdateMode = path?.startsWith("/member/update/");
+    const querClient = useQueryClient();
   const { data: choiceSections, isLoading } = useGetAllChoice();
-  const { data, isLoading: isLoadingMember } = useGetMember(memberID);
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
   const { member_info: memberData } = data ?? {};
-  const querClient = useQueryClient();
-
   const {
     membership_type,
     institute_name,
@@ -170,9 +170,10 @@ export default function MembershipDetailsStep() {
     mutationFn: async (userData: any) => {
       const formData = new FormData();
       Object.entries(userData).forEach(([key, value]) => {
-        formData.append(key, value as any);
+        if (value != null) {
+          formData.append(key, value as any);
+        }
       });
-
       const res = await axiosInstance.patch(
         `/api/member/v1/members/${memberID}/`,
         formData,
@@ -188,7 +189,6 @@ export default function MembershipDetailsStep() {
       if (data?.status === "success") {
         querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Membership Updated Successfully.");
-        formik.resetForm();
       }
     },
     onError: (error: any) => {
@@ -210,9 +210,6 @@ export default function MembershipDetailsStep() {
     },
   });
 
-  console.log(memberData);
-  //Placholder ISSUE : Intial value not recieved Int id for String..
-
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
@@ -222,13 +219,13 @@ export default function MembershipDetailsStep() {
             member_ID: memberData.member_ID || "",
             first_name: memberData.first_name || "",
             last_name: memberData.last_name || "",
-            gender: memberData.gender?.id || "",
+            gender: memberData.gender?.name || "",
             date_of_birth: memberData.date_of_birth || null,
             institute_name: memberData.institute_name?.name || "",
             batch_number: memberData.batch_number || "",
-            membership_status: memberData.membership_status?.id || "",
+            membership_status: memberData.membership_status?.name || "",
             membership_type: memberData.membership_type?.name || "",
-            marital_status: memberData.marital_status?.id || "",
+            marital_status: memberData.marital_status?.name || "",
             anniversary_date: memberData.anniversary_date || null,
             profile_photo: null as File | null,
             blood_group: memberData.blood_group || "",
@@ -281,9 +278,6 @@ export default function MembershipDetailsStep() {
     formik.values.institute_name,
     isUpdateMode,
   ]);
-
-  console.log("values", formik.values);
-  console.log("errors", formik.errors);
 
   const imgRef = useRef<HTMLInputElement>(null);
   const handleProfilePictureUpload = (

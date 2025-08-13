@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
   data: Yup.array()
@@ -37,6 +38,8 @@ const initialValues = {
 
 export default function EmergencyContactStep() {
   const router = useRouter();
+  const queryClient = useQueryClient(); // <CHANGE> Added queryClient
+
   const {
     currentStep,
     setCurrentStep,
@@ -44,7 +47,13 @@ export default function EmergencyContactStep() {
     markStepCompleted,
     memberID,
     setMemberID,
+    isUpdateMode,
   } = useAddMemberStore();
+
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const { emergency_contact: memberData } = data ?? {};
 
   const { mutate: addEmergencyContactFunc, isPending } = useMutation({
     mutationFn: async (userData: any) => {
@@ -102,15 +111,93 @@ export default function EmergencyContactStep() {
     },
   });
 
+  const { mutate: updateEmergencyContactFunc, isPending: isUpdating } =
+    useMutation({
+      mutationFn: async (userData: any) => {
+        const res = await axiosInstance.patch(
+          `/api/member/v1/members/emergency_contact/${memberID}`,
+          userData
+        );
+        return res.data;
+      },
+      onSuccess: (data) => {
+        if (data?.status === "success") {
+          queryClient.invalidateQueries({
+            queryKey: ["useGetMember", memberID],
+          });
+          toast.success(
+            data.message || "Emergency Contact has been successfully updated."
+          );
+        }
+      },
+      onError: (error: any) => {
+        console.log("error", error?.response);
+        const { message, errors, detail } = error?.response?.data || {};
+        if (errors?.data && Array.isArray(errors.data)) {
+          const contactsErrors = errors.data;
+          contactsErrors.forEach(
+            (contactErrorObj: any, contactIndex: number) => {
+              if (contactErrorObj && typeof contactErrorObj === "object") {
+                for (const [fieldName, messages] of Object.entries(
+                  contactErrorObj
+                )) {
+                  if (Array.isArray(messages) && messages.length > 0) {
+                    const fieldPath = `data.${contactIndex}.${fieldName}`;
+                    formik.setFieldError(fieldPath, messages[0]);
+                  }
+                }
+              }
+            }
+          );
+        }
+        if (errors && typeof errors === "object") {
+          const otherErrorKeys = Object.keys(errors).filter(
+            (key) => key !== "data"
+          );
+
+          if (otherErrorKeys.length > 0) {
+            const firstKey = otherErrorKeys[0];
+            const messages = errors[firstKey];
+
+            if (Array.isArray(messages) && messages.length > 0) {
+              toast.error(messages[0]);
+              return;
+            }
+          }
+        }
+
+        toast.error(detail || message || "Submission Failed");
+      },
+    });
+
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    initialValues:
+      isUpdateMode && memberData
+        ? {
+            data: memberData.map((c: any) => ({
+              id: c.id || 0,
+              contact_name: c.contact_name || "",
+              contact_number: c.contact_number || "",
+              relation_with_member: c.relation_with_member || "",
+            })),
+          }
+        : initialValues,
     validationSchema,
     onSubmit: (values) => {
+      if (!memberID) {
+        toast.error("No Member ID found. Please start from member creation.");
+        return;
+      }
       const data = {
-        member_ID: memberID || "GM0001-PU",
+        member_ID: memberID,
         data: values.data,
       };
-      addEmergencyContactFunc(data);
+      if (isUpdateMode) {
+        updateEmergencyContactFunc(data);
+      } else {
+        addEmergencyContactFunc(data);
+      }
     },
   });
 
@@ -126,7 +213,9 @@ export default function EmergencyContactStep() {
 
   const removeEmergencyContact = (index: number) => {
     if (formik.values.data.length > 1) {
-      const updatedContacts = formik.values.data.filter((_, i) => i !== index);
+      const updatedContacts = formik.values.data.filter(
+        (_: any, i: any) => i !== index
+      );
       formik.setFieldValue("data", updatedContacts);
     } else {
       toast.error("At least one emergency contact is required");
@@ -188,11 +277,10 @@ export default function EmergencyContactStep() {
                   name={`data.${index}.contact_name`}
                   className="w-full"
                 />
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index]?.contact_name &&
-                  formik.touched.data?.[index]?.contact_name && (
+                {(formik.touched.data as any[])?.[index]?.contact_name &&
+                  (formik.errors.data as any[])?.[index]?.contact_name && (
                     <p className="text-sm text-red-600">
-                      {formik.errors.data[index].contact_name}
+                      {(formik.errors.data as any[])?.[index]?.contact_name}
                     </p>
                   )}
               </div>
@@ -215,11 +303,10 @@ export default function EmergencyContactStep() {
                   name={`data.${index}.contact_number`}
                   className="w-full"
                 />
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index]?.contact_number &&
-                  formik.touched.data?.[index]?.contact_number && (
+                {(formik.touched.data as any[])?.[index]?.contact_number &&
+                  (formik.errors.data as any[])?.[index]?.contact_number && (
                     <p className="text-sm text-red-600">
-                      {formik.errors.data[index].contact_number}
+                      {(formik.errors.data as any[])?.[index]?.contact_number}
                     </p>
                   )}
               </div>
@@ -241,11 +328,15 @@ export default function EmergencyContactStep() {
                   name={`data.${index}.relation_with_member`}
                   className="w-full"
                 />
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index]?.relation_with_member &&
-                  formik.touched.data?.[index]?.relation_with_member && (
+                {(formik.touched.data as any[])?.[index]
+                  ?.relation_with_member &&
+                  (formik.errors.data as any[])?.[index]
+                    ?.relation_with_member && (
                     <p className="text-sm text-red-600">
-                      {formik.errors.data[index].relation_with_member}
+                      {
+                        (formik.errors.data as any[])?.[index]
+                          ?.relation_with_member
+                      }
                     </p>
                   )}
               </div>
@@ -289,10 +380,10 @@ export default function EmergencyContactStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
-          {isPending ? "Saving..." : "Save & Next"}
+          {isPending || isUpdating ? "Saving..." : "Save & Next"}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

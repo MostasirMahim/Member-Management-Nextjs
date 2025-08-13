@@ -17,8 +17,9 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
+import useGetMember from "@/hooks/data/useGetMember";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoadingCard } from "../ui/loading";
 
 const validationSchema = Yup.object({
@@ -47,6 +48,7 @@ const initialValues = {
 
 export default function EmailDetailsStep() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const {
     currentStep,
     setCurrentStep,
@@ -54,9 +56,17 @@ export default function EmailDetailsStep() {
     markStepCompleted,
     memberID,
     setMemberID,
+    isUpdateMode,
   } = useAddMemberStore();
+
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { email_type } = choiceSections ?? {};
+
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const { email_address: memberData } = data ?? {};
+
   const { mutate: addEmailFunc, isPending } = useMutation({
     mutationFn: async (userData: any) => {
       const res = await axiosInstance.post(
@@ -67,10 +77,11 @@ export default function EmailDetailsStep() {
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-        formik.resetForm();
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Email has been successfully added.");
         markStepCompleted(currentStep);
         nextStep();
+        formik.resetForm();
       }
     },
     onError: (error: any) => {
@@ -96,33 +107,97 @@ export default function EmailDetailsStep() {
         const otherErrorKeys = Object.keys(errors).filter(
           (key) => key !== "data"
         );
-
         if (otherErrorKeys.length > 0) {
           const firstKey = otherErrorKeys[0];
           const messages = errors[firstKey];
-
           if (Array.isArray(messages) && messages.length > 0) {
             toast.error(messages[0]);
             return;
           }
         }
       }
+      toast.error(detail || message || "Submission Failed");
+    },
+  });
 
+  const { mutate: updateEmailFunc, isPending: isUpdating } = useMutation({
+    mutationFn: async (userData: any) => {
+      const res = await axiosInstance.patch(
+        `/api/member/v1/members/email_address/${memberID}/`,
+        userData
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Email has been successfully updated.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+      if (errors?.data && Array.isArray(errors.data)) {
+        const contactsErrors = errors.data;
+        contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+          if (contactErrorObj && typeof contactErrorObj === "object") {
+            for (const [fieldName, messages] of Object.entries(
+              contactErrorObj
+            )) {
+              if (Array.isArray(messages) && messages.length > 0) {
+                const fieldPath = `data.${contactIndex}.${fieldName}`;
+                formik.setFieldError(fieldPath, messages[0]);
+              }
+            }
+          }
+        });
+      }
+
+      if (errors && typeof errors === "object") {
+        const otherErrorKeys = Object.keys(errors).filter(
+          (key) => key !== "data"
+        );
+        if (otherErrorKeys.length > 0) {
+          const firstKey = otherErrorKeys[0];
+          const messages = errors[firstKey];
+          if (Array.isArray(messages) && messages.length > 0) {
+            toast.error(messages[0]);
+            return;
+          }
+        }
+      }
       toast.error(detail || message || "Submission Failed");
     },
   });
 
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    initialValues:
+      isUpdateMode && memberData
+        ? {
+            data: memberData?.map((email: any) => ({
+              id: email.id || 0,
+              email_type: email.email_type.id || 0,
+              email: email.email || "",
+              is_primary: email.is_primary || false,
+            })),
+          }
+        : initialValues,
     validationSchema,
     onSubmit: (values) => {
-      const data = {
-        member_ID: memberID || "GM0001-PU",
-        data: values.data,
-      };
-      addEmailFunc(data);
+      if (!memberID) {
+        toast.error("No Member ID found. Please start from member creation.");
+        return;
+      }
+      const payload = { member_ID: memberID, data: values.data };
+      if (isUpdateMode) {
+        updateEmailFunc(payload);
+      } else {
+        addEmailFunc(payload);
+      }
     },
   });
+  console.log("formik", formik.values);
 
   const addEmail = () => {
     const newEmail = {
@@ -130,14 +205,15 @@ export default function EmailDetailsStep() {
       email: "",
       is_primary: false,
     };
-    const updatedEmails = [...formik.values.data, newEmail];
-    formik.setFieldValue("data", updatedEmails);
+    formik.setFieldValue("data", [...formik.values.data, newEmail]);
   };
 
   const removeEmail = (index: number) => {
     if (formik.values.data.length > 1) {
-      const updatedEmails = formik.values.data.filter((_, i) => i !== index);
-      formik.setFieldValue("data", updatedEmails);
+      formik.setFieldValue(
+        "data",
+        formik.values.data.filter((_: any, i: any) => i !== index)
+      );
     } else {
       toast.error("At least one email is required");
     }
@@ -145,16 +221,18 @@ export default function EmailDetailsStep() {
 
   const updateEmail = (index: number, field: string, value: any) => {
     if (field === "is_primary" && value === true) {
-      const updatedEmails = formik.values.data.map((email, i) => ({
-        ...email,
-        is_primary: i === index ? true : false,
-      }));
-      formik.setFieldValue("data", updatedEmails);
+      formik.setFieldValue(
+        "data",
+        formik.values.data.map((email: any, i: any) => ({
+          ...email,
+          is_primary: i === index,
+        }))
+      );
     } else {
       formik.setFieldValue(`data.${index}.${field}`, value);
     }
   };
-  //Button Functions
+
   const handleSkip = () => {
     nextStep();
   };
@@ -219,12 +297,10 @@ export default function EmailDetailsStep() {
                     ))}
                   </SelectContent>
                 </Select>
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index] !== null &&
-                  (formik.errors.data[index] as any).email_type &&
-                  formik.touched.data?.[index]?.email_type && (
+                {(formik.touched.data as any[])?.[index]?.email_type &&
+                  (formik.errors.data as any[])?.[index]?.email_type && (
                     <p className="text-sm text-red-600">
-                      {(formik.errors.data[index] as any).email_type}
+                      {(formik.errors.data as any[])?.[index]?.email_type}
                     </p>
                   )}
               </div>
@@ -241,12 +317,10 @@ export default function EmailDetailsStep() {
                   name={`data.${index}.email`}
                   className="w-full"
                 />
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index] !== null &&
-                  (formik.errors.data[index] as any).email &&
-                  formik.touched.data?.[index]?.email && (
+                {(formik.touched.data as any[])?.[index]?.email &&
+                  (formik.errors.data as any[])?.[index]?.email && (
                     <p className="text-sm text-red-600">
-                      {(formik.errors.data[index] as any).email}
+                      {(formik.errors.data as any[])?.[index]?.email}
                     </p>
                   )}
               </div>
@@ -278,13 +352,12 @@ export default function EmailDetailsStep() {
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
         <div className="flex gap-3 flex-1">
           <Button
             type="button"
             variant="outline"
-            onClick={() => handleSaveAndExit()}
+            onClick={handleSaveAndExit}
             className="flex-1 sm:flex-none bg-transparent"
           >
             Exit
@@ -292,7 +365,7 @@ export default function EmailDetailsStep() {
           <Button
             type="button"
             variant="ghost"
-            onClick={() => handleSkip()}
+            onClick={handleSkip}
             className="flex-1 sm:flex-none"
           >
             Skip
@@ -300,10 +373,11 @@ export default function EmailDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isUpdating} // 🆕 disable during update
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
-          {isPending ? "Saving..." : "Save & Next"}
+          {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
+          {/* 🆕 show Saving on update */}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

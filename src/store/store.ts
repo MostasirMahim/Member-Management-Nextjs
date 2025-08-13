@@ -180,12 +180,14 @@ interface StepStore {
   completedSteps: number[];
   totalSteps: number;
   memberID: string;
+  isUpdateMode: boolean;
   setMemberID: (memberID: string) => void;
   setCurrentStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
   markStepCompleted: (step: number) => void;
   resetSteps: () => void;
+  setIsUpdateMode: (value: boolean) => void;
 }
 
 export const useAddMemberStore = create<StepStore>((set, get) => ({
@@ -193,8 +195,10 @@ export const useAddMemberStore = create<StepStore>((set, get) => ({
   completedSteps: [],
   totalSteps: 12,
   memberID: "",
+  isUpdateMode: false,
 
   setMemberID: (memberID: string) => set({ memberID }),
+  setIsUpdateMode: (value: boolean) => set({ isUpdateMode: value }),
 
   setCurrentStep: (step: number) => {
     const { totalSteps } = get();

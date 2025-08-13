@@ -48,8 +48,10 @@ export default function ContactDetailsStep() {
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { contact_type } = choiceSections ?? {};
 
-  const { data, isLoading: isLoadingMember } = useGetMember(memberID);
-  const { contact_info: memberData } = data ?? {};
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const {contact_info: memberData} = data ?? {};
 
   const querClient = useQueryClient();
 
@@ -121,7 +123,6 @@ export default function ContactDetailsStep() {
         console.log(data);
         querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Contact has been successfully updated.");
-        formik.resetForm();
       }
     },
     onError: (error: any) => {

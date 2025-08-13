@@ -42,6 +42,7 @@ export default function AddMember() {
     memberID,
     setCurrentStep,
     setMemberID,
+    setIsUpdateMode,
   } = useAddMemberStore();
   const router = useRouter();
   const path = usePathname();
@@ -49,6 +50,7 @@ export default function AddMember() {
   const isUpdatePage = path?.startsWith("/member/update/");
 
   useEffect(() => {
+    setIsUpdateMode(isUpdatePage);
     if (!memberID && isUpdatePage && params.id) {
       setMemberID(params.id as string);
     }
