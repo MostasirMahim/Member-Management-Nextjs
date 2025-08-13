@@ -120,7 +120,7 @@ const navigation = [
       },
       {
         icon: <Edit className="h-4 w-4" />,
-        label: "Viwes",
+        label: "Views",
         href: "/dues/view",
       },
     ],
@@ -177,16 +177,8 @@ const navigation = [
       },
     ],
   },
-  {
-    icon: <Users className="h-5 w-5" />,
-    label: "All Users",
-    href: "/users",
-  },
-  {
-    icon: <Users className="h-5 w-5" />,
-    label: "All Groups",
-    href: "/groups",
-  },
+  { icon: <Users className="h-5 w-5" />, label: "All Users", href: "/users" },
+  { icon: <Users className="h-5 w-5" />, label: "All Groups", href: "/groups" },
   {
     icon: <Users className="h-5 w-5" />,
     label: "Add Choices",
@@ -204,13 +196,13 @@ const navigation = [
   },
   {
     icon: <Logs className="h-5 w-5" />,
-    label: "My activity logs",
+    label: "My Activity Logs",
     href: "/activity_logs/my",
   },
-  ,
+
   {
     icon: <Mails className="h-5 w-5" />,
-    label: "Email management",
+    label: "Email Management",
     href: "#",
     subItems: [
       {
@@ -225,12 +217,12 @@ const navigation = [
       },
       {
         icon: <BetweenHorizonalStart className="h-4 w-4" />,
-        label: "Add email to group",
+        label: "Add Email to Group",
         href: "/emails/add_email/",
       },
       {
         icon: <SquarePen className="h-4 w-4" />,
-        label: "Compose email",
+        label: "Compose Email",
         href: "/emails/compose/",
       },
       {
@@ -240,11 +232,12 @@ const navigation = [
       },
       {
         icon: <Settings className="h-4 w-4" />,
-        label: "View all composes",
+        label: "View All Composes",
         href: "/emails/compose/view/",
       },
     ],
   },
+
   {
     icon: <Package className="h-5 w-5" />,
     label: "Products Management",
@@ -278,7 +271,6 @@ const navigation = [
           },
         ],
       },
-
       {
         icon: <List className="h-4 w-4" />,
         label: "Brands",
@@ -286,7 +278,7 @@ const navigation = [
         subItems: [
           {
             icon: <Plus className="h-3 w-3" />,
-            label: "Add brand",
+            label: "Add Brand",
             href: "/products/brands/add/",
           },
           {
@@ -297,20 +289,45 @@ const navigation = [
         ],
       },
       {
-        icon: <Image className="h-4 w-4" />,
+        icon: <List className="h-4 w-4" />,
         label: "Media",
-        href: "/products/media/",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Media",
+            href: "/products/media/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Media",
+            href: "/products/media/",
+          },
+        ],
       },
       {
         icon: <BadgeDollarSign className="h-4 w-4" />,
         label: "Prices",
-        href: "/products/prices/",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Product Price",
+            href: "/products/prices/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Product Price",
+            href: "/products/prices/",
+          },
+        ],
       },
     ],
   },
+
   {
     icon: <HandPlatter className="h-5 w-5" />,
-    label: "Restaurant management",
+    label: "Restaurant Management",
     href: "#",
     subItems: [
       {
@@ -320,52 +337,54 @@ const navigation = [
       },
       {
         icon: <BookCheck className="h-4 w-4" />,
-        label: "Add restaurants choices",
+        label: "Add Restaurants Choices",
         href: "/restaurants/choices/",
       },
       {
         icon: <ShoppingCart className="h-4 w-4" />,
-        label: "Add restaurant item",
+        label: "Add Restaurant Item",
         href: "/restaurants/items/add/",
       },
       {
         icon: <ListTodo className="h-4 w-4" />,
-        label: "Add item category",
+        label: "Add Item Category",
         href: "/restaurants/items/add/category/",
       },
       {
         icon: <Upload className="h-4 w-4" />,
-        label: "Upload restaurant sales",
+        label: "Upload Restaurant Sales",
         href: "/restaurants/sales/upload/",
       },
       {
         icon: <ShoppingCart className="h-4 w-4" />,
-        label: "View cart",
+        label: "View Cart",
         href: "/restaurants/checkout/",
       },
     ],
   },
+
   {
     icon: <PercentCircle className="h-5 w-5" />,
-    label: "Promo code management",
+    label: "Promo Code Management",
     href: "#",
     subItems: [
       {
         icon: <Code className="h-4 w-4" />,
-        label: "View all promo codes",
-        href: "/promo_codes/",
+        label: "Add Promo Code",
+        href: "/promo-codes/add/",
       },
       {
         icon: <TicketCheck className="h-4 w-4" />,
-        label: "promo codes category",
-        href: "/promo_codes/categories/",
+        label: "View Promo Codes",
+        href: "/promo-codes/view/",
       },
       {
         icon: <TicketPlus className="h-4 w-4" />,
-        label: "Add category",
-        href: "/promo_codes/categories/add/",
+        label: "Add Promo Code Category",
+        href: "/promo-codes/categories/add/",
       },
     ],
+    
   },
 ];
 

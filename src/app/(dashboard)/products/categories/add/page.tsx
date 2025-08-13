@@ -1,7 +1,6 @@
 
-import AddCategory from "@/components/products/categories/AddCategory";
+import ProductAddForm from "@/components/products/ProductAddForm";
 export default function Page() {
-  return  <AddCategory/>
+  return  <ProductAddForm/>
 
-  
 }
