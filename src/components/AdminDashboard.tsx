@@ -302,6 +302,11 @@ const navigation = [
         label: "Add category",
         href: "/promo_codes/categories/add/",
       },
+      {
+        icon: <Eye className="h-4 w-4" />,
+        label: "View applied promo codes",
+        href: "/promo_codes/applied_promo_codes/",
+      },
     ],
   },
 ];
