@@ -22,8 +22,7 @@ export default async function ProductsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* User Input (select box etc) */}
-      {/* <CategorySelect categories={categories} /> */}
+     
 
       {/* Show in Table */}
       <ProductTable products={products} />

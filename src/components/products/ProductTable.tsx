@@ -90,7 +90,7 @@ export default function ProductTable({ products }: Props) {
   const itemsPerPage = 10;
 
   // Filter products
-  const filteredProducts = products.data.filter((p) => {
+  const filteredProducts = products?.data?.filter((p) => {
     if (
       searchQuery &&
       !p.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -103,13 +103,13 @@ export default function ProductTable({ products }: Props) {
   });
 
   // Pagination calc
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredProducts?.length / itemsPerPage);
 
   // currentPage validate
   const currentPage = pageParam > totalPages ? 1 : pageParam;
 
   // Slice data for current page
-  const paginatedProducts = filteredProducts.slice(
+  const paginatedProducts = filteredProducts?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -137,9 +137,9 @@ export default function ProductTable({ products }: Props) {
         <SearchFilterSection
           filterOptions={{
             categories: Array.from(
-              new Set(products.data.map((p) => p.category))
+              new Set(products?.data?.map((p) => p.category))
             ),
-            brands: Array.from(new Set(products.data.map((p) => p.brand))),
+            brands: Array.from(new Set(products?.data?.map((p) => p.brand))),
           }}
         />
       </CardHeader>
