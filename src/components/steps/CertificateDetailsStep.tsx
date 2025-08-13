@@ -11,7 +11,9 @@ import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query"; // <CHANGE> Added useQueryClient
+// <CHANGE> Added useGetMember import
+import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
   data: Yup.array()
@@ -33,6 +35,8 @@ const validationSchema = Yup.object({
 export default function CertificateDetailsStep() {
   const fileInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const router = useRouter();
+  const queryClient = useQueryClient(); 
+
   const {
     currentStep,
     setCurrentStep,
@@ -40,109 +44,222 @@ export default function CertificateDetailsStep() {
     markStepCompleted,
     memberID,
     setMemberID,
+    isUpdateMode, 
   } = useAddMemberStore();
 
- const { mutate: addCertificateFunc, isPending } = useMutation({
-  mutationFn: async (userData: any[]) => {
-    const errors: Record<string, string> = {};
+ 
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const { certificate: memberData } = data ?? {};
 
-    const responses = await Promise.allSettled(
-      userData.map(async (document, index) => {
-        try {
-          const formData = new FormData();
+  const { mutate: addCertificateFunc, isPending } = useMutation({
+    mutationFn: async (userData: any[]) => {
+      const errors: Record<string, string> = {};
 
-          Object.entries(document).forEach(([key, value]) => {
-            if (value instanceof File || value instanceof Blob) {
-              formData.append(key, value);
-            } else if (typeof value === "boolean" || typeof value === "number") {
-              formData.append(key, String(value));
-            } else if (value !== null && value !== undefined) {
-              formData.append(key, value as any);
-            }
-          });
+      const responses = await Promise.allSettled(
+        userData.map(async (document, index) => {
+          try {
+            const formData = new FormData();
 
-          const res = await axiosInstance.post(
-            "/api/member/v1/members/certificate/",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+            Object.entries(document).forEach(([key, value]) => {
+              if (value instanceof File || value instanceof Blob) {
+                formData.append(key, value);
+              } else if (
+                typeof value === "boolean" ||
+                typeof value === "number"
+              ) {
+                formData.append(key, String(value));
+              } else if (value !== null && value !== undefined) {
+                formData.append(key, value as any);
+              }
+            });
 
-          return res.data;
-        } catch (err: any) {
-          const { errors: resErrors } = err?.response?.data || {};
-          console.log(err?.response?.data);
-          if (resErrors && typeof resErrors === "object") {
-            for (const [fieldName, messages] of Object.entries(resErrors)) {
-              if (Array.isArray(messages) && messages.length > 0) {
-                const fieldPath = `data.${index}.${fieldName}`;
-                errors[fieldPath] = messages[0];
+            const res = await axiosInstance.post(
+              "/api/member/v1/members/certificate/",
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+
+            return res.data;
+          } catch (err: any) {
+            const { errors: resErrors } = err?.response?.data || {};
+            console.log(err?.response?.data);
+            if (resErrors && typeof resErrors === "object") {
+              for (const [fieldName, messages] of Object.entries(resErrors)) {
+                if (Array.isArray(messages) && messages.length > 0) {
+                  const fieldPath = `data.${index}.${fieldName}`;
+                  errors[fieldPath] = messages[0];
+                }
               }
             }
+
+            return null;
           }
+        })
+      );
+      Object.entries(errors).forEach(([fieldPath, message]) => {
+        formik.setFieldError(fieldPath, message);
+      });
 
-          return null;
-        }
-      })
-    );
-    Object.entries(errors).forEach(([fieldPath, message]) => {
-      formik.setFieldError(fieldPath, message);
-    });
+      const successfulData = responses
+        .map((res) => (res.status === "fulfilled" ? res.value : null))
+        .filter((val) => val !== null);
 
-    const successfulData = responses
-      .map((res) => (res.status === "fulfilled" ? res.value : null))
-      .filter((val) => val !== null);
+      const anyFailed = responses.some(
+        (res) => res.status === "rejected" || res.value === null
+      );
 
-    const anyFailed = responses.some(
-      (res) => res.status === "rejected" || res.value === null
-    );
+      if (anyFailed) {
+        throw new Error("Some certificates failed to submit.");
+      }
 
-    if (anyFailed) {
-      throw new Error("Some certificates failed to submit.");
-    }
-
-    return successfulData;
-  },
-
-  onSuccess: (dataArray) => {
-    if (Array.isArray(dataArray) && dataArray.length > 0) {
-      formik.resetForm();
-      toast.success("All Certificates have been successfully added.");
-      markStepCompleted(currentStep);
-      nextStep();
-    }
-  },
-
-  onError: (error: any) => {
-    console.error("Certificate submit error:", error);
-    toast.error(error?.message || "Some certificates failed to submit.");
-  },
-});
-
-
-  const formik = useFormik({
-    initialValues: {
-      data: [
-        {
-          member_ID: memberID || "GM0001-PU",
-          title: "",
-          certificate_document: null as File | null,
-          certificate_number: "",
-        },
-      ],
+      return successfulData;
     },
-    validationSchema,
+
+    onSuccess: (dataArray) => {
+      if (Array.isArray(dataArray) && dataArray.length > 0) {
+        formik.resetForm();
+        toast.success("All Certificates have been successfully added.");
+        markStepCompleted(currentStep);
+        nextStep();
+      }
+    },
+
+    onError: (error: any) => {
+      console.error("Certificate submit error:", error);
+      toast.error(error?.message || "Some certificates failed to submit.");
+    },
+  });
+
+
+  const { mutate: updateCertificateFunc, isPending: isUpdating } = useMutation({
+    mutationFn: async (userData: any[]) => {
+      const errors: Record<string, string> = {};
+
+      const responses = await Promise.allSettled(
+        userData.map(async (document, index) => {
+          try {
+            const formData = new FormData();
+
+            Object.entries(document).forEach(([key, value]) => {
+              if (value instanceof File || value instanceof Blob) {
+                formData.append(key, value);
+              } else if (
+                typeof value === "boolean" ||
+                typeof value === "number"
+              ) {
+                formData.append(key, String(value));
+              } else if (value !== null && value !== undefined) {
+                formData.append(key, value as any);
+              }
+            });
+
+            const res = await axiosInstance.patch(
+              `/api/member/v1/members/certificate/`,
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+
+            return res.data;
+          } catch (err: any) {
+            const { errors: resErrors } = err?.response?.data || {};
+            console.log(err?.response?.data);
+            if (resErrors && typeof resErrors === "object") {
+              for (const [fieldName, messages] of Object.entries(resErrors)) {
+                if (Array.isArray(messages) && messages.length > 0) {
+                  const fieldPath = `data.${index}.${fieldName}`;
+                  errors[fieldPath] = messages[0];
+                }
+              }
+            }
+
+            return null;
+          }
+        })
+      );
+      Object.entries(errors).forEach(([fieldPath, message]) => {
+        formik.setFieldError(fieldPath, message);
+      });
+
+      const successfulData = responses
+        .map((res) => (res.status === "fulfilled" ? res.value : null))
+        .filter((val) => val !== null);
+
+      const anyFailed = responses.some(
+        (res) => res.status === "rejected" || res.value === null
+      );
+
+      if (anyFailed) {
+        throw new Error("Some certificates failed to update.");
+      }
+
+      return successfulData;
+    },
+
+    onSuccess: (dataArray) => {
+      if (Array.isArray(dataArray) && dataArray.length > 0) {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success("All Certificate updated.");
+
+      }
+    },
+
+    onError: (error: any) => {
+      console.error("Certificate update error:", error);
+      toast.error(error?.message || "Some certificates failed to update.");
+    },
+  });
+
+  console.log("memberData", memberData);
+  const formik = useFormik({
+    enableReinitialize: true, 
+    initialValues:
+      isUpdateMode && memberData
+        ? {
+            data: memberData?.map((c: any) => ({
+              id: c.id || 0,
+              member_ID: memberID ,
+              title: c.title || "",
+              certificate_document: null as File | null,
+              certificate_number: c.certificate_number || "",
+            })),
+          }
+        : {
+            data: [
+              {
+                member_ID: memberID,
+                title: "",
+                certificate_document: null as File | null,
+                certificate_number: "",
+              },
+            ],
+          },
+    validationSchema : isUpdateMode ? Yup.object({}) : validationSchema,
     onSubmit: (values) => {
-      addCertificateFunc(values.data);
+     if(!memberID) {
+       toast.error("Member ID not found");
+       return;
+     }
+      if (isUpdateMode) {
+        updateCertificateFunc(values.data);
+      } else {
+        addCertificateFunc(values.data);
+      }
     },
   });
 
   const addCertificate = () => {
     const newCertificate = {
-      member_ID: memberID || "GM0001-PU",
+      member_ID: memberID,
       title: "",
       certificate_document: null as File | null,
       certificate_number: "",
@@ -154,7 +271,7 @@ export default function CertificateDetailsStep() {
   const removeCertificate = (index: number) => {
     if (formik.values.data.length > 1) {
       const updatedCertificates = formik.values.data.filter(
-        (_, i) => i !== index
+        (_: any, i: any) => i !== index
       );
       formik.setFieldValue("data", updatedCertificates);
     } else {
@@ -235,11 +352,11 @@ export default function CertificateDetailsStep() {
                     name={`data.${index}.title`}
                     className="w-full"
                   />
-                  {typeof formik.errors.data?.[index] === "object" &&
-                    formik.errors.data?.[index]?.title &&
-                    formik.touched.data?.[index]?.title && (
+                  {/* <CHANGE> Updated to use consistent touch/error pattern */}
+                  {(formik.touched.data as any[])?.[index]?.title &&
+                    (formik.errors.data as any[])?.[index]?.title && (
                       <p className="text-sm text-red-600">
-                        {formik.errors.data[index].title}
+                        {(formik.errors.data as any[])?.[index]?.title}
                       </p>
                     )}
                 </div>
@@ -288,11 +405,16 @@ export default function CertificateDetailsStep() {
                       </Button>
                     )}
                   </div>
-                  {typeof formik.errors.data?.[index] === "object" &&
-                    formik.errors.data?.[index]?.certificate_document &&
-                    formik.touched.data?.[index]?.certificate_document && (
+                  {/* <CHANGE> Updated to use consistent touch/error pattern */}
+                  {(formik.touched.data as any[])?.[index]
+                    ?.certificate_document &&
+                    (formik.errors.data as any[])?.[index]
+                      ?.certificate_document && (
                       <p className="text-sm text-red-600">
-                        {formik.errors.data[index].certificate_document}
+                        {
+                          (formik.errors.data as any[])?.[index]
+                            ?.certificate_document
+                        }
                       </p>
                     )}
                 </div>
@@ -314,11 +436,16 @@ export default function CertificateDetailsStep() {
                     name={`data.${index}.certificate_number`}
                     className="w-full"
                   />
-                  {typeof formik.errors.data?.[index] === "object" &&
-                    formik.errors.data?.[index]?.certificate_number &&
-                    formik.touched.data?.[index]?.certificate_number && (
+                  {/* <CHANGE> Updated to use consistent touch/error pattern */}
+                  {(formik.touched.data as any[])?.[index]
+                    ?.certificate_number &&
+                    (formik.errors.data as any[])?.[index]
+                      ?.certificate_number && (
                       <p className="text-sm text-red-600">
-                        {formik.errors.data[index].certificate_number}
+                        {
+                          (formik.errors.data as any[])?.[index]
+                            ?.certificate_number
+                        }
                       </p>
                     )}
                 </div>
@@ -362,10 +489,11 @@ export default function CertificateDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isUpdating} // <CHANGE> Added isUpdating to disabled state
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
-          {isPending ? "Saving..." : "Save & Next"}
+          {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
+          {/* <CHANGE> Added isUpdating check */}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

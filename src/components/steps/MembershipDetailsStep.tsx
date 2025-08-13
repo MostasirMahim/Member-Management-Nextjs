@@ -70,11 +70,12 @@ export default function MembershipDetailsStep() {
     memberID,
     isUpdateMode,
   } = useAddMemberStore();
-    const querClient = useQueryClient();
+  const querClient = useQueryClient();
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
     enabled: isUpdateMode && !!memberID,
   });
+
   const { member_info: memberData } = data ?? {};
   const {
     membership_type,
@@ -345,9 +346,7 @@ export default function MembershipDetailsStep() {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue>
-                    {formik.values.membership_type || "Choose Membership Type"}
-                  </SelectValue>
+                  <SelectValue placeholder="Choose Membership Type" />
                 </SelectTrigger>
                 <SelectContent>
                   {membership_type?.map((choice: any, index: number) => (
@@ -721,10 +720,7 @@ export default function MembershipDetailsStep() {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue>
-                    {formik.values.nationality ??
-                      "What is his/her Nationality?"}
-                  </SelectValue>
+                  <SelectValue placeholder="Select Nationality" />
                 </SelectTrigger>
                 <SelectContent>
                   {countries?.map((name: any, index: number) => (

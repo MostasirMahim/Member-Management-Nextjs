@@ -30,11 +30,13 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { useAddMemberStore } from "@/store/store";
 import { useRouter } from "next/navigation";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
+
+import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
   data: Yup.array()
@@ -55,6 +57,8 @@ const validationSchema = Yup.object({
 export default function DescendantsDetailsStep() {
   const fileInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const {
     currentStep,
     setCurrentStep,
@@ -62,7 +66,14 @@ export default function DescendantsDetailsStep() {
     markStepCompleted,
     memberID,
     setMemberID,
+    isUpdateMode,
   } = useAddMemberStore();
+
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const { descendant: memberData } = data ?? {};
+
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { descendant_relation_choice } = choiceSections ?? {};
 
@@ -150,22 +161,125 @@ export default function DescendantsDetailsStep() {
     },
   });
 
-  const formik = useFormik({
-    initialValues: {
-      data: [
-        {
-          member_ID: memberID || "GM0001-PU",
-          name: "",
-          descendant_contact_number: "",
-          dob: null as Date | null,
-          image: null as File | null,
-          relation_type: "",
-        },
-      ],
+  const { mutate: updateDescendantFunc, isPending: isUpdating } = useMutation({
+    mutationFn: async (userData: any[]) => {
+      const errors: Record<string, string> = {};
+
+      const responses = await Promise.allSettled(
+        userData.map(async (descendant, index) => {
+          try {
+            const formData = new FormData();
+
+            Object.entries(descendant).forEach(([key, value]) => {
+              if (value instanceof File || value instanceof Blob) {
+                formData.append(key, value);
+              } else if (
+                typeof value === "boolean" ||
+                typeof value === "number"
+              ) {
+                formData.append(key, String(value));
+              } else if (value !== null && value !== undefined) {
+                formData.append(key, value as any);
+              }
+            });
+
+            const res = await axiosInstance.patch(
+              `/api/member/v1/members/descendants/`,
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+
+            return res.data;
+          } catch (err: any) {
+            const { errors: resErrors } = err?.response?.data || {};
+            console.log(err);
+            if (resErrors && typeof resErrors === "object") {
+              for (const [fieldName, messages] of Object.entries(resErrors)) {
+                if (Array.isArray(messages) && messages.length > 0) {
+                  const fieldPath = `data.${index}.${fieldName}`;
+                  errors[fieldPath] = messages[0];
+                }
+              }
+            }
+            return null;
+          }
+        })
+      );
+
+      Object.entries(errors).forEach(([fieldPath, message]) => {
+        formik.setFieldError(fieldPath, message);
+      });
+
+      const successfulData = responses
+        .map((res) => (res.status === "fulfilled" ? res.value : null))
+        .filter((val) => val !== null);
+
+      const anyFailed = responses.some(
+        (res) => res.status === "rejected" || res.value === null
+      );
+
+      if (anyFailed) {
+        throw new Error("Some descendants failed to update.");
+      }
+
+      return successfulData;
     },
+
+    onSuccess: (dataArray) => {
+      if (Array.isArray(dataArray) && dataArray.length > 0) {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success("All descendants updated.");
+      }
+    },
+
+    onError: (error: any) => {
+      console.error("Descendant update error:", error);
+      toast.error(error?.message || "Some descendants failed to update.");
+    },
+  });
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues:
+      isUpdateMode && memberData
+        ? {
+            data: memberData?.map((d: any) => ({
+              id: d.id || 0,
+              member_ID: memberID,
+              name: d.name || "",
+              descendant_contact_number: d.descendant_contact_number || "",
+              dob: d.dob || null,
+              image: null as File | null,
+              relation_type: d.relation_type?.id?.toString() || "",
+            })),
+          }
+        : {
+            data: [
+              {
+                member_ID: memberID,
+                name: "",
+                descendant_contact_number: "",
+                dob: null as Date | null,
+                image: null as File | null,
+                relation_type: "",
+              },
+            ],
+          },
     validationSchema,
     onSubmit: (values) => {
-      addDescendantFunc(values.data);
+      if (!memberID) {
+        toast.error("No Member ID found.");
+        return;
+      }
+      if (isUpdateMode) {
+        updateDescendantFunc(values.data);
+      } else {
+        addDescendantFunc(values.data);
+      }
     },
   });
 
@@ -185,7 +299,7 @@ export default function DescendantsDetailsStep() {
   const removeDescendant = (index: number) => {
     if (formik.values.data.length > 1) {
       const updatedDescendants = formik.values.data.filter(
-        (_, i) => i !== index
+        (_: any, i: any) => i !== index
       );
       formik.setFieldValue("data", updatedDescendants);
     } else {
@@ -262,12 +376,11 @@ export default function DescendantsDetailsStep() {
                     name={`data.${index}.name`}
                     className="w-full"
                   />
-                  {typeof formik.errors.data?.[index] === "object" &&
-                    formik.errors.data?.[index] !== null &&
-                    (formik.errors.data[index] as any).name &&
-                    formik.touched.data?.[index]?.name && (
+
+                  {(formik.touched.data as any[])?.[index]?.name &&
+                    (formik.errors.data as any[])?.[index]?.name && (
                       <p className="text-sm text-red-600">
-                        {(formik.errors.data[index] as any).name}
+                        {(formik.errors.data as any[])?.[index]?.name}
                       </p>
                     )}
                 </div>
@@ -290,15 +403,15 @@ export default function DescendantsDetailsStep() {
                     name={`data.${index}.descendant_contact_number`}
                     className="w-full"
                   />
-                  {typeof formik.errors.data?.[index] === "object" &&
-                    formik.errors.data?.[index] !== null &&
-                    (formik.errors.data[index] as any)
-                      .descendant_contact_number &&
-                    formik.touched.data?.[index]?.descendant_contact_number && (
+
+                  {(formik.touched.data as any[])?.[index]
+                    ?.descendant_contact_number &&
+                    (formik.errors.data as any[])?.[index]
+                      ?.descendant_contact_number && (
                       <p className="text-sm text-red-600">
                         {
-                          (formik.errors.data[index] as any)
-                            .descendant_contact_number
+                          (formik.errors.data as any[])?.[index]
+                            ?.descendant_contact_number
                         }
                       </p>
                     )}
@@ -339,12 +452,11 @@ export default function DescendantsDetailsStep() {
                       />
                     </PopoverContent>
                   </Popover>
-                  {typeof formik.errors.data?.[index] === "object" &&
-                    formik.errors.data?.[index] !== null &&
-                    (formik.errors.data[index] as any).dob &&
-                    formik.touched.data?.[index]?.dob && (
+
+                  {(formik.touched.data as any[])?.[index]?.dob &&
+                    (formik.errors.data as any[])?.[index]?.dob && (
                       <p className="text-sm text-red-600">
-                        {(formik.errors.data[index] as any).dob}
+                        {(formik.errors.data as any[])?.[index]?.dob}
                       </p>
                     )}
                 </div>
@@ -428,12 +540,10 @@ export default function DescendantsDetailsStep() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {typeof formik.errors.data?.[index] === "object" &&
-                    formik.errors.data?.[index] !== null &&
-                    (formik.errors.data[index] as any).relation_type &&
-                    formik.touched.data?.[index]?.relation_type && (
+                  {(formik.touched.data as any[])?.[index]?.relation_type &&
+                    (formik.errors.data as any[])?.[index]?.relation_type && (
                       <p className="text-sm text-red-600">
-                        {(formik.errors.data[index] as any).relation_type}
+                        {(formik.errors.data as any[])?.[index]?.relation_type}
                       </p>
                     )}
                 </div>
@@ -477,10 +587,10 @@ export default function DescendantsDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
-          {isPending ? "Saving..." : "Save & Next"}
+          {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

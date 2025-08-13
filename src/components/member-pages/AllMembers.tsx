@@ -55,7 +55,8 @@ function AllMembers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const {setMemberID} = useAddMemberStore()
+  const { setMemberID, memberID, setIsUpdateMode, isUpdateMode } =
+    useAddMemberStore();
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page")) || 1;
   const { data: allMembersReq, isLoading: user_isLoading } =
@@ -104,6 +105,7 @@ function AllMembers() {
   };
   const handleUpdate = (member_ID: string) => {
     setMemberID(member_ID);
+    setIsUpdateMode(true);
     router.push(`/member/update/${member_ID}`);
   };
 

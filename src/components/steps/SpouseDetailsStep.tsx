@@ -24,10 +24,11 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
 import { useAddMemberStore } from "@/store/store";
 import { useRouter } from "next/navigation";
+import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
   spouse_name: Yup.string().required("Spouse name is required"),
@@ -49,6 +50,8 @@ const initialValues = {
 export default function SpouseDetailsStep() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const {
     currentStep,
     setCurrentStep,
@@ -56,7 +59,14 @@ export default function SpouseDetailsStep() {
     markStepCompleted,
     memberID,
     setMemberID,
+    isUpdateMode,
   } = useAddMemberStore();
+
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const { spouse: memberData } = data ?? {};
+
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { spouse_status_choice } = choiceSections ?? {};
 
@@ -64,7 +74,9 @@ export default function SpouseDetailsStep() {
     mutationFn: async (userData: any) => {
       const formData = new FormData();
       Object.entries(userData).forEach(([key, value]) => {
-        formData.append(key, value as any);
+        if (value != null) {
+          formData.append(key, value as any);
+        }
       });
 
       const res = await axiosInstance.post(
@@ -103,13 +115,74 @@ export default function SpouseDetailsStep() {
     },
   });
 
+  const { mutate: updateSpouseFunc, isPending: isUpdating } = useMutation({
+    mutationFn: async (userData: any) => {
+      const formData = new FormData();
+      Object.entries(userData).forEach(([key, value]) => {
+        formData.append(key, value as any);
+      });
+
+      const res = await axiosInstance.patch(
+        `/api/member/v1/members/spouse/`,
+        userData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Spouse has been successfully updated.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+
+      if (errors && typeof errors === "object") {
+        for (const [fieldName, messages] of Object.entries(errors)) {
+          if (Array.isArray(messages) && messages.length > 0) {
+            formik.setFieldError(fieldName, messages[0]);
+          }
+        }
+        toast.error("Submission Failed");
+      } else {
+        toast.error(detail || message || "Submission Failed");
+      }
+    },
+  });
+  
   const formik = useFormik({
-    initialValues,
-    validationSchema,
+    enableReinitialize: true,
+    initialValues:
+      isUpdateMode && memberData
+        ? {
+            member_ID: memberID || "",
+            id: memberData[0]?.id || 0,
+            spouse_name: memberData[0]?.spouse_name || "",
+            contact_number: memberData[0].spouse_contact_number || "",
+            spouse_dob: memberData[0].spouse_dob || null,
+            image: null as File | null,
+            current_status: memberData[0]?.current_status?.toString() || "",
+          }
+        : initialValues,
+    validationSchema: isUpdateMode ? Yup.object({}) : validationSchema,
     onSubmit: (values) => {
-      values.member_ID = memberID || "GM0001-PU";
+      if (!memberID) {
+        toast.error("No Member ID found.");
+        return;
+      }
+      values.member_ID = memberID;
       if (values.member_ID) {
-        addSpouseFunc(values);
+        if (isUpdateMode) {
+          updateSpouseFunc(values);
+        } else {
+          addSpouseFunc(values);
+        }
       }
     },
   });
@@ -157,7 +230,9 @@ export default function SpouseDetailsStep() {
             className="w-full"
           />
           {formik.errors.spouse_name && formik.touched.spouse_name && (
-            <p className="text-sm text-red-600">{formik.errors.spouse_name}</p>
+            <p className="text-sm text-red-600">
+              {formik.errors.spouse_name as string}
+            </p>
           )}
         </div>
 
@@ -180,7 +255,7 @@ export default function SpouseDetailsStep() {
           />
           {formik.errors.contact_number && formik.touched.contact_number && (
             <p className="text-sm text-red-600">
-              {formik.errors.contact_number}
+              {formik.errors.contact_number as string}
             </p>
           )}
         </div>
@@ -256,7 +331,7 @@ export default function SpouseDetailsStep() {
           </Select>
           {formik.errors.current_status && formik.touched.current_status && (
             <p className="text-sm text-red-600">
-              {formik.errors.current_status}
+              {formik.errors.current_status as string}
             </p>
           )}
         </div>
@@ -327,10 +402,10 @@ export default function SpouseDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
-          {isPending ? "Saving..." : "Save & Next"}
+          {isPending || isUpdating ? "Saving..." : "Save & Next"}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
