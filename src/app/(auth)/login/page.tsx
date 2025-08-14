@@ -53,14 +53,21 @@ export default function page() {
     },
     onError: (error: any) => {
       console.log("Error in Login", error?.response);
-      const { message, errors, details } = error?.response.data;
+
+      const { message, errors } = error?.response?.data || {};
 
       if (errors) {
-        errors?.map((error: any) => {
-          toast.error(error?.message);
+        Object.values(errors).forEach((errorArr: any) => {
+          if (Array.isArray(errorArr)) {
+            errorArr.forEach((msg: string) => toast.error(msg));
+          } else {
+            toast.error(errorArr);
+          }
         });
+      } else if (message) {
+        toast.error(message);
       } else {
-        toast.error(details || "Logout Failed");
+        toast.error("Login failed. Please try again.");
       }
     },
   });

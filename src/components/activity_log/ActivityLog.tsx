@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 
 function ActivityLog({ data }: { data: any }) {
   const activityLogs = data?.data;
+  console.log(activityLogs);    
   const paginationData = data?.pagination;
   const router = useRouter();
   const currentPage = paginationData?.current_page || 1;
@@ -56,6 +57,7 @@ function ActivityLog({ data }: { data: any }) {
 
   return (
     <div>
+      
       <Table>
         <TableCaption>All user activity logs. </TableCaption>
         <TableHeader>
@@ -86,6 +88,7 @@ function ActivityLog({ data }: { data: any }) {
           {activityLogs?.map((log: any, indx: number) => (
             <TableRow key={indx} className="">
               <TableCell className="text-center font-medium ">
+                
                 {log.user || "None"}
               </TableCell>
               <TableCell className="text-center ">

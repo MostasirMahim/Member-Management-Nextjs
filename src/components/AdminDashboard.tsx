@@ -23,6 +23,11 @@ import {
   Logs,
   Mails,
   MailPlus,
+  Package,
+  List,
+  BadgeDollarSign,
+  Image,
+  Tag,
   UserRound,
   BetweenHorizonalStart,
   SquarePen,
@@ -43,6 +48,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -115,7 +121,7 @@ const navigation = [
       },
       {
         icon: <Edit className="h-4 w-4" />,
-        label: "Viwes",
+        label: "Views",
         href: "/dues/view",
       },
     ],
@@ -172,16 +178,8 @@ const navigation = [
       },
     ],
   },
-  {
-    icon: <Users className="h-5 w-5" />,
-    label: "All Users",
-    href: "/users",
-  },
-  {
-    icon: <Users className="h-5 w-5" />,
-    label: "All Groups",
-    href: "/groups",
-  },
+  { icon: <Users className="h-5 w-5" />, label: "All Users", href: "/users" },
+  { icon: <Users className="h-5 w-5" />, label: "All Groups", href: "/groups" },
   {
     icon: <Users className="h-5 w-5" />,
     label: "Add Choices",
@@ -199,13 +197,13 @@ const navigation = [
   },
   {
     icon: <Logs className="h-5 w-5" />,
-    label: "My activity logs",
+    label: "My Activity Logs",
     href: "/activity_logs/my",
   },
-  ,
+
   {
     icon: <Mails className="h-5 w-5" />,
-    label: "Email management",
+    label: "Email Management",
     href: "#",
     subItems: [
       {
@@ -220,12 +218,12 @@ const navigation = [
       },
       {
         icon: <BetweenHorizonalStart className="h-4 w-4" />,
-        label: "Add email to group",
+        label: "Add Email to Group",
         href: "/emails/add_email/",
       },
       {
         icon: <SquarePen className="h-4 w-4" />,
-        label: "Compose email",
+        label: "Compose Email",
         href: "/emails/compose/",
       },
       {
@@ -235,14 +233,119 @@ const navigation = [
       },
       {
         icon: <Settings className="h-4 w-4" />,
-        label: "View all composes",
+        label: "View All Composes",
         href: "/emails/compose/view/",
       },
     ],
   },
+
+  {
+    icon: <Package className="h-5 w-5" />,
+    label: "Products Management",
+    href: "#",
+    subItems: [
+      {
+        icon: <Plus className="h-3 w-3" />,
+        label: "Add Product",
+        href: "/products/add/",
+      },
+      {
+        icon: <Eye className="h-3 w-3" />,
+        label: "View Products",
+        href: "/products",
+      },
+
+      {
+        icon: <List className="h-4 w-4" />,
+        label: "Categories",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Category",
+            href: "/products/categories/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Categories",
+            href: "/products/categories/",
+          },
+        ],
+      },
+      {
+        icon: <List className="h-4 w-4" />,
+        label: "Brands",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Brand",
+            href: "/products/brands/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Brands",
+            href: "/products/brands/",
+          },
+        ],
+      },
+      {
+        icon: <List className="h-4 w-4" />,
+        label: "Media",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Media",
+            href: "/products/media/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Media",
+            href: "/products/media/",
+          },
+        ],
+      },
+      {
+        icon: <BadgeDollarSign className="h-4 w-4" />,
+        label: "Prices",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Product Price",
+            href: "/products/prices/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Product Price",
+            href: "/products/prices/",
+          },
+        ],
+      },
+      {
+      icon: <ShoppingCart className="h-4 w-4" />,
+      label: "Product Buy",
+      href: "#",
+      subItems: [
+        {
+          icon: <Plus className="h-3 w-3" />,
+          label: "Add Product Cart",
+          href: "/products/buy/add/",
+        },
+        {
+          icon: <Eye className="h-3 w-3" />,
+          label: "View Product Cart",
+          href: "/products/buy/",
+        },
+      ],
+    },
+    ],
+  },
+
   {
     icon: <HandPlatter className="h-5 w-5" />,
-    label: "Restaurant management",
+    label: "Restaurant Management",
     href: "#",
     subItems: [
       {
@@ -252,40 +355,41 @@ const navigation = [
       },
       {
         icon: <BookCheck className="h-4 w-4" />,
-        label: "Add restaurants choices",
+        label: "Add Restaurants Choices",
         href: "/restaurants/choices/",
       },
       {
         icon: <ShoppingCart className="h-4 w-4" />,
-        label: "Add restaurant item",
+        label: "Add Restaurant Item",
         href: "/restaurants/items/add/",
       },
       {
         icon: <ListTodo className="h-4 w-4" />,
-        label: "Add item category",
+        label: "Add Item Category",
         href: "/restaurants/items/add/category/",
       },
       {
         icon: <Upload className="h-4 w-4" />,
-        label: "Upload restaurant sales",
+        label: "Upload Restaurant Sales",
         href: "/restaurants/sales/upload/",
       },
       {
         icon: <ShoppingCart className="h-4 w-4" />,
-        label: "View cart",
+        label: "View Cart",
         href: "/restaurants/checkout/",
       },
     ],
   },
+
   {
     icon: <PercentCircle className="h-5 w-5" />,
-    label: "Promo code management",
+    label: "Promo Code Management",
     href: "#",
     subItems: [
       {
         icon: <Code className="h-4 w-4" />,
-        label: "View all promo codes",
-        href: "/promo_codes/",
+        label: "Add Promo Code",
+        href: "/promo-codes/add/",
       },
       {
         icon: <CirclePlus className="h-4 w-4" />,
@@ -294,13 +398,13 @@ const navigation = [
       },
       {
         icon: <TicketCheck className="h-4 w-4" />,
-        label: "promo codes category",
-        href: "/promo_codes/categories/",
+        label: "View Promo Codes",
+        href: "/promo-codes/view/",
       },
       {
         icon: <TicketPlus className="h-4 w-4" />,
-        label: "Add category",
-        href: "/promo_codes/categories/add/",
+        label: "Add Promo Code Category",
+        href: "/promo-codes/categories/add/",
       },
       {
         icon: <Eye className="h-4 w-4" />,
@@ -308,6 +412,7 @@ const navigation = [
         href: "/promo_codes/applied_promo_codes/",
       },
     ],
+    
   },
 ];
 
@@ -324,6 +429,92 @@ interface NavItemProps {
   }>;
 }
 
+// const NavItem = ({
+//   icon,
+//   label,
+//   href,
+//   active,
+//   badge,
+//   subItems,
+// }: NavItemProps) => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const pathname = usePathname();
+
+//   // Check if any sub-item is active
+//   const hasActiveSubItem = subItems?.some(
+//     (subItem) => pathname === subItem.href
+//   );
+//   const isParentActive = active || hasActiveSubItem;
+
+//   if (subItems && subItems.length > 0) {
+//     return (
+//       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+//         <CollapsibleTrigger asChild>
+//           <Button
+//             variant="ghost"
+//             className={cn(
+//               "w-full justify-start gap-3 h-10 px-3",
+//               isParentActive && "bg-accent text-accent-foreground"
+//             )}
+//           >
+//             {icon}
+//             <span className="flex-1 text-left">{label}</span>
+//             {badge && (
+//               <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+//                 {badge}
+//               </span>
+//             )}
+//             {isOpen ? (
+//               <ChevronDown className="h-4 w-4" />
+//             ) : (
+//               <ChevronRight className="h-4 w-4" />
+//             )}
+//           </Button>
+//         </CollapsibleTrigger>
+//         <CollapsibleContent className="space-y-1">
+//           <div className="ml-6 space-y-1">
+//             {subItems.map((subItem) => (
+//               <Link key={subItem.href} href={subItem.href}>
+//                 <Button
+//                   variant="ghost"
+//                   className={cn(
+//                     "w-full justify-start gap-3 h-9 px-3 text-sm",
+//                     pathname === subItem.href &&
+//                       "bg-accent text-accent-foreground"
+//                   )}
+//                 >
+//                   {subItem.icon}
+//                   <span>{subItem.label}</span>
+//                 </Button>
+//               </Link>
+//             ))}
+//           </div>
+//         </CollapsibleContent>
+//       </Collapsible>
+//     );
+//   }
+
+//   return (
+//     <Link href={href}>
+//       <Button
+//         variant="ghost"
+//         className={cn(
+//           "w-full justify-start gap-3 h-10 px-3",
+//           active && "bg-accent text-accent-foreground"
+//         )}
+//       >
+//         {icon}
+//         <span className="flex-1 text-left">{label}</span>
+//         {badge && (
+//           <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+//             {badge}
+//           </span>
+//         )}
+//       </Button>
+//     </Link>
+//   );
+// };
+
 const NavItem = ({
   icon,
   label,
@@ -335,11 +526,72 @@ const NavItem = ({
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  // Check if any sub-item is active
   const hasActiveSubItem = subItems?.some(
-    (subItem) => pathname === subItem.href
+    (subItem) =>
+      pathname === subItem.href ||
+      subItem.subItems?.some((nested) => pathname === nested.href)
   );
   const isParentActive = active || hasActiveSubItem;
+
+  const renderSubItems = (items: any[], level: number = 1) => {
+    return (
+      <div className={`ml-${level * 4} space-y-1`}>
+        {items.map((item, index) => {
+          const hasNested = item.subItems && item.subItems.length > 0;
+          const isActive =
+            pathname === item.href ||
+            item.subItems?.some((nested) => pathname === nested.href);
+          const [nestedOpen, setNestedOpen] = useState(false);
+
+          if (hasNested) {
+            return (
+              <Collapsible
+                key={item.label + index}
+                open={nestedOpen}
+                onOpenChange={setNestedOpen}
+              >
+                <CollapsibleTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start gap-3 h-9 px-3 text-sm",
+                      isActive && "bg-accent text-accent-foreground"
+                    )}
+                  >
+                    {item.icon}
+                    <span className="flex-1 text-left">{item.label}</span>
+                    {nestedOpen ? (
+                      <ChevronDown className="h-3 w-3" />
+                    ) : (
+                      <ChevronRight className="h-3 w-3" />
+                    )}
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  {renderSubItems(item.subItems, level + 1)}
+                </CollapsibleContent>
+              </Collapsible>
+            );
+          } else {
+            return (
+              <Link key={item.href} href={item.href}>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start gap-3 h-9 px-3 text-sm",
+                    pathname === item.href && "bg-accent text-accent-foreground"
+                  )}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Button>
+              </Link>
+            );
+          }
+        })}
+      </div>
+    );
+  };
 
   if (subItems && subItems.length > 0) {
     return (
@@ -366,25 +618,7 @@ const NavItem = ({
             )}
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-1">
-          <div className="ml-6 space-y-1">
-            {subItems.map((subItem) => (
-              <Link key={subItem.href} href={subItem.href}>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start gap-3 h-9 px-3 text-sm",
-                    pathname === subItem.href &&
-                      "bg-accent text-accent-foreground"
-                  )}
-                >
-                  {subItem.icon}
-                  <span>{subItem.label}</span>
-                </Button>
-              </Link>
-            ))}
-          </div>
-        </CollapsibleContent>
+        <CollapsibleContent>{renderSubItems(subItems)}</CollapsibleContent>
       </Collapsible>
     );
   }
