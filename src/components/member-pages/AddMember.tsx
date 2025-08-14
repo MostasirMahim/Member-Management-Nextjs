@@ -52,7 +52,6 @@ export default function AddMember() {
   } = useAddMemberStore();
 
   const path = usePathname();
-
   const isUpdatePage = path?.startsWith("/member/update/");
 
   useEffect(() => {
@@ -112,7 +111,10 @@ export default function AddMember() {
                 </p>
               ) : (
                 <p>
-                  Add New Member <span>{memberID}</span>
+                  Add New Member{" "}
+                  <span className="font-secondary text-lg text-sky-500">
+                    #{memberID}
+                  </span>
                 </p>
               )}
             </h1>

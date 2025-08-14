@@ -226,13 +226,13 @@ export default function DocumentDetailsStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
-            data: memberData.map((d: any) => ({
-              id: d.id || 0,
+            data: memberData?.map((d: any) => ({
+              id: d?.id || 0,
               member_ID: memberID,
               document_document: null as File | null,
-              document_type: d.document_type?.id?.toString() || "",
+              document_type: d?.document_type?.id?.toString() || "",
             })),
           }
         : {

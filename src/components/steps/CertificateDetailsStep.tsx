@@ -35,7 +35,7 @@ const validationSchema = Yup.object({
 export default function CertificateDetailsStep() {
   const fileInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const router = useRouter();
-  const queryClient = useQueryClient(); 
+  const queryClient = useQueryClient();
 
   const {
     currentStep,
@@ -44,10 +44,9 @@ export default function CertificateDetailsStep() {
     markStepCompleted,
     memberID,
     setMemberID,
-    isUpdateMode, 
+    isUpdateMode,
   } = useAddMemberStore();
 
- 
   const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
     enabled: isUpdateMode && !!memberID,
   });
@@ -136,7 +135,6 @@ export default function CertificateDetailsStep() {
     },
   });
 
-
   const { mutate: updateCertificateFunc, isPending: isUpdating } = useMutation({
     mutationFn: async (userData: any[]) => {
       const errors: Record<string, string> = {};
@@ -209,7 +207,6 @@ export default function CertificateDetailsStep() {
       if (Array.isArray(dataArray) && dataArray.length > 0) {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success("All Certificate updated.");
-
       }
     },
 
@@ -219,18 +216,17 @@ export default function CertificateDetailsStep() {
     },
   });
 
-  console.log("memberData", memberData);
   const formik = useFormik({
-    enableReinitialize: true, 
+    enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
             data: memberData?.map((c: any) => ({
-              id: c.id || 0,
-              member_ID: memberID ,
-              title: c.title || "",
+              id: c?.id || 0,
+              member_ID: memberID,
+              title: c?.title || "",
               certificate_document: null as File | null,
-              certificate_number: c.certificate_number || "",
+              certificate_number: c?.certificate_number || "",
             })),
           }
         : {
@@ -243,12 +239,12 @@ export default function CertificateDetailsStep() {
               },
             ],
           },
-    validationSchema : isUpdateMode ? Yup.object({}) : validationSchema,
+    validationSchema: isUpdateMode ? Yup.object({}) : validationSchema,
     onSubmit: (values) => {
-     if(!memberID) {
-       toast.error("Member ID not found");
-       return;
-     }
+      if (!memberID) {
+        toast.error("Member ID not found");
+        return;
+      }
       if (isUpdateMode) {
         updateCertificateFunc(values.data);
       } else {

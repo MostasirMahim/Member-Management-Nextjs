@@ -131,7 +131,7 @@ export default function EmailDetailsStep() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
-        toast.success(data.message || "Email has been successfully updated.");
+        toast.success(data.message || "Email successfully updated.");
       }
     },
     onError: (error: any) => {
@@ -173,13 +173,13 @@ export default function EmailDetailsStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
             data: memberData?.map((email: any) => ({
-              id: email.id || 0,
-              email_type: email.email_type.id || 0,
-              email: email.email || "",
-              is_primary: email.is_primary || false,
+              id: email?.id || 0,
+              email_type: email?.email_type.id || 0,
+              email: email?.email || "",
+              is_primary: email?.is_primary || false,
             })),
           }
         : initialValues,
@@ -197,7 +197,6 @@ export default function EmailDetailsStep() {
       }
     },
   });
-  console.log("formik", formik.values);
 
   const addEmail = () => {
     const newEmail = {

@@ -166,13 +166,13 @@ export default function JobDetailsStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData  && memberData?.length > 0
         ? {
-            data: memberData.map((j: any) => ({
-              id: j.id || 0,
-              title: j.title || "",
-              organization_name: j.organization_name || "",
-              location: j.location || "",
+            data: memberData?.map((j: any) => ({
+              id: j?.id || 0,
+              title: j?.title || "",
+              organization_name: j?.organization_name || "",
+              location: j?.location || "",
             })),
           }
         : initialValues,

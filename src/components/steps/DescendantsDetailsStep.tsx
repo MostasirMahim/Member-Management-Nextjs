@@ -245,16 +245,16 @@ export default function DescendantsDetailsStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
             data: memberData?.map((d: any) => ({
-              id: d.id || 0,
+              id: d?.id || 0,
               member_ID: memberID,
-              name: d.name || "",
-              descendant_contact_number: d.descendant_contact_number || "",
-              dob: d.dob || null,
+              name: d?.name || "",
+              descendant_contact_number: d?.descendant_contact_number || "",
+              dob: d?.dob || null,
               image: null as File | null,
-              relation_type: d.relation_type?.id?.toString() || "",
+              relation_type: d?.relation_type?.id?.toString() || "",
             })),
           }
         : {

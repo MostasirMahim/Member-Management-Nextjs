@@ -170,9 +170,9 @@ export default function SpecialDaysStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
-            data: memberData.map((s: any) => ({
+            data: memberData?.map((s: any) => ({
               id: s.id || 0,
               title: s.title || "",
               date: s.date ? new Date(s.date) : null,

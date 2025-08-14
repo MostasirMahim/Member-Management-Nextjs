@@ -52,7 +52,6 @@ export default function ContactDetailsStep() {
     enabled: isUpdateMode && !!memberID,
   });
   const {contact_info: memberData} = data ?? {};
-
   const querClient = useQueryClient();
 
   const { mutate: addContactFunc, isPending } = useMutation({
@@ -122,7 +121,7 @@ export default function ContactDetailsStep() {
       if (data?.status === "success") {
         console.log(data);
         querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
-        toast.success(data.message || "Contact has been successfully updated.");
+        toast.success(data.message || "Contact successfully updated.");
       }
     },
     onError: (error: any) => {
@@ -166,13 +165,13 @@ export default function ContactDetailsStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0 
         ? {
             contacts: memberData?.map((memberData: any) => ({
-              id: memberData.id,
+              id: memberData?.id,
               contact_type: memberData.contact_type?.id || "",
-              number: memberData.number || "",
-              is_primary: memberData.is_primary || false,
+              number: memberData?.number || "",
+              is_primary: memberData?.is_primary || false,
             })),
           }
         : {
@@ -202,7 +201,7 @@ export default function ContactDetailsStep() {
       }
     },
   });
-
+console.log("formik", formik.values);
   const addContact = () => {
     const newContact = {
       contact_type: "",

@@ -173,13 +173,13 @@ export default function EmergencyContactStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
-            data: memberData.map((c: any) => ({
-              id: c.id || 0,
-              contact_name: c.contact_name || "",
-              contact_number: c.contact_number || "",
-              relation_with_member: c.relation_with_member || "",
+            data: memberData?.map((c: any) => ({
+              id: c?.id || 0,
+              contact_name: c?.contact_name || "",
+              contact_number: c?.contact_number || "",
+              relation_with_member: c?.relation_with_member || "",
             })),
           }
         : initialValues,

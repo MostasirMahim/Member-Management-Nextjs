@@ -135,7 +135,7 @@ export default function AddressDetailsStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
             data: memberData?.map((addr: any) => ({
               id: addr.id || 0,

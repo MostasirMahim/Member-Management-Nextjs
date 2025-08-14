@@ -262,23 +262,33 @@ export default function MembershipDetailsStep() {
     },
   });
 
-  useEffect(() => {
+  const handleFieldChangeAndGenerateID = (fieldName: string, value: string) => {
+    formik.setFieldValue(fieldName, value);
+    const otherFieldValue =
+      fieldName === "membership_type"
+        ? formik.values.institute_name
+        : formik.values.membership_type;
+    const currentFieldValue = value?.trim();
+    const otherFieldTrimmed = otherFieldValue?.trim();
+
     if (
-      formik.values.membership_type &&
-      formik.values.institute_name &&
+      currentFieldValue &&
+      currentFieldValue !== "" &&
+      otherFieldTrimmed &&
+      otherFieldTrimmed !== "" &&
       !isUpdateMode
     ) {
       const data = {
-        membership_type: formik.values.membership_type,
-        institute_name: formik.values.institute_name,
+        membership_type:
+          fieldName === "membership_type"
+            ? value
+            : formik.values.membership_type,
+        institute_name:
+          fieldName === "institute_name" ? value : formik.values.institute_name,
       };
       generateID(data);
     }
-  }, [
-    formik.values.membership_type,
-    formik.values.institute_name,
-    isUpdateMode,
-  ]);
+  };
 
   const imgRef = useRef<HTMLInputElement>(null);
   const handleProfilePictureUpload = (
@@ -339,10 +349,10 @@ export default function MembershipDetailsStep() {
                 Membership Type
               </Label>
               <Select
+                disabled={isUpdateMode}
                 value={formik.values.membership_type}
-                disabled={formik.values.member_ID !== ""}
                 onValueChange={(value) =>
-                  formik.setFieldValue("membership_type", value)
+                  handleFieldChangeAndGenerateID("membership_type", value)
                 }
               >
                 <SelectTrigger className="w-full">
@@ -368,10 +378,10 @@ export default function MembershipDetailsStep() {
                 Institute Name
               </Label>
               <Select
-                disabled={formik.values.member_ID !== ""}
+                disabled={isUpdateMode}
                 value={formik.values.institute_name}
                 onValueChange={(value) =>
-                  formik.setFieldValue("institute_name", value)
+                  handleFieldChangeAndGenerateID("institute_name", value)
                 }
               >
                 <SelectTrigger className="w-full">

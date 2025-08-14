@@ -164,8 +164,8 @@ export default function SpouseDetailsStep() {
             member_ID: memberID || "",
             id: memberData[0]?.id || 0,
             spouse_name: memberData[0]?.spouse_name || "",
-            contact_number: memberData[0].spouse_contact_number || "",
-            spouse_dob: memberData[0].spouse_dob || null,
+            contact_number: memberData[0]?.spouse_contact_number || "",
+            spouse_dob: memberData[0]?.spouse_dob || null,
             image: null as File | null,
             current_status: memberData[0]?.current_status?.toString() || "",
           }

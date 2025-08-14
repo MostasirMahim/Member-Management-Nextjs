@@ -164,13 +164,13 @@ export default function CompanionDetailsStep() {
       isUpdateMode && memberData
         ? {
             member_ID: memberID,
-            id: memberData[0].id || 0,
-            companion_name: memberData[0].companion_name || "",
-            companion_dob: memberData[0].companion_dob || null,
+            id: memberData[0]?.id || 0,
+            companion_name: memberData[0]?.companion_name || "",
+            companion_dob: memberData[0]?.companion_dob || null,
             companion_contact_number:
-              memberData[0].companion_contact_number || "",
-            companion_card_number: memberData[0].companion_card_number || "",
-            relation_with_member: memberData[0].relation_with_member || "",
+              memberData[0]?.companion_contact_number || "",
+            companion_card_number: memberData[0]?.companion_card_number || "",
+            relation_with_member: memberData[0]?.relation_with_member || "",
             companion_image: null as File | null,
           }
         : {
