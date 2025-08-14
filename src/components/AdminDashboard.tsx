@@ -323,6 +323,23 @@ const navigation = [
           },
         ],
       },
+      {
+      icon: <ShoppingCart className="h-4 w-4" />,
+      label: "Product Buy",
+      href: "#",
+      subItems: [
+        {
+          icon: <Plus className="h-3 w-3" />,
+          label: "Add Product Cart",
+          href: "/products/buy/add/",
+        },
+        {
+          icon: <Eye className="h-3 w-3" />,
+          label: "View Product Cart",
+          href: "/products/buy/",
+        },
+      ],
+    },
     ],
   },
 
