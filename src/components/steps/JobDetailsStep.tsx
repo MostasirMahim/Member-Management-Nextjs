@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, Plus, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
+import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
   data: Yup.array()
@@ -37,6 +38,8 @@ const initialValues = {
 
 export default function JobDetailsStep() {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const {
     currentStep,
     setCurrentStep,
@@ -44,7 +47,13 @@ export default function JobDetailsStep() {
     markStepCompleted,
     memberID,
     setMemberID,
+    isUpdateMode,
   } = useAddMemberStore();
+
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const { job: memberData } = data ?? {};
 
   const { mutate: addJobDetailsFunc, isPending } = useMutation({
     mutationFn: async (userData: any) => {
@@ -100,15 +109,88 @@ export default function JobDetailsStep() {
     },
   });
 
+  const { mutate: updateJobDetailsFunc, isPending: isUpdating } = useMutation({
+    mutationFn: async (userData: any) => {
+      const res = await axiosInstance.patch(
+        `/api/member/v1/members/job/${memberID}`,
+        userData
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(
+          data.message || "Job Detail has been successfully updated."
+        );
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+      if (errors?.data && Array.isArray(errors.data)) {
+        const contactsErrors = errors.data;
+        contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+          if (contactErrorObj && typeof contactErrorObj === "object") {
+            for (const [fieldName, messages] of Object.entries(
+              contactErrorObj
+            )) {
+              if (Array.isArray(messages) && messages.length > 0) {
+                const fieldPath = `data.${contactIndex}.${fieldName}`;
+                formik.setFieldError(fieldPath, messages[0]);
+              }
+            }
+          }
+        });
+      }
+      if (errors && typeof errors === "object") {
+        const otherErrorKeys = Object.keys(errors).filter(
+          (key) => key !== "data"
+        );
+
+        if (otherErrorKeys.length > 0) {
+          const firstKey = otherErrorKeys[0];
+          const messages = errors[firstKey];
+
+          if (Array.isArray(messages) && messages.length > 0) {
+            toast.error(messages[0]);
+            return;
+          }
+        }
+      }
+
+      toast.error(detail || message || "Submission Failed");
+    },
+  });
+
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    initialValues:
+      isUpdateMode && memberData  && memberData?.length > 0
+        ? {
+            data: memberData?.map((j: any) => ({
+              id: j?.id || 0,
+              title: j?.title || "",
+              organization_name: j?.organization_name || "",
+              location: j?.location || "",
+            })),
+          }
+        : initialValues,
     validationSchema,
     onSubmit: (values) => {
+      if (!memberID) {
+        toast.error("No Member ID found.");
+        return;
+      }
       const data = {
-        member_ID: memberID || "GM0001-PU",
+        member_ID: memberID,
         data: values.data,
       };
-      addJobDetailsFunc(data);
+      if (isUpdateMode) {
+        updateJobDetailsFunc(data);
+      } else {
+        addJobDetailsFunc(data);
+      }
     },
   });
 
@@ -124,7 +206,9 @@ export default function JobDetailsStep() {
 
   const removeJob = (index: number) => {
     if (formik.values.data.length > 1) {
-      const updatedJobs = formik.values.data.filter((_, i) => i !== index);
+      const updatedJobs = formik.values.data.filter(
+        (_: any, i: any) => i !== index
+      );
       formik.setFieldValue("data", updatedJobs);
     } else {
       toast.error("At least one job detail is required");
@@ -181,11 +265,10 @@ export default function JobDetailsStep() {
                   name={`data.${index}.title`}
                   className="w-full"
                 />
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index]?.title &&
-                  formik.touched.data?.[index]?.title && (
+                {(formik.touched.data as any[])?.[index]?.title &&
+                  (formik.errors.data as any[])?.[index]?.title && (
                     <p className="text-sm text-red-600">
-                      {formik.errors.data[index].title}
+                      {(formik.errors.data as any[])?.[index]?.title}
                     </p>
                   )}
               </div>
@@ -205,11 +288,13 @@ export default function JobDetailsStep() {
                   name={`data.${index}.organization_name`}
                   className="w-full"
                 />
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index]?.organization_name &&
-                  formik.touched.data?.[index]?.organization_name && (
+                {(formik.touched.data as any[])?.[index]?.organization_name &&
+                  (formik.errors.data as any[])?.[index]?.organization_name && (
                     <p className="text-sm text-red-600">
-                      {formik.errors.data[index].organization_name}
+                      {
+                        (formik.errors.data as any[])?.[index]
+                          ?.organization_name
+                      }
                     </p>
                   )}
               </div>
@@ -227,11 +312,10 @@ export default function JobDetailsStep() {
                   name={`data.${index}.location`}
                   className="w-full"
                 />
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index]?.location &&
-                  formik.touched.data?.[index]?.location && (
+                {(formik.touched.data as any[])?.[index]?.location &&
+                  (formik.errors.data as any[])?.[index]?.location && (
                     <p className="text-sm text-red-600">
-                      {formik.errors.data[index].location}
+                      {(formik.errors.data as any[])?.[index]?.location}
                     </p>
                   )}
               </div>
@@ -276,10 +360,10 @@ export default function JobDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
-          {isPending ? "Saving..." : "Save & Next"}
+          {isPending || isUpdating ? "Saving..." : "Save & Next"}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

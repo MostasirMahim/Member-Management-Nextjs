@@ -19,9 +19,9 @@ import { useAddMemberStore } from "@/store/store";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "react-toastify";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useGetMember from "@/hooks/data/useGetMember";
 
-// Validation Schema
 const validationSchema = Yup.object({
   data: Yup.array()
     .of(
@@ -37,6 +37,8 @@ const validationSchema = Yup.object({
 export default function DocumentDetailsStep() {
   const fileInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const {
     currentStep,
     setCurrentStep,
@@ -44,7 +46,14 @@ export default function DocumentDetailsStep() {
     markStepCompleted,
     memberID,
     setMemberID,
+    isUpdateMode,
   } = useAddMemberStore();
+
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const { document: memberData } = data ?? {};
+
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { document_type } = choiceSections ?? {};
 
@@ -120,7 +129,7 @@ export default function DocumentDetailsStep() {
     onSuccess: (dataArray) => {
       if (Array.isArray(dataArray) && dataArray.length > 0) {
         formik.resetForm();
-        toast.success("All documents have been successfully added.");
+        toast.success("All document successfully added.");
         markStepCompleted(currentStep);
         nextStep();
       }
@@ -132,25 +141,126 @@ export default function DocumentDetailsStep() {
     },
   });
 
-  const formik = useFormik({
-    initialValues: {
-      data: [
-        {
-          member_ID: memberID || "GM0001-PU",
-          document_document: null as File | null,
-          document_type: "",
-        },
-      ],
+  const { mutate: updateDocumentFunc, isPending: isUpdating } = useMutation({
+    mutationFn: async (userData: any[]) => {
+      const errors: Record<string, string> = {};
+
+      const responses = await Promise.allSettled(
+        userData.map(async (document, index) => {
+          try {
+            const formData = new FormData();
+
+            Object.entries(document).forEach(([key, value]) => {
+              if (value instanceof File || value instanceof Blob) {
+                formData.append(key, value);
+              } else if (
+                typeof value === "boolean" ||
+                typeof value === "number"
+              ) {
+                formData.append(key, String(value));
+              } else if (value !== null && value !== undefined) {
+                formData.append(key, value as any);
+              }
+            });
+
+            const res = await axiosInstance.patch(
+              `/api/member/v1/members/documents/`,
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+
+            return res.data;
+          } catch (err: any) {
+            const { errors: resErrors } = err?.response?.data || {};
+            console.log(err?.response?.data);
+            if (resErrors && typeof resErrors === "object") {
+              for (const [fieldName, messages] of Object.entries(resErrors)) {
+                if (Array.isArray(messages) && messages.length > 0) {
+                  const fieldPath = `data.${index}.${fieldName}`;
+                  errors[fieldPath] = messages[0];
+                }
+              }
+            }
+
+            return null;
+          }
+        })
+      );
+
+      Object.entries(errors).forEach(([fieldPath, message]) => {
+        formik.setFieldError(fieldPath, message);
+      });
+
+      const successfulData = responses
+        .map((res) => (res.status === "fulfilled" ? res.value : null))
+        .filter((val) => val !== null);
+
+      const anyFailed = responses.some(
+        (res) => res.status === "rejected" || res.value === null
+      );
+
+      if (anyFailed) {
+        throw new Error("Some documents failed to update.");
+      }
+
+      return successfulData;
     },
-    validationSchema,
+
+    onSuccess: (dataArray) => {
+      if (Array.isArray(dataArray) && dataArray.length > 0) {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success("All document updated.");
+      }
+    },
+
+    onError: (error: any) => {
+      console.error("Documents update error:", error);
+      toast.error(error?.message || "Some documents failed to update.");
+    },
+  });
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues:
+      isUpdateMode && memberData && memberData?.length > 0
+        ? {
+            data: memberData?.map((d: any) => ({
+              id: d?.id || 0,
+              member_ID: memberID,
+              document_document: null as File | null,
+              document_type: d?.document_type?.id?.toString() || "",
+            })),
+          }
+        : {
+            data: [
+              {
+                member_ID: memberID,
+                document_document: null as File | null,
+                document_type: "",
+              },
+            ],
+          },
+    validationSchema: isUpdateMode ? Yup.object({}) : validationSchema,
     onSubmit: (values) => {
-      addDocumentFunc(values.data);
+      if (!memberID) {
+        toast.error("Member ID not found");
+        return;
+      }
+      if (isUpdateMode) {
+        updateDocumentFunc(values.data);
+      } else {
+        addDocumentFunc(values.data);
+      }
     },
   });
 
   const addDocument = () => {
     const newDocument = {
-      member_ID: memberID || "GM0001-PU",
+      member_ID: memberID,
       document_document: null as File | null,
       document_type: "",
     };
@@ -159,7 +269,9 @@ export default function DocumentDetailsStep() {
   };
   const removeDocument = (index: number) => {
     if (formik.values.data.length > 1) {
-      const updatedDocuments = formik.values.data.filter((_, i) => i !== index);
+      const updatedDocuments = formik.values.data.filter(
+        (_: any, i: any) => i !== index
+      );
       formik.setFieldValue("data", updatedDocuments);
     } else {
       toast.error("At least one document is required");
@@ -217,7 +329,6 @@ export default function DocumentDetailsStep() {
                 </div>
               )}
               <div className="grid gap-4 md:grid-cols-1">
-                {/* Upload Document */}
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700">
                     Upload Document
@@ -266,11 +377,15 @@ export default function DocumentDetailsStep() {
                       </Button>
                     )}
                   </div>
-                  {typeof formik.errors.data?.[index] === "object" &&
-                    formik.errors.data?.[index]?.document_document &&
-                    formik.touched.data?.[index]?.document_document && (
+
+                  {(formik.touched.data as any[])?.[index]?.document_document &&
+                    (formik.errors.data as any[])?.[index]
+                      ?.document_document && (
                       <p className="text-sm text-red-600">
-                        {formik.errors.data[index].document_document}
+                        {
+                          (formik.errors.data as any[])?.[index]
+                            ?.document_document
+                        }
                       </p>
                     )}
                 </div>
@@ -302,11 +417,11 @@ export default function DocumentDetailsStep() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {typeof formik.errors.data?.[index] === "object" &&
-                    formik.errors.data?.[index]?.document_type &&
-                    formik.touched.data?.[index]?.document_type && (
+
+                  {(formik.touched.data as any[])?.[index]?.document_type &&
+                    (formik.errors.data as any[])?.[index]?.document_type && (
                       <p className="text-sm text-red-600">
-                        {formik.errors.data[index].document_type}
+                        {(formik.errors.data as any[])?.[index]?.document_type}
                       </p>
                     )}
                 </div>
@@ -315,7 +430,6 @@ export default function DocumentDetailsStep() {
           );
         })}
 
-        {/* Add Another Button */}
         <div>
           <Button
             type="button"
@@ -352,10 +466,10 @@ export default function DocumentDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
-          {isPending ? "Saving..." : "Save & Next"}
+          {isPending || isUpdating ? "Saving..." : "Save & Next"}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

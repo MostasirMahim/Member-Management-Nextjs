@@ -16,22 +16,28 @@ import DescendantsDetailsStep from "../steps/DescendantsDetailsStep";
 import SpecialDaysStep from "../steps/SpecialDaysStep";
 import { useAddMemberStore } from "@/store/store";
 import JobDetailsStep from "../steps/JobDetailsStep";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 const stepTitles = [
-  "Membership Details",
-  "Member Contact Details",
-  "Member Emails Details",
-  "Member Address Details",
-  "Member Spouse Details",
-  "Member Descendants Details",
-  "Companion Details",
-  "Emergency Contact Details",
-  "Member Documents Details",
-  "Member Certificate Details",
-  "Member Job Details",
-  "Member Special Days",
+  { full: "Membership Details", short: "Membership" },
+  { full: "Member Contact Details", short: "Contact" },
+  { full: "Member Emails Details", short: "Email" },
+  { full: "Member Address Details", short: "Address" },
+  { full: "Member Spouse Details", short: "Spouse" },
+  { full: "Member Descendants Details", short: "Descendants" },
+  { full: "Member Companion Details", short: "Companion" },
+  { full: "Member Emergency Contact Details", short: "Emergency" },
+  { full: "Member Documents Details", short: "Documents" },
+  { full: "Member Certificate Details", short: "Certificate" },
+  { full: "Member Job Details", short: "Job" },
+  { full: "Member Special Days", short: "Special Days" },
 ];
 
 export default function AddMember() {
@@ -42,18 +48,30 @@ export default function AddMember() {
     memberID,
     setCurrentStep,
     setMemberID,
+    setIsUpdateMode,
   } = useAddMemberStore();
-  const router = useRouter();
+
   const path = usePathname();
-  const params = useParams();
   const isUpdatePage = path?.startsWith("/member/update/");
 
   useEffect(() => {
-    if (!memberID && isUpdatePage && params.id) {
-      setMemberID(params.id as string);
+    if (path?.startsWith("/member/update/")) {
+      const memberIdFromPath = path.split("/").pop();
+      if (memberIdFromPath && memberIdFromPath !== memberID) {
+        setMemberID(memberIdFromPath);
+        setIsUpdateMode(true);
+      }
     }
-  }, [isUpdatePage, params.id, memberID]);
+  }, [path, memberID, setMemberID, setIsUpdateMode]);
 
+  useEffect(() => {
+    return () => {
+      if (!path?.startsWith("/member/update/")) {
+        setMemberID("");
+        setIsUpdateMode(false);
+      }
+    };
+  }, [path, setMemberID, setIsUpdateMode]);
   const handleStepClick = (stepIndex: number) => {
     setCurrentStep(stepIndex);
   };
@@ -93,7 +111,10 @@ export default function AddMember() {
                 </p>
               ) : (
                 <p>
-                  Add New Member <span>{memberID}</span>
+                  Add New Member{" "}
+                  <span className="font-secondary text-lg text-sky-500">
+                    #{memberID}
+                  </span>
                 </p>
               )}
             </h1>
@@ -103,42 +124,51 @@ export default function AddMember() {
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>{stepTitles[currentStep]}</span>
+              <span>{stepTitles[currentStep].full}</span>
               <span>{Math.round(progressPercentage)}% Complete</span>
             </div>
             <Progress value={progressPercentage} className="h-2" />
           </div>
-          <div className="hidden lg:flex justify-between mt-4 overflow-x-auto">
-            {stepTitles.map((title, index) => (
-              <div
-                key={index}
-                className={`flex flex-col items-center space-y-1 min-w-0 flex-1 cursor-pointer transition-colors ${
-                  index <= currentStep ? "text-primary" : "text-gray-400"
-                }`}
-                onClick={() => handleStepClick(index)}
-              >
+          <div className="flex justify-between mt-4 overflow-x-auto">
+            <TooltipProvider>
+              {stepTitles.map((item, index) => (
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
-                    completedSteps.includes(index)
-                      ? "bg-green-500 text-white"
-                      : index === currentStep
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-gray-200 text-gray-500 hover:bg-gray-300"
+                  key={index}
+                  className={`flex flex-col items-center space-y-1 min-w-0 flex-1 cursor-pointer transition-colors ${
+                    index <= currentStep ? "text-primary" : "text-gray-400"
                   }`}
+                  onClick={() => handleStepClick(index)}
                 >
-                  {completedSteps.includes(index) ? "✓" : index + 1}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                          completedSteps.includes(index)
+                            ? "bg-green-500 text-white"
+                            : index === currentStep
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-gray-200 text-gray-500 hover:bg-gray-300"
+                        }`}
+                      >
+                        {completedSteps.includes(index) ? "✓" : index + 1}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{item.full}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <span className="hidden sm:block text-xs text-center truncate w-full px-1">
+                    {item.short}
+                  </span>
                 </div>
-                <span className="text-xs text-center truncate w-full px-1">
-                  {title}
-                </span>
-              </div>
-            ))}
+              ))}
+            </TooltipProvider>
           </div>
         </div>
         <Card className="shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl text-primary">
-              {stepTitles[currentStep]}
+              {stepTitles[currentStep].full}
             </CardTitle>
           </CardHeader>
           <CardContent>

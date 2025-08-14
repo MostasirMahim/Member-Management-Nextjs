@@ -68,14 +68,15 @@ export default function MembershipDetailsStep() {
     markStepCompleted,
     setMemberID,
     memberID,
+    isUpdateMode,
   } = useAddMemberStore();
-  const path = usePathname();
-  const isUpdateMode = path?.startsWith("/member/update/");
-  const { data: choiceSections, isLoading } = useGetAllChoice();
-  const { data, isLoading: isLoadingMember } = useGetMember(memberID);
-  const { member_info: memberData } = data ?? {};
   const querClient = useQueryClient();
+  const { data: choiceSections, isLoading } = useGetAllChoice();
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
 
+  const { member_info: memberData } = data ?? {};
   const {
     membership_type,
     institute_name,
@@ -170,9 +171,10 @@ export default function MembershipDetailsStep() {
     mutationFn: async (userData: any) => {
       const formData = new FormData();
       Object.entries(userData).forEach(([key, value]) => {
-        formData.append(key, value as any);
+        if (value != null) {
+          formData.append(key, value as any);
+        }
       });
-
       const res = await axiosInstance.patch(
         `/api/member/v1/members/${memberID}/`,
         formData,
@@ -188,7 +190,6 @@ export default function MembershipDetailsStep() {
       if (data?.status === "success") {
         querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Membership Updated Successfully.");
-        formik.resetForm();
       }
     },
     onError: (error: any) => {
@@ -210,9 +211,6 @@ export default function MembershipDetailsStep() {
     },
   });
 
-  console.log(memberData);
-  //Placholder ISSUE : Intial value not recieved Int id for String..
-
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
@@ -222,13 +220,13 @@ export default function MembershipDetailsStep() {
             member_ID: memberData.member_ID || "",
             first_name: memberData.first_name || "",
             last_name: memberData.last_name || "",
-            gender: memberData.gender?.id || "",
+            gender: memberData.gender?.name || "",
             date_of_birth: memberData.date_of_birth || null,
             institute_name: memberData.institute_name?.name || "",
             batch_number: memberData.batch_number || "",
-            membership_status: memberData.membership_status?.id || "",
+            membership_status: memberData.membership_status?.name || "",
             membership_type: memberData.membership_type?.name || "",
-            marital_status: memberData.marital_status?.id || "",
+            marital_status: memberData.marital_status?.name || "",
             anniversary_date: memberData.anniversary_date || null,
             profile_photo: null as File | null,
             blood_group: memberData.blood_group || "",
@@ -264,26 +262,33 @@ export default function MembershipDetailsStep() {
     },
   });
 
-  useEffect(() => {
+  const handleFieldChangeAndGenerateID = (fieldName: string, value: string) => {
+    formik.setFieldValue(fieldName, value);
+    const otherFieldValue =
+      fieldName === "membership_type"
+        ? formik.values.institute_name
+        : formik.values.membership_type;
+    const currentFieldValue = value?.trim();
+    const otherFieldTrimmed = otherFieldValue?.trim();
+
     if (
-      formik.values.membership_type &&
-      formik.values.institute_name &&
+      currentFieldValue &&
+      currentFieldValue !== "" &&
+      otherFieldTrimmed &&
+      otherFieldTrimmed !== "" &&
       !isUpdateMode
     ) {
       const data = {
-        membership_type: formik.values.membership_type,
-        institute_name: formik.values.institute_name,
+        membership_type:
+          fieldName === "membership_type"
+            ? value
+            : formik.values.membership_type,
+        institute_name:
+          fieldName === "institute_name" ? value : formik.values.institute_name,
       };
       generateID(data);
     }
-  }, [
-    formik.values.membership_type,
-    formik.values.institute_name,
-    isUpdateMode,
-  ]);
-
-  console.log("values", formik.values);
-  console.log("errors", formik.errors);
+  };
 
   const imgRef = useRef<HTMLInputElement>(null);
   const handleProfilePictureUpload = (
@@ -344,16 +349,14 @@ export default function MembershipDetailsStep() {
                 Membership Type
               </Label>
               <Select
+                disabled={isUpdateMode}
                 value={formik.values.membership_type}
-                disabled={formik.values.member_ID !== ""}
                 onValueChange={(value) =>
-                  formik.setFieldValue("membership_type", value)
+                  handleFieldChangeAndGenerateID("membership_type", value)
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue>
-                    {formik.values.membership_type || "Choose Membership Type"}
-                  </SelectValue>
+                  <SelectValue placeholder="Choose Membership Type" />
                 </SelectTrigger>
                 <SelectContent>
                   {membership_type?.map((choice: any, index: number) => (
@@ -375,10 +378,10 @@ export default function MembershipDetailsStep() {
                 Institute Name
               </Label>
               <Select
-                disabled={formik.values.member_ID !== ""}
+                disabled={isUpdateMode}
                 value={formik.values.institute_name}
                 onValueChange={(value) =>
-                  formik.setFieldValue("institute_name", value)
+                  handleFieldChangeAndGenerateID("institute_name", value)
                 }
               >
                 <SelectTrigger className="w-full">
@@ -727,10 +730,7 @@ export default function MembershipDetailsStep() {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue>
-                    {formik.values.nationality ??
-                      "What is his/her Nationality?"}
-                  </SelectValue>
+                  <SelectValue placeholder="Select Nationality" />
                 </SelectTrigger>
                 <SelectContent>
                   {countries?.map((name: any, index: number) => (

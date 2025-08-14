@@ -23,10 +23,12 @@ import { CalendarIcon, ChevronRight, Upload, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
+
+import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
   member_ID: Yup.string().required("Member ID is required"),
@@ -47,6 +49,8 @@ const validationSchema = Yup.object({
 export default function CompanionDetailsStep() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const {
     currentStep,
     setCurrentStep,
@@ -54,7 +58,13 @@ export default function CompanionDetailsStep() {
     markStepCompleted,
     memberID,
     setMemberID,
+    isUpdateMode,
   } = useAddMemberStore();
+
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const { companion: memberData } = data ?? {};
 
   const { mutate: addCompanionFunc, isPending } = useMutation({
     mutationFn: async (userData: any) => {
@@ -103,19 +113,86 @@ export default function CompanionDetailsStep() {
     },
   });
 
-  const formik = useFormik({
-    initialValues: {
-      member_ID: memberID || "GM0001-PU",
-      companion_name: "",
-      companion_dob: null as Date | null,
-      companion_contact_number: "",
-      companion_card_number: "",
-      relation_with_member: "",
-      companion_image: null as File | null,
+  const { mutate: updateCompanionFunc, isPending: isUpdating } = useMutation({
+    mutationFn: async (userData: any) => {
+      const formData = new FormData();
+      Object.entries(userData).forEach(([key, value]) => {
+        formData.append(key, value as any);
+      });
+
+      const res = await axiosInstance.patch(
+        `/api/member/v1/members/companion/`,
+        userData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return res.data;
     },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Companion updated.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+
+      if (errors && typeof errors === "object") {
+        for (const [fieldName, messages] of Object.entries(errors)) {
+          if (Array.isArray(messages) && messages.length > 0) {
+            formik.setFieldError(fieldName, messages[0]);
+            if (fieldName === "member_ID") {
+              toast.error(messages[0]);
+              return;
+            }
+          }
+        }
+        toast.error("Submission Failed");
+      } else {
+        toast.error(detail || message || "Submission Failed");
+      }
+    },
+  });
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues:
+      isUpdateMode && memberData
+        ? {
+            member_ID: memberID,
+            id: memberData[0]?.id || 0,
+            companion_name: memberData[0]?.companion_name || "",
+            companion_dob: memberData[0]?.companion_dob || null,
+            companion_contact_number:
+              memberData[0]?.companion_contact_number || "",
+            companion_card_number: memberData[0]?.companion_card_number || "",
+            relation_with_member: memberData[0]?.relation_with_member || "",
+            companion_image: null as File | null,
+          }
+        : {
+            member_ID: memberID,
+            companion_name: "",
+            companion_dob: null as Date | null,
+            companion_contact_number: "",
+            companion_card_number: "",
+            relation_with_member: "",
+            companion_image: null as File | null,
+          },
     validationSchema,
     onSubmit: (values) => {
-      addCompanionFunc(values);
+      if (!memberID) {
+        toast.error("No Member ID found.");
+        return;
+      }
+      if (isUpdateMode) {
+        updateCompanionFunc(values);
+      } else {
+        addCompanionFunc(values);
+      }
     },
   });
 
@@ -169,9 +246,10 @@ export default function CompanionDetailsStep() {
             placeholder="Enter Companion Name"
             className="w-full"
           />
-          {formik.errors.companion_name && formik.touched.companion_name && (
+          {/* <CHANGE> Updated to use consistent touch/error pattern */}
+          {formik.touched.companion_name && formik.errors.companion_name && (
             <p className="text-sm text-red-600">
-              {formik.errors.companion_name}
+              {formik.errors.companion_name as string}
             </p>
           )}
         </div>
@@ -213,7 +291,8 @@ export default function CompanionDetailsStep() {
               />
             </PopoverContent>
           </Popover>
-          {formik.errors.companion_dob && formik.touched.companion_dob && (
+
+          {formik.touched.companion_dob && formik.errors.companion_dob && (
             <p className="text-sm text-red-600">
               {formik.errors.companion_dob as string}
             </p>
@@ -237,10 +316,11 @@ export default function CompanionDetailsStep() {
             placeholder="Enter Companion Contact"
             className="w-full"
           />
-          {formik.errors.companion_contact_number &&
-            formik.touched.companion_contact_number && (
+
+          {formik.touched.companion_contact_number &&
+            formik.errors.companion_contact_number && (
               <p className="text-sm text-red-600">
-                {formik.errors.companion_contact_number}
+                {formik.errors.companion_contact_number as string}
               </p>
             )}
         </div>
@@ -261,10 +341,11 @@ export default function CompanionDetailsStep() {
             placeholder="Enter Companion Card Number"
             className="w-full"
           />
-          {formik.errors.companion_card_number &&
-            formik.touched.companion_card_number && (
+
+          {formik.touched.companion_card_number &&
+            formik.errors.companion_card_number && (
               <p className="text-sm text-red-600">
-                {formik.errors.companion_card_number}
+                {formik.errors.companion_card_number as string}
               </p>
             )}
         </div>
@@ -284,10 +365,11 @@ export default function CompanionDetailsStep() {
             placeholder="Enter Relation with Member"
             className="w-full"
           />
-          {formik.errors.relation_with_member &&
-            formik.touched.relation_with_member && (
+
+          {formik.touched.relation_with_member &&
+            formik.errors.relation_with_member && (
               <p className="text-sm text-red-600">
-                {formik.errors.relation_with_member}
+                {formik.errors.relation_with_member as string}
               </p>
             )}
         </div>
@@ -358,10 +440,10 @@ export default function CompanionDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
-          {isPending ? "Saving..." : "Save & Next"}
+          {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

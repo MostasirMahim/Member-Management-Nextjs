@@ -2,7 +2,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-function useGetMember(id: string) {
+function useGetMember(id: string, option = {}) {
   return useQuery({
     queryKey: ["useGetMember", id],
     queryFn: async () => {
@@ -25,6 +25,7 @@ function useGetMember(id: string) {
       }
     },
     enabled: !!id,
+    ...option,
   });
 }
 

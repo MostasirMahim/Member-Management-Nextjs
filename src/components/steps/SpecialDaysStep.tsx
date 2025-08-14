@@ -16,8 +16,9 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
 import { toast } from "react-toastify";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
+import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
   data: Yup.array()
@@ -41,6 +42,8 @@ const initialValues = {
 
 export default function SpecialDaysStep() {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const {
     currentStep,
     setCurrentStep,
@@ -48,7 +51,13 @@ export default function SpecialDaysStep() {
     markStepCompleted,
     memberID,
     setMemberID,
+    isUpdateMode,
   } = useAddMemberStore();
+
+  const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
+    enabled: isUpdateMode && !!memberID,
+  });
+  const { special_days: memberData } = data ?? {};
 
   const { mutate: addSpecialDayFunc, isPending } = useMutation({
     mutationFn: async (userData: any) => {
@@ -106,16 +115,85 @@ export default function SpecialDaysStep() {
     },
   });
 
+  const { mutate: updateSpecialDayFunc, isPending: isUpdating } = useMutation({
+    mutationFn: async (userData: any) => {
+      const res = await axiosInstance.patch(
+        `/api/member/v1/members/special_day/${memberID}`,
+        userData
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Special day successfully updated.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+      if (errors?.data && Array.isArray(errors.data)) {
+        const contactsErrors = errors.data;
+        contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+          if (contactErrorObj && typeof contactErrorObj === "object") {
+            for (const [fieldName, messages] of Object.entries(
+              contactErrorObj
+            )) {
+              if (Array.isArray(messages) && messages.length > 0) {
+                const fieldPath = `data.${contactIndex}.${fieldName}`;
+                formik.setFieldError(fieldPath, messages[0]);
+              }
+            }
+          }
+        });
+      }
+      if (errors && typeof errors === "object") {
+        const otherErrorKeys = Object.keys(errors).filter(
+          (key) => key !== "data"
+        );
+
+        if (otherErrorKeys.length > 0) {
+          const firstKey = otherErrorKeys[0];
+          const messages = errors[firstKey];
+
+          if (Array.isArray(messages) && messages.length > 0) {
+            toast.error(messages[0]);
+            return;
+          }
+        }
+      }
+
+      toast.error(detail || message || "Submission Failed");
+    },
+  });
+
   const formik = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    initialValues:
+      isUpdateMode && memberData && memberData?.length > 0
+        ? {
+            data: memberData?.map((s: any) => ({
+              id: s.id || 0,
+              title: s.title || "",
+              date: s.date ? new Date(s.date) : null,
+            })),
+          }
+        : initialValues,
     validationSchema,
     onSubmit: (values) => {
-      console.log("Special Days Form submitted:", values);
+      if (!memberID) {
+        toast.error("No Member ID found.");
+        return;
+      }
       const data = {
-        member_ID: memberID || "GM0001-PU",
+        member_ID: memberID,
         data: values.data,
       };
-      addSpecialDayFunc(data);
+      if (isUpdateMode) {
+        updateSpecialDayFunc(data);
+      } else {
+        addSpecialDayFunc(data);
+      }
     },
   });
 
@@ -131,7 +209,7 @@ export default function SpecialDaysStep() {
   const removeSpecialDay = (index: number) => {
     if (formik.values.data.length > 1) {
       const updatedSpecialDays = formik.values.data.filter(
-        (_, i) => i !== index
+        (_: any, i: any) => i !== index
       );
       formik.setFieldValue("data", updatedSpecialDays);
     } else {
@@ -190,11 +268,10 @@ export default function SpecialDaysStep() {
                   name={`data.${index}.title`}
                   className="w-full"
                 />
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index]?.title &&
-                  formik.touched.data?.[index]?.title && (
+                {(formik.touched.data as any[])?.[index]?.title &&
+                  (formik.errors.data as any[])?.[index]?.title && (
                     <p className="text-sm text-red-600">
-                      {formik.errors.data[index].title}
+                      {(formik.errors.data as any[])?.[index]?.title}
                     </p>
                   )}
               </div>
@@ -235,11 +312,10 @@ export default function SpecialDaysStep() {
                     />
                   </PopoverContent>
                 </Popover>
-                {typeof formik.errors.data?.[index] === "object" &&
-                  formik.errors.data?.[index]?.date &&
-                  formik.touched.data?.[index]?.date && (
+                {(formik.touched.data as any[])?.[index]?.date &&
+                  (formik.errors.data as any[])?.[index]?.date && (
                     <p className="text-sm text-red-600">
-                      {formik.errors.data[index].date as string}
+                      {(formik.errors.data as any[])?.[index]?.date}
                     </p>
                   )}
               </div>
@@ -284,10 +360,10 @@ export default function SpecialDaysStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
-          {isPending ? "Saving..." : "Save & Next"}
+          {isPending || isUpdating ? "Saving..." : "Save & Next"}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
