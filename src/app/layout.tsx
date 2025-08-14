@@ -4,8 +4,8 @@ import "./globals.css";
 import Providers from "@/providers/QueryProviders";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/providers/ThemeProviders";
-import "react-toastify/ReactToastify.css"
-import {ToastContainer} from 'react-toastify'
+import "react-toastify/ReactToastify.css";
+import { Bounce, ToastContainer } from "react-toastify";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -39,12 +39,23 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-          
             {children}
           </ThemeProvider>
 
           <Toaster />
-          <ToastContainer/>
+          <ToastContainer
+            position="top-center"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick={false}
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            transition={Bounce}
+          />
         </Providers>
       </body>
     </html>

@@ -174,3 +174,61 @@ export const useRegUserStore = create<RegUserState>((set, get) => ({
       isOtpPass: false,
     }),
 }));
+
+interface StepStore {
+  currentStep: number;
+  completedSteps: number[];
+  totalSteps: number;
+  memberID: string;
+  isUpdateMode: boolean;
+  setMemberID: (memberID: string) => void;
+  setCurrentStep: (step: number) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  markStepCompleted: (step: number) => void;
+  resetSteps: () => void;
+  setIsUpdateMode: (value: boolean) => void;
+}
+
+export const useAddMemberStore = create<StepStore>((set, get) => ({
+  currentStep: 0,
+  completedSteps: [],
+  totalSteps: 12,
+  memberID: "",
+  isUpdateMode: false,
+
+  setMemberID: (memberID: string) => set({ memberID }),
+  setIsUpdateMode: (value: boolean) => set({ isUpdateMode: value }),
+
+  setCurrentStep: (step: number) => {
+    const { totalSteps } = get();
+    if (step >= 0 && step < totalSteps) {
+      set({ currentStep: step });
+    }
+  },
+
+  nextStep: () => {
+    const { currentStep, totalSteps } = get();
+    if (currentStep < totalSteps - 1) {
+      set({ currentStep: currentStep + 1 });
+    }
+  },
+
+  prevStep: () => {
+    const { currentStep } = get();
+    if (currentStep > 0) {
+      set({ currentStep: currentStep - 1 });
+    }
+  },
+
+  markStepCompleted: (step: number) => {
+    const { completedSteps } = get();
+    if (!completedSteps.includes(step)) {
+      set({ completedSteps: [...completedSteps, step] });
+    }
+  },
+
+  resetSteps: () => {
+    set({ currentStep: 0, completedSteps: [] });
+  },
+}));

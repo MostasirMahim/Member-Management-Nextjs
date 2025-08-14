@@ -80,6 +80,7 @@ const config: Config = {
       },
       fontFamily: {
         primary: ["Plus Jakarta Sans", "sans-serif"],
+        secondary: ["Manrope", "sans-serif"],
       },
     },
   },

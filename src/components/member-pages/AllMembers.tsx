@@ -1,16 +1,14 @@
 "use client";
-
 import { useState } from "react";
 import {
   Search,
   Filter,
   MoreHorizontal,
-  ArrowUpDown,
   Check,
   X,
   Pencil,
   Trash2,
-  UserPlus,
+  FileSpreadsheet,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -31,7 +29,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -40,139 +37,96 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-
-
-import { useQuery } from "@tanstack/react-query";
-import { formatJoinedDate } from "@/lib/date_modify";
-import { LoadingPage } from "@/components/ui/loading";
-import { DummyUsers } from "@/lib/dummy";
+import { LoadingDots, LoadingPage } from "@/components/ui/loading";
+import useGetAllMembers from "@/hooks/data/useGetAllMembers";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination";
+import { useAddMemberStore } from "@/store/store";
 
 function AllMembers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-
-  // const { data: allUsers, isLoading: user_isLoading } = useQuery({
-  //   queryKey: ["all_Users"],
-  //   queryFn: () => getAllUsers(),
-  // });
+  const { setMemberID, memberID, setIsUpdateMode, isUpdateMode } =
+    useAddMemberStore();
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page")) || 1;
+  const { data: allMembersReq, isLoading: user_isLoading } =
+    useGetAllMembers(page);
+  const allMembers = allMembersReq?.data;
+  const paginationData = allMembersReq?.pagination;
+  const { current_page, total_pages } = paginationData || {};
 
   const filteredUsers =
-    DummyUsers?.filter((user) => {
+    allMembers?.filter((user: any) => {
       const matchesSearch =
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesRole = "author";
-
-      return matchesSearch && matchesRole;
+        user.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.member_ID.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch;
     }) || [];
+  const router = useRouter();
+  const handleMemberClick = (member_ID: string) => {
+    router.push(`/member/view/${member_ID}`);
+  };
 
-  // if (user_isLoading) return <LoadingPage />;
+  const goToPage = (page: number) => {
+    if (page !== current_page) {
+      router.push(`?page=${page}`);
+      router.refresh();
+    }
+  };
+
+  const renderPageLinks = () => {
+    const pagesToShow = [];
+
+    for (let i = 1; i <= total_pages; i++) {
+      pagesToShow.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => goToPage(i)}
+            isActive={i === current_page}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return pagesToShow;
+  };
+  const handleUpdate = (member_ID: string) => {
+    setMemberID(member_ID);
+    setIsUpdateMode(true);
+    router.push(`/member/update/${member_ID}`);
+  };
+
+  if (user_isLoading) return <LoadingDots />;
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+          <h1 className="text-3xl font-bold tracking-tight">ALL Members</h1>
           <p className="text-muted-foreground">
-            Manage user accounts and permissions
+            A list of all members in the system.
           </p>
         </div>
 
-        <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-1">
-              <UserPlus className="h-4 w-4" /> Add User
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New User</DialogTitle>
-              <DialogDescription>
-                Create a new user account. The user will receive an email with
-                login instructions.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input id="name" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
-                  Username
-                </Label>
-                <Input id="username" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="email" className="text-right">
-                  Email
-                </Label>
-                <Input id="email" type="email" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="role" className="text-right">
-                  Role
-                </Label>
-                <Select defaultValue="reader">
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrator</SelectItem>
-                    <SelectItem value="editor">Editor</SelectItem>
-                    <SelectItem value="author">Author</SelectItem>
-                    <SelectItem value="reader">Reader</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="col-start-2 col-span-3 flex items-center space-x-2">
-                  <Checkbox id="send-email" />
-                  <label
-                    htmlFor="send-email"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Send welcome email
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  console.log("Adding new user");
-                  setIsAddUserOpen(false);
-                }}
-              >
-                Create User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div>
+          <Button className="gap-1">
+            <FileSpreadsheet className="h-4 w-4" />
+            Export
+          </Button>
+        </div>
       </div>
-
-      {/* Filters and Search */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 flex gap-2">
           <div className="relative flex-1">
@@ -247,24 +201,40 @@ function AllMembers() {
           </DropdownMenu>
         </div>
       </div>
-
-      {/* Users Table */}
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border my-2 font-secondary">
+        <Table className="">
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[300px]">
-                <div className="flex items-center gap-1">
-                  User
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <ArrowUpDown className="h-3 w-3" />
-                  </Button>
-                </div>
+            <TableRow className=" text-center font-bold h-14 bg-[#f9fafb] ">
+              <TableHead className=" text-black dark:text-white font-bold  ">
+                ID
               </TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Joined</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
+                Member
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
+                Type
+              </TableHead>
+              <TableHead className=" text-black dark:text-white font-bold">
+                Status
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
+                Batch
+              </TableHead>
+              <TableHead className=" text-black dark:text-white font-bold text-center">
+                Martial St.
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold text-center">
+                DOB
+              </TableHead>
+              <TableHead className=" text-black dark:text-white font-bold">
+                Blood Group
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold ">
+                Nationality
+              </TableHead>
+              <TableHead className="text-black dark:text-white text-right font-bold">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -278,37 +248,62 @@ function AllMembers() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={user.avatar || "user.png"}
-                          alt={user.name}
-                        />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
+              filteredUsers.map((user: any) => (
+                <TableRow
+                  key={user.member_ID}
+                  className="  cursor-pointer hover:translate-y-1 transition-transform duration-300 ease-in-out "
+                >
+                  <TableCell
+                    className="font-medium "
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
+                    {user.member_ID}
+                  </TableCell>
+                  <TableCell
+                    className="flex justify-start items-center"
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
+                    <div className="space-y-1 ">
+                      <p className="font-medium text-left">
+                        {user.first_name + " " + user.last_name}
+                      </p>
+                      <p className="text-xs text-muted-foreground text-left">
+                        {user.institute_name}
+                      </p>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">auther</Badge>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    <p>{user.membership_type}</p>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
                     <Badge
                       variant={"default"}
                       className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
                     >
-                      Active
+                      {user.membership_status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{formatJoinedDate(user.createdAt)}</TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    {user.batch_number || "-"}
+                  </TableCell>
+                  <TableCell
+                    className="text-center"
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
+                    {user.marital_status || "-"}
+                  </TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    {user.date_of_birth || "-"}
+                  </TableCell>
+                  <TableCell
+                    className="text-center"
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
+                    {user.blood_group || "-"}
+                  </TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    {user.nationality || "-"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -319,8 +314,11 @@ function AllMembers() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="gap-2">
-                          <Pencil className="h-4 w-4" /> Edit
+                        <DropdownMenuItem
+                          className="gap-2"
+                          onClick={() => handleUpdate(user.member_ID)}
+                        >
+                          <Pencil className="h-4 w-4" /> Update
                         </DropdownMenuItem>
                         <DropdownMenuItem className="gap-2">
                           {true ? (
@@ -347,21 +345,38 @@ function AllMembers() {
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing <strong>1</strong> to <strong>{filteredUsers.length}</strong>{" "}
-          of <strong>{filteredUsers.length}</strong> users
-        </p>
+      {/* -- PAGINATION -- */}
+      <div className=" flex justify-center">
+        <Pagination>
+          <PaginationContent>
+            {/* Previous Button */}
+            {paginationData?.previous && (
+              <PaginationItem className="cursor-pointer">
+                <PaginationPrevious
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goToPage(current_page - 1);
+                  }}
+                />
+              </PaginationItem>
+            )}
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" disabled>
-            Next
-          </Button>
-        </div>
+            {/* Page Numbers */}
+            {renderPageLinks()}
+
+            {/* Next Button */}
+            {paginationData?.next && (
+              <PaginationItem>
+                <PaginationNext
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goToPage(current_page + 1);
+                  }}
+                />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

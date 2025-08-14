@@ -1,6 +1,9 @@
-
-export function formatJoinedDate(date: Date) {
-  const parsedDate = typeof date === 'string' ? new Date(date) : date;
+export function formatJoinedDate(date: Date | string | null) {
+  if (!date) return "";
+  const parsedDate = typeof date === "string" ? new Date(date) : date;
+  if (isNaN(parsedDate.getTime())) {
+    return "";
+  }
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "2-digit",
@@ -10,7 +13,7 @@ export function formatJoinedDate(date: Date) {
 }
 
 export function formatPostDate(date: Date) {
-  const parsedDate = typeof date === 'string' ? new Date(date) : date;
+  const parsedDate = typeof date === "string" ? new Date(date) : date;
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "long",

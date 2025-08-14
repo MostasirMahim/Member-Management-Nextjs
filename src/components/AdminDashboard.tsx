@@ -23,6 +23,22 @@ import {
   Logs,
   Mails,
   MailPlus,
+  UserRound,
+  BetweenHorizonalStart,
+  SquarePen,
+  ExternalLink,
+  Settings,
+  HandPlatter,
+  Soup,
+  BookCheck,
+  ShoppingCart,
+  ListTodo,
+  Upload,
+  PercentCircle,
+  Code,
+  TicketCheck,
+  TicketPlus,
+  CirclePlus,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -197,6 +213,100 @@ const navigation = [
         label: "Configurations",
         href: "/emails/configurations/",
       },
+      {
+        icon: <UserRound className="h-4 w-4" />,
+        label: "Groups",
+        href: "/emails/groups/",
+      },
+      {
+        icon: <BetweenHorizonalStart className="h-4 w-4" />,
+        label: "Add email to group",
+        href: "/emails/add_email/",
+      },
+      {
+        icon: <SquarePen className="h-4 w-4" />,
+        label: "Compose email",
+        href: "/emails/compose/",
+      },
+      {
+        icon: <ExternalLink className="h-4 w-4" />,
+        label: "Outbox",
+        href: "/emails/outbox/",
+      },
+      {
+        icon: <Settings className="h-4 w-4" />,
+        label: "View all composes",
+        href: "/emails/compose/view/",
+      },
+    ],
+  },
+  {
+    icon: <HandPlatter className="h-5 w-5" />,
+    label: "Restaurant management",
+    href: "#",
+    subItems: [
+      {
+        icon: <Soup className="h-4 w-4" />,
+        label: "Restaurants",
+        href: "/restaurants/",
+      },
+      {
+        icon: <BookCheck className="h-4 w-4" />,
+        label: "Add restaurants choices",
+        href: "/restaurants/choices/",
+      },
+      {
+        icon: <ShoppingCart className="h-4 w-4" />,
+        label: "Add restaurant item",
+        href: "/restaurants/items/add/",
+      },
+      {
+        icon: <ListTodo className="h-4 w-4" />,
+        label: "Add item category",
+        href: "/restaurants/items/add/category/",
+      },
+      {
+        icon: <Upload className="h-4 w-4" />,
+        label: "Upload restaurant sales",
+        href: "/restaurants/sales/upload/",
+      },
+      {
+        icon: <ShoppingCart className="h-4 w-4" />,
+        label: "View cart",
+        href: "/restaurants/checkout/",
+      },
+    ],
+  },
+  {
+    icon: <PercentCircle className="h-5 w-5" />,
+    label: "Promo code management",
+    href: "#",
+    subItems: [
+      {
+        icon: <Code className="h-4 w-4" />,
+        label: "View all promo codes",
+        href: "/promo_codes/",
+      },
+      {
+        icon: <CirclePlus className="h-4 w-4" />,
+        label: "Add promo code",
+        href: "/promo_codes/add/",
+      },
+      {
+        icon: <TicketCheck className="h-4 w-4" />,
+        label: "promo codes category",
+        href: "/promo_codes/categories/",
+      },
+      {
+        icon: <TicketPlus className="h-4 w-4" />,
+        label: "Add category",
+        href: "/promo_codes/categories/add/",
+      },
+      {
+        icon: <Eye className="h-4 w-4" />,
+        label: "View applied promo codes",
+        href: "/promo_codes/applied_promo_codes/",
+      },
     ],
   },
 ];
@@ -347,7 +457,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   }
 
   const Sidebar = () => (
-    <div className="flex flex-col h-full font-primary">
+    <div className="flex flex-col h-full max-h-screen overflow-hidden font-primary">
       <div className="p-4">
         <div className="flex items-center justify-center">
           <img
@@ -378,7 +488,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
   if (isPending) return <LoadingDots />;
   return (
-    <div className="min-h-screen h-screen max-h-screen overflow-y-auto flex bg-muted/30">
+    <div className="min-h-screen h-screen max-h-screen overflow-hidden flex bg-muted/30">
       <aside className="hidden lg:block w-64 border-r bg-background h-screen sticky top-0">
         <Sidebar />
       </aside>
