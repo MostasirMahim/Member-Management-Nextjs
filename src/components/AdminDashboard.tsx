@@ -331,24 +331,23 @@ const NavItem = ({
   active,
   badge,
   subItems,
-}: NavItemProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  isOpen,
+  onToggle,
+}: NavItemProps & { isOpen?: boolean; onToggle?: () => void }) => {
   const pathname = usePathname();
 
-  // Check if any sub-item is active
   const hasActiveSubItem = subItems?.some(
     (subItem) => pathname === subItem.href
   );
   const isParentActive = active || hasActiveSubItem;
-
-  if (subItems && subItems.length > 0) {
+  if (subItems && subItems?.length > 0) {
     return (
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Collapsible open={isOpen} onOpenChange={onToggle}>
         <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-start gap-3 h-10 px-3",
+              "w-full justify-start gap-1 h-10 px-3",
               isParentActive && "bg-accent text-accent-foreground"
             )}
           >
@@ -366,10 +365,10 @@ const NavItem = ({
             )}
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-1">
+        <CollapsibleContent className="space-y-1 overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
           <div className="ml-6 space-y-1">
-            {subItems.map((subItem) => (
-              <Link key={subItem.href} href={subItem.href}>
+            {subItems.map((subItem,index) => (
+              <Link key={index} href={subItem.href}>
                 <Button
                   variant="ghost"
                   className={cn(
@@ -416,7 +415,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
-
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { mutate: logOutFunc, isPending } = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.delete("/api/account/v1/logout/");
@@ -470,15 +469,19 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
       <ScrollArea className="flex-1 px-3">
         <nav className="space-y-1">
-          {navigation.map((item: any) => (
+          {navigation.map((item: any, index) => (
             <NavItem
-              key={item.label}
+              key={index}
               icon={item.icon}
               label={item.label}
               href={item.href}
               active={pathname === item.href}
               badge={item.badge}
               subItems={item.subItems}
+              isOpen={openMenu === item.label}
+              onToggle={() =>
+                setOpenMenu(openMenu === item.label ? null : item.label)
+              }
             />
           ))}
         </nav>
