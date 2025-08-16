@@ -406,7 +406,6 @@ export default function CompanionDetailsStep() {
                 variant="ghost"
                 onClick={() => {
                   fileInputRef.current?.click();
-                  console.log("Clicked to upload companion picture");
                 }}
                 className="w-full"
               >

@@ -109,14 +109,14 @@ export default function AddMember() {
                 <p>
                   Update Member{" "}
                   <span className="font-secondary text-lg text-sky-500">
-                    #{memberID}
+                    { memberID && "#" + memberID}
                   </span>
                 </p>
               ) : (
                 <p>
                   Add New Member{" "}
                   <span className="font-secondary text-lg text-sky-500">
-                    #{memberID}
+                    {memberID && "#" + memberID}
                   </span>
                 </p>
               )}

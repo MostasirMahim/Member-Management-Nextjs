@@ -39,6 +39,9 @@ import {
   TicketCheck,
   TicketPlus,
   CirclePlus,
+  BadgeDollarSign,
+  List,
+  Package,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -278,6 +281,109 @@ const navigation = [
     ],
   },
   {
+    icon: <Package className="h-5 w-5" />,
+    label: "Products Management",
+    href: "#",
+    subItems: [
+      {
+        icon: <Plus className="h-3 w-3" />,
+        label: "Add Product",
+        href: "/products/add/",
+      },
+      {
+        icon: <Eye className="h-3 w-3" />,
+        label: "View Products",
+        href: "/products",
+      },
+
+      {
+        icon: <List className="h-4 w-4" />,
+        label: "Categories",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Category",
+            href: "/products/categories/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Categories",
+            href: "/products/categories/",
+          },
+        ],
+      },
+      {
+        icon: <List className="h-4 w-4" />,
+        label: "Brands",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Brand",
+            href: "/products/brands/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Brands",
+            href: "/products/brands/",
+          },
+        ],
+      },
+      {
+        icon: <List className="h-4 w-4" />,
+        label: "Media",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Media",
+            href: "/products/media/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Media",
+            href: "/products/media/",
+          },
+        ],
+      },
+      {
+        icon: <BadgeDollarSign className="h-4 w-4" />,
+        label: "Prices",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Product Price",
+            href: "/products/prices/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Product Price",
+            href: "/products/prices/",
+          },
+        ],
+      },
+      {
+        icon: <ShoppingCart className="h-4 w-4" />,
+        label: "Product Buy",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Product Cart",
+            href: "/products/buy/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Product Cart",
+            href: "/products/buy/",
+          },
+        ],
+      },
+    ],
+  },
+  {
     icon: <PercentCircle className="h-5 w-5" />,
     label: "Promo code management",
     href: "#",
@@ -331,50 +437,50 @@ const NavItem = ({
   active,
   badge,
   subItems,
-  isOpen,
-  onToggle,
-}: NavItemProps & { isOpen?: boolean; onToggle?: () => void }) => {
+}: NavItemProps) => {
   const pathname = usePathname();
 
   const hasActiveSubItem = subItems?.some(
     (subItem) => pathname === subItem.href
   );
   const isParentActive = active || hasActiveSubItem;
+  const [isOpen, setIsOpen] = useState(isParentActive);
+
   if (subItems && subItems?.length > 0) {
     return (
-      <Collapsible open={isOpen} onOpenChange={onToggle}>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-start gap-1 h-10 px-3",
-              isParentActive && "bg-accent text-accent-foreground"
+              "w-[98%] hover:translate-y-1 transition-transform duration-300 ease-in-out  justify-between gap-1  h-10 px-3 ",
+              isParentActive && "bg-primary hover:bg-primaryhover:text-white rounded-xl dark:bg-accent text-white"
             )}
           >
-            {icon}
-            <span className="flex-1 text-left">{label}</span>
-            {badge && (
-              <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
-                {badge}
-              </span>
-            )}
-            {isOpen ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
+            <div className="flex items-center gap-2">
+              {icon}
+              <span className=" text-left">{label}</span>
+            </div>
+
+            <div className="flex items-center ">
+              {isOpen ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+            </div>
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-1 overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+        <CollapsibleContent className="space-y-1 ">
           <div className="ml-6 space-y-1">
-            {subItems.map((subItem,index) => (
+            {subItems.map((subItem, index) => (
               <Link key={index} href={subItem.href}>
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start gap-3 h-9 px-3 text-sm",
+                    "w-full hover:translate-y-1 transition-transform duration-300 ease-in-out my-1 justify-start gap-3 h-9 px-3 text-sm",
                     pathname === subItem.href &&
-                      "bg-accent text-accent-foreground"
+                      "bg-primary py-1 hover:bg-primary hover:text-white rounded-xl  dark:bg-accent text-white"
                   )}
                 >
                   {subItem.icon}
@@ -393,8 +499,8 @@ const NavItem = ({
       <Button
         variant="ghost"
         className={cn(
-          "w-full justify-start gap-3 h-10 px-3",
-          active && "bg-accent text-accent-foreground"
+          "w-full hover:translate-y-1 transition-transform duration-300 ease-in-out  justify-start gap-3 h-10 px-3",
+          active && "bg-primary hover:bg-primary hover:text-white rounded-xl  dark:bg-accent text-white"
         )}
       >
         {icon}
@@ -415,7 +521,6 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { mutate: logOutFunc, isPending } = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.delete("/api/account/v1/logout/");
@@ -456,7 +561,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   }
 
   const Sidebar = () => (
-    <div className="flex flex-col h-full max-h-screen overflow-hidden font-primary">
+    <div className="flex flex-col  max-h-screen overflow-y-auto font-primary ">
       <div className="p-4">
         <div className="flex items-center justify-center">
           <img
@@ -467,8 +572,8 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <ScrollArea className="flex-1 px-3">
-        <nav className="space-y-1">
+      <ScrollArea className="flex-1  overflow-y-auto no-scrollbar">
+        <nav className="space-y-1 px-2">
           {navigation.map((item: any, index) => (
             <NavItem
               key={index}
@@ -478,10 +583,6 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
               active={pathname === item.href}
               badge={item.badge}
               subItems={item.subItems}
-              isOpen={openMenu === item.label}
-              onToggle={() =>
-                setOpenMenu(openMenu === item.label ? null : item.label)
-              }
             />
           ))}
         </nav>
@@ -491,8 +592,8 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
   if (isPending) return <LoadingDots />;
   return (
-    <div className="min-h-screen h-screen max-h-screen overflow-hidden flex bg-muted/30">
-      <aside className="hidden lg:block w-64 border-r bg-background h-screen sticky top-0">
+    <div className="min-h-screen flex bg-muted/30 max-w-screen-2xl mx-auto">
+      <aside className="hidden lg:block w-64 border-r bg-background h-full overflow-y-auto sticky top-0">
         <Sidebar />
       </aside>
 
@@ -506,7 +607,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
         </SheetContent>
       </Sheet>
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col ">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
           <Button
             variant="ghost"

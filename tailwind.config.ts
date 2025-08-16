@@ -56,20 +56,7 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      keyframes: {
-         "accordion-down": {
-    from: { height: "0", opacity: "0", transform: "scaleY(0.95)" },
-    to: { height: "var(--radix-accordion-content-height)", opacity: "1", transform: "scaleY(1)" },
-  },
-  "accordion-up": {
-    from: { height: "var(--radix-accordion-content-height)", opacity: "1", transform: "scaleY(1)" },
-    to: { height: "0", opacity: "0", transform: "scaleY(0.95)" },
-  },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.3s ease-out",
-        "accordion-up": "accordion-up 0.3s ease-out",
-      },
+     
       fontFamily: {
         primary: ["Plus Jakarta Sans", "sans-serif"],
         secondary: ["Manrope", "sans-serif"],

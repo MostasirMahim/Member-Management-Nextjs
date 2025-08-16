@@ -206,7 +206,7 @@ function AllMembers() {
       <div className="rounded-md border my-2 font-secondary">
         <Table className="">
           <TableHeader>
-            <TableRow className=" text-center font-bold h-14 bg-[#f9fafb] ">
+            <TableRow className=" text-center font-bold h-14 bg-[#f9fafb] dark:bg-accent">
               <TableHead className=" text-black dark:text-white font-bold  ">
                 ID
               </TableHead>
