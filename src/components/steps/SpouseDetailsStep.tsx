@@ -92,7 +92,6 @@ export default function SpouseDetailsStep() {
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-        formik.resetForm();
         toast.success(data.message || "Spouse has been successfully added.");
         markStepCompleted(currentStep);
         nextStep();
@@ -155,11 +154,11 @@ export default function SpouseDetailsStep() {
       }
     },
   });
-  
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
             member_ID: memberID || "",
             id: memberData[0]?.id || 0,
