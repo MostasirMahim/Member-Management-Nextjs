@@ -1,13 +1,7 @@
-
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableHeader,
@@ -24,13 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  MoreVertical,
-  Pencil,
-  Trash2,
-  Eye,
-  Package,
-} from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Eye, Package } from "lucide-react";
 import { SearchFilterSection } from "@/components/products/SearchFilterSection";
 import Link from "next/link";
 import Image from "next/image";
@@ -115,16 +103,16 @@ export default function ProductTable({ products }: Props) {
   );
 
   const goToPage = (page: number) => {
-  if (page < 1 || page > totalPages) return;
+    if (page < 1 || page > totalPages) return;
 
-  const params = new URLSearchParams(Array.from(searchParams.entries()));
-  params.set("page", page.toString());
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    params.set("page", page.toString());
 
-  router.push(`?${params.toString()}`);
-};
+    router.push(`?${params.toString()}`);
+  };
 
   return (
-    <div >
+    <div>
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-row items-center gap-2">
           <Package className="h-6 w-6 opacity-75" />
@@ -157,7 +145,9 @@ export default function ProductTable({ products }: Props) {
               <TableHead className="text-gray-600">Status</TableHead>
               <TableHead className="text-gray-600">Category</TableHead>
               <TableHead className="text-gray-600">Brand</TableHead>
-              <TableHead className="text-right text-gray-500">Actions</TableHead>
+              <TableHead className="text-right text-gray-500">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -168,7 +158,10 @@ export default function ProductTable({ products }: Props) {
               >
                 <TableCell>
                   <Image
-                    src={`http://127.0.0.1:8000/${prod.media[0]?.image}` || "/placeholder.png"}
+                    src={
+                      `http://127.0.0.1:8000/${prod.media[0]?.image}` ||
+                      "/placeholder.png"
+                    }
                     alt={prod.name}
                     width={56}
                     height={56}
@@ -202,11 +195,15 @@ export default function ProductTable({ products }: Props) {
                       {prod.quantity_in_stock} in stock
                     </Badge>
                   ) : (
-                    <Badge className="bg-red-500 text-white">Out of stock</Badge>
+                    <Badge className="bg-red-500 text-white">
+                      Out of stock
+                    </Badge>
                   )}
                 </TableCell>
 
-                <TableCell className="text-gray-600 font-semibold">{prod.sku}</TableCell>
+                <TableCell className="text-gray-600 font-semibold">
+                  {prod.sku}
+                </TableCell>
 
                 <TableCell>
                   <Badge
@@ -260,28 +257,20 @@ export default function ProductTable({ products }: Props) {
 
         {/* Pagination */}
         <Pagination className="mt-4 justify-center flex cursor-pointer">
-          <PaginationPrevious
-            onClick={() => goToPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          />
+          <PaginationPrevious onClick={() => goToPage(currentPage - 1)} />
           <PaginationContent>
             {Array.from({ length: totalPages }).map((_, i) => {
               const page = i + 1;
               return (
-                <PaginationItem
-                  key={page}
-                  onClick={() => goToPage(page)}
-                  active={page === currentPage}
-                >
-                  <PaginationLink>{page}</PaginationLink>
+                <PaginationItem key={page} onClick={() => goToPage(page)}>
+                  <PaginationLink isActive={page === currentPage}>
+                    {page}
+                  </PaginationLink>
                 </PaginationItem>
               );
             })}
           </PaginationContent>
-          <PaginationNext
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          />
+          <PaginationNext onClick={() => goToPage(currentPage + 1)} />
         </Pagination>
       </CardContent>
     </div>
