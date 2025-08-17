@@ -609,7 +609,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   if (isPending) return <LoadingDots />;
   return (
     <div className="min-h-screen flex bg-muted/30 max-w-screen-2xl mx-auto">
-      <aside className="hidden lg:block w-64 border-r bg-background h-full overflow-y-auto sticky top-0">
+      <aside className="hidden lg:block w-[20%] border-r bg-background h-full overflow-y-auto sticky top-0">
         <Sidebar />
       </aside>
 
@@ -623,7 +623,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
         </SheetContent>
       </Sheet>
 
-      <div className="flex-1 flex flex-col ">
+      <div className="flex-1 flex flex-col w-[80%] ">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
           <Button
             variant="ghost"
@@ -673,7 +673,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
             </DropdownMenu>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8 ">
+        <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 ">
           {children}
         </main>
       </div>

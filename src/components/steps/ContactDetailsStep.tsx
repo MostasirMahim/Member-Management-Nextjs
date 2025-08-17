@@ -51,7 +51,7 @@ export default function ContactDetailsStep() {
   const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
     enabled: isUpdateMode && !!memberID,
   });
-  const {contact_info: memberData} = data ?? {};
+  const { contact_info: memberData } = data ?? {};
   const querClient = useQueryClient();
 
   const { mutate: addContactFunc, isPending } = useMutation({
@@ -165,7 +165,7 @@ export default function ContactDetailsStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData && memberData?.length > 0 
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
             contacts: memberData?.map((memberData: any) => ({
               id: memberData?.id,
@@ -201,7 +201,6 @@ export default function ContactDetailsStep() {
       }
     },
   });
-console.log("formik", formik.values);
   const addContact = () => {
     const newContact = {
       contact_type: "",
@@ -290,13 +289,9 @@ console.log("formik", formik.values);
                   </SelectContent>
                 </Select>
                 {(formik.touched.contacts as any[])?.[index]?.contact_type &&
-                  (formik.errors.contacts as any[])?.[index]?.contact_type
-                    ?.name && (
+                  (formik.errors.contacts as any[])?.[index]?.contact_type && (
                     <p className="text-sm text-red-600">
-                      {
-                        (formik.errors.contacts as any[])?.[index]?.contact_type
-                          ?.name
-                      }
+                      {(formik.errors.contacts as any[])?.[index]?.contact_type}
                     </p>
                   )}
               </div>

@@ -39,7 +39,7 @@ const validationSchema = Yup.object({
 const initialValues = {
   data: [
     {
-      email_type: 0,
+      email_type: null,
       email: "",
       is_primary: false,
     },
@@ -231,7 +231,7 @@ export default function EmailDetailsStep() {
       formik.setFieldValue(`data.${index}.${field}`, value);
     }
   };
-
+  
   const handleSkip = () => {
     nextStep();
   };

@@ -682,6 +682,12 @@ export default function MembershipDetailsStep() {
                   />
                 </PopoverContent>
               </Popover>
+               {formik.touched.anniversary_date &&
+                formik.errors.anniversary_date && (
+                  <p className="text-sm text-red-600">
+                    {formik.errors.anniversary_date as string}
+                  </p>
+                )}
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">
