@@ -38,11 +38,10 @@ const formSchema = z.object({
 });
 
 export default function AddProductForm() {
-  const [categories, setCategories] = useState<any[]>([]);
-  const [brands, setBrands] = useState<any[]>([]);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
       name: "",
       description: "",
@@ -213,7 +212,7 @@ export default function AddProductForm() {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat) => (
+                        {categories.map((cat: any) => (
                           <SelectItem key={cat.id} value={cat.id.toString()}>
                             {cat.name}
                           </SelectItem>
@@ -244,7 +243,7 @@ export default function AddProductForm() {
                         <SelectValue placeholder="Select brand (optional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        {brands.map((b) => (
+                        {brands.map((b: any) => (
                           <SelectItem key={b.id} value={b.id.toString()}>
                             {b.name}
                           </SelectItem>

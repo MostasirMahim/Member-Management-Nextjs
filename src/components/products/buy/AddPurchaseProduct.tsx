@@ -4,17 +4,32 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useCartStore } from "@/store/cartStore"; 
+import { useCartStore } from "@/store/cartStore";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableFooter } from "@/components/ui/table";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  TableFooter,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Package } from "lucide-react";
 import { SearchFilterSection } from "@/components/products/SearchFilterSection";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // ---------------- Interfaces ----------------
 interface Media {
@@ -47,7 +62,7 @@ interface ProductResponse {
 }
 
 interface Props {
-  products: ProductResponse;
+  products: any;
 }
 
 export default function ProductTable({ products }: Props) {
@@ -62,9 +77,14 @@ export default function ProductTable({ products }: Props) {
   const itemsPerPage = 10;
 
   // filtering
-  const filteredProducts = products?.data?.filter((p) => {
-    if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    if (selectedCategory !== "all" && p.category !== selectedCategory) return false;
+  const filteredProducts = products?.data?.filter((p: any) => {
+    if (
+      searchQuery &&
+      !p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+      return false;
+    if (selectedCategory !== "all" && p.category !== selectedCategory)
+      return false;
     if (selectedBrand !== "all" && p.brand !== selectedBrand) return false;
     return true;
   });
@@ -84,7 +104,9 @@ export default function ProductTable({ products }: Props) {
   };
 
   // Selected products state
-  const [selected, setSelected] = useState<{ [key: number]: { checked: boolean; quantity: number } }>({});
+  const [selected, setSelected] = useState<{
+    [key: number]: { checked: boolean; quantity: number };
+  }>({});
 
   const handleCheckboxChange = (id: number) => {
     setSelected((prev) => ({
@@ -102,8 +124,8 @@ export default function ProductTable({ products }: Props) {
 
   const handleAddToCart = () => {
     const selectedProducts = paginatedProducts
-      .filter((prod) => selected[prod.id]?.checked)
-      .map((prod) => ({
+      .filter((prod: any) => selected[prod.id]?.checked)
+      .map((prod: any) => ({
         id: prod.id,
         name: prod.name,
         sku: prod.sku,
@@ -111,12 +133,16 @@ export default function ProductTable({ products }: Props) {
         quantity: selected[prod.id]?.quantity || 1,
       }));
 
-    if (!selectedProducts.length) return toast.error("Please select at least one product");
+    if (!selectedProducts.length)
+      return toast.error("Please select at least one product");
 
     for (let prod of selectedProducts) {
       if (!prod.quantity || prod.quantity <= 0)
         return toast.error("Please enter quantity for all selected products");
-      if (prod.quantity > products?.data?.find((p) => p.id === prod.id)?.quantity_in_stock)
+      if (
+        prod.quantity >
+        products?.data?.find((p: any) => p.id === prod.id)?.quantity_in_stock
+      )
         return toast.error(`Insufficient stock for ${prod.name}`);
     }
 
@@ -124,103 +150,114 @@ export default function ProductTable({ products }: Props) {
   };
 
   return (
-    <div >
+    <div>
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-row items-center gap-2">
           <Package className="h-6 w-6 opacity-75" />
-          <CardTitle className="text-xl font-bold opacity-75">Add Products to Cart</CardTitle>
+          <CardTitle className="text-xl font-bold opacity-75">
+            Add Products to Cart
+          </CardTitle>
         </div>
         <SearchFilterSection
           filterOptions={{
-            categories: Array.from(new Set(products?.data?.map((p) => p.category))),
-            brands: Array.from(new Set(products?.data?.map((p) => p.brand))),
+            categories: Array.from(
+              new Set(products?.data?.map((p: any) => p.category))
+            ),
+            brands: Array.from(
+              new Set(products?.data?.map((p: any) => p.brand))
+            ),
           }}
         />
       </CardHeader>
 
-   
-
-        <Table className="w-full text-sm text-gray-700">
-          <TableHeader className="bg-gray-100">
-            <TableRow>
-              <TableHead>Checkbox</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead>SKU</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Quantity</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedProducts.map((prod) => (
-              <TableRow key={prod.id} className="hover:bg-indigo-50">
-                <TableCell>
-                  <Checkbox
-                    checked={selected[prod.id]?.checked || false}
-                    onCheckedChange={() => handleCheckboxChange(prod.id)}
-                  />
-                </TableCell>
-                <TableCell className="font-semibold">{prod.name}</TableCell>
-                <TableCell>${prod.price}</TableCell>
-                <TableCell>
-                  {prod.quantity_in_stock > 0 ? (
-                    <Badge className="bg-green-500 text-white">
-                      {prod.quantity_in_stock} in stock
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-red-500 text-white">Out of stock</Badge>
-                  )}
-                </TableCell>
-                <TableCell>{prod.sku}</TableCell>
-                <TableCell>
-                  <Badge className={prod.is_active ? "bg-green-600 text-white" : "bg-red-500 text-white"}>
-                    {prod.is_active ? "Active" : "Inactive"}
+      <Table className="w-full text-sm text-gray-700">
+        <TableHeader className="bg-gray-100">
+          <TableRow>
+            <TableHead>Checkbox</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Stock</TableHead>
+            <TableHead>SKU</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Quantity</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {paginatedProducts.map((prod: any) => (
+            <TableRow key={prod.id} className="hover:bg-indigo-50">
+              <TableCell>
+                <Checkbox
+                  checked={selected[prod.id]?.checked || false}
+                  onCheckedChange={() => handleCheckboxChange(prod.id)}
+                />
+              </TableCell>
+              <TableCell className="font-semibold">{prod.name}</TableCell>
+              <TableCell>${prod.price}</TableCell>
+              <TableCell>
+                {prod.quantity_in_stock > 0 ? (
+                  <Badge className="bg-green-500 text-white">
+                    {prod.quantity_in_stock} in stock
                   </Badge>
-                </TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={selected[prod.id]?.quantity || ""}
-                    onChange={(e) => handleQuantityChange(prod.id, Number(e.target.value))}
-                    disabled={!selected[prod.id]?.checked}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                <Button
-                  variant="outline"
-                  className="w-full mt-5 text-white bg-blue-500"
-                  onClick={handleAddToCart}
+                ) : (
+                  <Badge className="bg-red-500 text-white">Out of stock</Badge>
+                )}
+              </TableCell>
+              <TableCell>{prod.sku}</TableCell>
+              <TableCell>
+                <Badge
+                  className={
+                    prod.is_active
+                      ? "bg-green-600 text-white"
+                      : "bg-red-500 text-white"
+                  }
                 >
-                  Add Selected to Cart
-                </Button>
+                  {prod.is_active ? "Active" : "Inactive"}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Input
+                  type="number"
+                  min={1}
+                  value={selected[prod.id]?.quantity || ""}
+                  onChange={(e) =>
+                    handleQuantityChange(prod.id, Number(e.target.value))
+                  }
+                  disabled={!selected[prod.id]?.checked}
+                />
               </TableCell>
             </TableRow>
-          </TableFooter>
-        </Table>
+          ))}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={7} className="text-center">
+              <Button
+                variant="outline"
+                className="w-full mt-5 text-white bg-blue-500"
+                onClick={handleAddToCart}
+              >
+                Add Selected to Cart
+              </Button>
+            </TableCell>
+          </TableRow>
+        </TableFooter>
+      </Table>
 
-        {/* Pagination */}
-        <Pagination className="mt-4 justify-center flex cursor-pointer">
-          <PaginationPrevious onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} />
-          <PaginationContent>
-            {Array.from({ length: totalPages }).map((_, i) => {
-              const page = i + 1;
-              return (
-                <PaginationItem key={page} onClick={() => goToPage(page)}>
-                  <PaginationLink>{page}</PaginationLink>
-                </PaginationItem>
-              );
-            })}
-          </PaginationContent>
-          <PaginationNext onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} />
-        </Pagination>
-
+      {/* Pagination */}
+      <Pagination className="mt-4 justify-center flex cursor-pointer">
+        <PaginationPrevious onClick={() => goToPage(currentPage - 1)} />
+        <PaginationContent>
+          {Array.from({ length: totalPages }).map((_, i) => {
+            const page = i + 1;
+            return (
+              <PaginationItem key={page} onClick={() => goToPage(page)}>
+                <PaginationLink>{page}</PaginationLink>
+              </PaginationItem>
+            );
+          })}
+        </PaginationContent>
+        <PaginationNext onClick={() => goToPage(currentPage + 1)} />
+      </Pagination>
     </div>
   );
 }

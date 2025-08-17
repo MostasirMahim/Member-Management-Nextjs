@@ -20,8 +20,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MoreVertical, Pencil, Trash2, Layers } from "lucide-react";
 import { usePathname } from "next/navigation";
-import EditPriceModal from "@/components/products/prices/EditPriceModal";
-import DeletePriceDialog from "@/components/products/prices/DeletePriceDialog";
 
 interface Product {
   id: number;

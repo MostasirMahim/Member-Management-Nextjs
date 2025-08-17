@@ -25,9 +25,9 @@ import DeleteCategoryDialog from "@/components/products/categories/DeleteCategor
 import Image from "next/image";
 
 interface Product {
-    id: number,
-    name: string,
-    sku: string
+  id: number;
+  name: string;
+  sku: string;
 }
 
 interface Media {
@@ -47,7 +47,7 @@ interface MediaResponse {
 }
 
 interface Props {
-  media: MediaResponse;
+  media: any;
 }
 
 export default function MediaTable({ media }: Props) {
@@ -55,7 +55,7 @@ export default function MediaTable({ media }: Props) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState(null);
   const pathname = usePathname();
 
   const formatBDTime = (isoString: string) => {
@@ -95,7 +95,7 @@ export default function MediaTable({ media }: Props) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {media.data?.map((med, index) => (
+            {media.data?.map((med: any, index: number) => (
               <TableRow
                 key={med.id}
                 className="hover:bg-indigo-50 transition-all duration-200"
@@ -106,8 +106,7 @@ export default function MediaTable({ media }: Props) {
                 <TableCell className="font-medium text-gray-900">
                   <Image
                     src={
-                      `http://127.0.0.1:8000/${med.image}` ||
-                      "/placeholder.png"
+                      `http://127.0.0.1:8000/${med.image}` || "/placeholder.png"
                     }
                     alt={med.product.name}
                     width={250}
@@ -191,7 +190,7 @@ export default function MediaTable({ media }: Props) {
         <DeleteCategoryDialog
           open={deleteDialogOpen}
           onClose={() => setDeleteDialogOpen(false)}
-          categoryId={selectedMedia.id}
+          categoryId={(selectedMedia as any).id}
         />
       )}
     </div>
