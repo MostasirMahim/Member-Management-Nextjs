@@ -42,6 +42,10 @@ import {
   BadgeDollarSign,
   List,
   Package,
+  Wallet,
+  CircleDollarSign,
+  WalletCards,
+  FilePlus
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -415,6 +419,20 @@ const navigation = [
       },
     ],
   },
+  {
+  icon: <Wallet className="h-5 w-5" />,
+  label: "Member financial management",
+  href: "#",
+  subItems: [
+    {
+      icon: <FileText  className="h-4 w-4" />,
+      label: "View all Invoices",
+      href: "/member_financial_management/invoices",
+    },
+    
+  ],
+},
+
 ];
 
 interface SubItem {
