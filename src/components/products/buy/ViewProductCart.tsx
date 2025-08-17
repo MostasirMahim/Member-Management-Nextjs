@@ -64,10 +64,10 @@ export default function InvoicePage({ member_ids = [] }: InvoiceProps) {
   // Totals
   const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = parseFloat(
-  cart.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0)
-  .toFixed(2)
-);
-
+    cart
+      .reduce((sum, item) => sum + Number(item.price) * item.quantity, 0)
+      .toFixed(2)
+  );
 
   // Delete product from cart
   const handleDeleteProduct = (id: number) => {
@@ -78,36 +78,36 @@ export default function InvoicePage({ member_ids = [] }: InvoiceProps) {
 
   // Generate invoice
   const handleGenerateInvoice = async () => {
-  if (!selectedMember) return toast.error("Please select a member");
-  if (!cart.length) return toast.error("Cart is empty");
+    if (!selectedMember) return toast.error("Please select a member");
+    if (!cart.length) return toast.error("Cart is empty");
 
-  const payload = {
-    member_ID: selectedMember,
-    product_items: cart.map((p) => ({ product: p.id, quantity: p.quantity })),
-    promo_code: promoCode || undefined,
-  };
+    const payload = {
+      member_ID: selectedMember,
+      product_items: cart.map((p) => ({ product: p.id, quantity: p.quantity })),
+      promo_code: promoCode || undefined,
+    };
 
-  try {
-    await axiosInstance.post("/api/product/v1/products/buy/", payload);
-    toast.success("Invoice generated successfully!");
-    useCartStore.setState({ cart: [] });
-    router.refresh();
+    try {
+      await axiosInstance.post("/api/product/v1/products/buy/", payload);
+      toast.success("Invoice generated successfully!");
+      useCartStore.setState({ cart: [] });
+      router.refresh();
+    } catch (error: any) {
+      console.error("Invoice generation error:", error);
 
-  } catch (error: any) {
-    console.error("Invoice generation error:", error);
-
-    if (error?.response?.data?.errors) {
-      // errors object থেকে readable string বানানো
-      const errorMessages = Object.values(error.response.data.errors)
-        .flat()
-        .join(", ");
-      toast.error(errorMessages);
-    } else {
-      toast.error(error?.response?.data?.message || "Invoice generation failed");
+      if (error?.response?.data?.errors) {
+        // errors object থেকে readable string বানানো
+        const errorMessages = Object.values(error.response.data.errors)
+          .flat()
+          .join(", ");
+        toast.error(errorMessages);
+      } else {
+        toast.error(
+          error?.response?.data?.message || "Invoice generation failed"
+        );
+      }
     }
-  }
-};
-
+  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
@@ -148,7 +148,6 @@ export default function InvoicePage({ member_ids = [] }: InvoiceProps) {
           <Pagination className="mt-4 justify-center flex cursor-pointer">
             <PaginationPrevious
               onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              disabled={currentPage === 1}
             />
             <PaginationContent>
               {Array.from({ length: totalPages }).map((_, i) => {
@@ -157,16 +156,16 @@ export default function InvoicePage({ member_ids = [] }: InvoiceProps) {
                   <PaginationItem
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    active={page === currentPage}
                   >
-                    <PaginationLink>{page}</PaginationLink>
+                    <PaginationLink isActive={page === currentPage}>
+                      {page}
+                    </PaginationLink>
                   </PaginationItem>
                 );
               })}
             </PaginationContent>
             <PaginationNext
               onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-              disabled={currentPage === totalPages}
             />
           </Pagination>
         </CardContent>
