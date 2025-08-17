@@ -23,11 +23,6 @@ import {
   Logs,
   Mails,
   MailPlus,
-  Package,
-  List,
-  BadgeDollarSign,
-  Image,
-  Tag,
   UserRound,
   BetweenHorizonalStart,
   SquarePen,
@@ -44,11 +39,13 @@ import {
   TicketCheck,
   TicketPlus,
   CirclePlus,
+  BadgeDollarSign,
+  List,
+  Package,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -121,7 +118,7 @@ const navigation = [
       },
       {
         icon: <Edit className="h-4 w-4" />,
-        label: "Views",
+        label: "Viwes",
         href: "/dues/view",
       },
     ],
@@ -178,8 +175,16 @@ const navigation = [
       },
     ],
   },
-  { icon: <Users className="h-5 w-5" />, label: "All Users", href: "/users" },
-  { icon: <Users className="h-5 w-5" />, label: "All Groups", href: "/groups" },
+  {
+    icon: <Users className="h-5 w-5" />,
+    label: "All Users",
+    href: "/users",
+  },
+  {
+    icon: <Users className="h-5 w-5" />,
+    label: "All Groups",
+    href: "/groups",
+  },
   {
     icon: <Users className="h-5 w-5" />,
     label: "Add Choices",
@@ -197,13 +202,13 @@ const navigation = [
   },
   {
     icon: <Logs className="h-5 w-5" />,
-    label: "My Activity Logs",
+    label: "My activity logs",
     href: "/activity_logs/my",
   },
-
+  ,
   {
     icon: <Mails className="h-5 w-5" />,
-    label: "Email Management",
+    label: "Email management",
     href: "#",
     subItems: [
       {
@@ -218,12 +223,12 @@ const navigation = [
       },
       {
         icon: <BetweenHorizonalStart className="h-4 w-4" />,
-        label: "Add Email to Group",
+        label: "Add email to group",
         href: "/emails/add_email/",
       },
       {
         icon: <SquarePen className="h-4 w-4" />,
-        label: "Compose Email",
+        label: "Compose email",
         href: "/emails/compose/",
       },
       {
@@ -233,12 +238,48 @@ const navigation = [
       },
       {
         icon: <Settings className="h-4 w-4" />,
-        label: "View All Composes",
+        label: "View all composes",
         href: "/emails/compose/view/",
       },
     ],
   },
-
+  {
+    icon: <HandPlatter className="h-5 w-5" />,
+    label: "Restaurant management",
+    href: "#",
+    subItems: [
+      {
+        icon: <Soup className="h-4 w-4" />,
+        label: "Restaurants",
+        href: "/restaurants/",
+      },
+      {
+        icon: <BookCheck className="h-4 w-4" />,
+        label: "Add restaurants choices",
+        href: "/restaurants/choices/",
+      },
+      {
+        icon: <ShoppingCart className="h-4 w-4" />,
+        label: "Add restaurant item",
+        href: "/restaurants/items/add/",
+      },
+      {
+        icon: <ListTodo className="h-4 w-4" />,
+        label: "Add item category",
+        href: "/restaurants/items/add/category/",
+      },
+      {
+        icon: <Upload className="h-4 w-4" />,
+        label: "Upload restaurant sales",
+        href: "/restaurants/sales/upload/",
+      },
+      {
+        icon: <ShoppingCart className="h-4 w-4" />,
+        label: "View cart",
+        href: "/restaurants/checkout/",
+      },
+    ],
+  },
   {
     icon: <Package className="h-5 w-5" />,
     label: "Products Management",
@@ -324,72 +365,33 @@ const navigation = [
         ],
       },
       {
-      icon: <ShoppingCart className="h-4 w-4" />,
-      label: "Product Buy",
-      href: "#",
-      subItems: [
-        {
-          icon: <Plus className="h-3 w-3" />,
-          label: "Add Product Cart",
-          href: "/products/buy/add/",
-        },
-        {
-          icon: <Eye className="h-3 w-3" />,
-          label: "View Product Cart",
-          href: "/products/buy/",
-        },
-      ],
-    },
-    ],
-  },
-
-  {
-    icon: <HandPlatter className="h-5 w-5" />,
-    label: "Restaurant Management",
-    href: "#",
-    subItems: [
-      {
-        icon: <Soup className="h-4 w-4" />,
-        label: "Restaurants",
-        href: "/restaurants/",
-      },
-      {
-        icon: <BookCheck className="h-4 w-4" />,
-        label: "Add Restaurants Choices",
-        href: "/restaurants/choices/",
-      },
-      {
         icon: <ShoppingCart className="h-4 w-4" />,
-        label: "Add Restaurant Item",
-        href: "/restaurants/items/add/",
-      },
-      {
-        icon: <ListTodo className="h-4 w-4" />,
-        label: "Add Item Category",
-        href: "/restaurants/items/add/category/",
-      },
-      {
-        icon: <Upload className="h-4 w-4" />,
-        label: "Upload Restaurant Sales",
-        href: "/restaurants/sales/upload/",
-      },
-      {
-        icon: <ShoppingCart className="h-4 w-4" />,
-        label: "View Cart",
-        href: "/restaurants/checkout/",
+        label: "Product Buy",
+        href: "#",
+        subItems: [
+          {
+            icon: <Plus className="h-3 w-3" />,
+            label: "Add Product Cart",
+            href: "/products/buy/add/",
+          },
+          {
+            icon: <Eye className="h-3 w-3" />,
+            label: "View Product Cart",
+            href: "/products/buy/",
+          },
+        ],
       },
     ],
   },
-
   {
     icon: <PercentCircle className="h-5 w-5" />,
-    label: "Promo Code Management",
+    label: "Promo code management",
     href: "#",
     subItems: [
       {
         icon: <Code className="h-4 w-4" />,
-        label: "Add Promo Code",
-        href: "/promo-codes/add/",
+        label: "View all promo codes",
+        href: "/promo_codes/",
       },
       {
         icon: <CirclePlus className="h-4 w-4" />,
@@ -398,13 +400,13 @@ const navigation = [
       },
       {
         icon: <TicketCheck className="h-4 w-4" />,
-        label: "View Promo Codes",
-        href: "/promo-codes/view/",
+        label: "promo codes category",
+        href: "/promo_codes/categories/",
       },
       {
         icon: <TicketPlus className="h-4 w-4" />,
-        label: "Add Promo Code Category",
-        href: "/promo-codes/categories/add/",
+        label: "Add category",
+        href: "/promo_codes/categories/add/",
       },
       {
         icon: <Eye className="h-4 w-4" />,
@@ -412,7 +414,6 @@ const navigation = [
         href: "/promo_codes/applied_promo_codes/",
       },
     ],
-    
   },
 ];
 
@@ -429,92 +430,6 @@ interface NavItemProps {
   }>;
 }
 
-// const NavItem = ({
-//   icon,
-//   label,
-//   href,
-//   active,
-//   badge,
-//   subItems,
-// }: NavItemProps) => {
-//   const [isOpen, setIsOpen] = useState(false);
-//   const pathname = usePathname();
-
-//   // Check if any sub-item is active
-//   const hasActiveSubItem = subItems?.some(
-//     (subItem) => pathname === subItem.href
-//   );
-//   const isParentActive = active || hasActiveSubItem;
-
-//   if (subItems && subItems.length > 0) {
-//     return (
-//       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-//         <CollapsibleTrigger asChild>
-//           <Button
-//             variant="ghost"
-//             className={cn(
-//               "w-full justify-start gap-3 h-10 px-3",
-//               isParentActive && "bg-accent text-accent-foreground"
-//             )}
-//           >
-//             {icon}
-//             <span className="flex-1 text-left">{label}</span>
-//             {badge && (
-//               <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
-//                 {badge}
-//               </span>
-//             )}
-//             {isOpen ? (
-//               <ChevronDown className="h-4 w-4" />
-//             ) : (
-//               <ChevronRight className="h-4 w-4" />
-//             )}
-//           </Button>
-//         </CollapsibleTrigger>
-//         <CollapsibleContent className="space-y-1">
-//           <div className="ml-6 space-y-1">
-//             {subItems.map((subItem) => (
-//               <Link key={subItem.href} href={subItem.href}>
-//                 <Button
-//                   variant="ghost"
-//                   className={cn(
-//                     "w-full justify-start gap-3 h-9 px-3 text-sm",
-//                     pathname === subItem.href &&
-//                       "bg-accent text-accent-foreground"
-//                   )}
-//                 >
-//                   {subItem.icon}
-//                   <span>{subItem.label}</span>
-//                 </Button>
-//               </Link>
-//             ))}
-//           </div>
-//         </CollapsibleContent>
-//       </Collapsible>
-//     );
-//   }
-
-//   return (
-//     <Link href={href}>
-//       <Button
-//         variant="ghost"
-//         className={cn(
-//           "w-full justify-start gap-3 h-10 px-3",
-//           active && "bg-accent text-accent-foreground"
-//         )}
-//       >
-//         {icon}
-//         <span className="flex-1 text-left">{label}</span>
-//         {badge && (
-//           <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
-//             {badge}
-//           </span>
-//         )}
-//       </Button>
-//     </Link>
-//   );
-// };
-
 const NavItem = ({
   icon,
   label,
@@ -523,102 +438,58 @@ const NavItem = ({
   badge,
   subItems,
 }: NavItemProps) => {
-  const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
   const hasActiveSubItem = subItems?.some(
-    (subItem) =>
-      pathname === subItem.href ||
-      subItem.subItems?.some((nested) => pathname === nested.href)
+    (subItem) => pathname === subItem.href
   );
   const isParentActive = active || hasActiveSubItem;
+  const [isOpen, setIsOpen] = useState(isParentActive);
 
-  const renderSubItems = (items: any[], level: number = 1) => {
-    return (
-      <div className={`ml-${level * 4} space-y-1`}>
-        {items.map((item, index) => {
-          const hasNested = item.subItems && item.subItems.length > 0;
-          const isActive =
-            pathname === item.href ||
-            item.subItems?.some((nested) => pathname === nested.href);
-          const [nestedOpen, setNestedOpen] = useState(false);
-
-          if (hasNested) {
-            return (
-              <Collapsible
-                key={item.label + index}
-                open={nestedOpen}
-                onOpenChange={setNestedOpen}
-              >
-                <CollapsibleTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start gap-3 h-9 px-3 text-sm",
-                      isActive && "bg-accent text-accent-foreground"
-                    )}
-                  >
-                    {item.icon}
-                    <span className="flex-1 text-left">{item.label}</span>
-                    {nestedOpen ? (
-                      <ChevronDown className="h-3 w-3" />
-                    ) : (
-                      <ChevronRight className="h-3 w-3" />
-                    )}
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  {renderSubItems(item.subItems, level + 1)}
-                </CollapsibleContent>
-              </Collapsible>
-            );
-          } else {
-            return (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start gap-3 h-9 px-3 text-sm",
-                    pathname === item.href && "bg-accent text-accent-foreground"
-                  )}
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                </Button>
-              </Link>
-            );
-          }
-        })}
-      </div>
-    );
-  };
-
-  if (subItems && subItems.length > 0) {
+  if (subItems && subItems?.length > 0) {
     return (
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-start gap-3 h-10 px-3",
-              isParentActive && "bg-accent text-accent-foreground"
+              "w-[98%] hover:translate-y-1 transition-transform duration-300 ease-in-out  justify-between gap-1  h-10 px-3 ",
+              isParentActive && "bg-primary hover:bg-primaryhover:text-white rounded-xl dark:bg-accent text-white"
             )}
           >
-            {icon}
-            <span className="flex-1 text-left">{label}</span>
-            {badge && (
-              <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
-                {badge}
-              </span>
-            )}
-            {isOpen ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
+            <div className="flex items-center gap-2">
+              {icon}
+              <span className=" text-left">{label}</span>
+            </div>
+
+            <div className="flex items-center ">
+              {isOpen ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+            </div>
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent>{renderSubItems(subItems)}</CollapsibleContent>
+        <CollapsibleContent className="space-y-1 ">
+          <div className="ml-6 space-y-1">
+            {subItems.map((subItem, index) => (
+              <Link key={index} href={subItem.href}>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full hover:translate-y-1 transition-transform duration-300 ease-in-out my-1 justify-start gap-3 h-9 px-3 text-sm",
+                    pathname === subItem.href &&
+                      "bg-primary py-1 hover:bg-primary hover:text-white rounded-xl  dark:bg-accent text-white"
+                  )}
+                >
+                  {subItem.icon}
+                  <span>{subItem.label}</span>
+                </Button>
+              </Link>
+            ))}
+          </div>
+        </CollapsibleContent>
       </Collapsible>
     );
   }
@@ -628,8 +499,8 @@ const NavItem = ({
       <Button
         variant="ghost"
         className={cn(
-          "w-full justify-start gap-3 h-10 px-3",
-          active && "bg-accent text-accent-foreground"
+          "w-full hover:translate-y-1 transition-transform duration-300 ease-in-out  justify-start gap-3 h-10 px-3",
+          active && "bg-primary hover:bg-primary hover:text-white rounded-xl  dark:bg-accent text-white"
         )}
       >
         {icon}
@@ -650,7 +521,6 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
-
   const { mutate: logOutFunc, isPending } = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.delete("/api/account/v1/logout/");
@@ -691,7 +561,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   }
 
   const Sidebar = () => (
-    <div className="flex flex-col h-full max-h-screen overflow-hidden font-primary">
+    <div className="flex flex-col  max-h-screen overflow-y-auto font-primary ">
       <div className="p-4">
         <div className="flex items-center justify-center">
           <img
@@ -702,11 +572,11 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <ScrollArea className="flex-1 px-3">
-        <nav className="space-y-1">
-          {navigation.map((item: any) => (
+      <ScrollArea className="flex-1  overflow-y-auto no-scrollbar">
+        <nav className="space-y-1 px-2">
+          {navigation.map((item: any, index) => (
             <NavItem
-              key={item.label}
+              key={index}
               icon={item.icon}
               label={item.label}
               href={item.href}
@@ -722,8 +592,8 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
   if (isPending) return <LoadingDots />;
   return (
-    <div className="min-h-screen h-screen max-h-screen overflow-hidden flex bg-muted/30">
-      <aside className="hidden lg:block w-64 border-r bg-background h-screen sticky top-0">
+    <div className="min-h-screen flex bg-muted/30 max-w-screen-2xl mx-auto">
+      <aside className="hidden lg:block w-64 border-r bg-background h-full overflow-y-auto sticky top-0">
         <Sidebar />
       </aside>
 
@@ -737,7 +607,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
         </SheetContent>
       </Sheet>
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col ">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
           <Button
             variant="ghost"

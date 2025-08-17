@@ -49,6 +49,7 @@ export default function AddMember() {
     setCurrentStep,
     setMemberID,
     setIsUpdateMode,
+    resetSteps,
   } = useAddMemberStore();
 
   const path = usePathname();
@@ -66,12 +67,14 @@ export default function AddMember() {
 
   useEffect(() => {
     return () => {
+      setMemberID("");
+      resetSteps();
       if (!path?.startsWith("/member/update/")) {
-        setMemberID("");
         setIsUpdateMode(false);
       }
     };
   }, [path, setMemberID, setIsUpdateMode]);
+
   const handleStepClick = (stepIndex: number) => {
     setCurrentStep(stepIndex);
   };
@@ -106,14 +109,14 @@ export default function AddMember() {
                 <p>
                   Update Member{" "}
                   <span className="font-secondary text-lg text-sky-500">
-                    #{memberID}
+                    { memberID && "#" + memberID}
                   </span>
                 </p>
               ) : (
                 <p>
                   Add New Member{" "}
                   <span className="font-secondary text-lg text-sky-500">
-                    #{memberID}
+                    {memberID && "#" + memberID}
                   </span>
                 </p>
               )}

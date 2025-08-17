@@ -4,11 +4,10 @@ import {
   Search,
   Filter,
   MoreHorizontal,
-  Check,
-  X,
   Pencil,
   Trash2,
   FileSpreadsheet,
+  TrainTrackIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -108,6 +107,9 @@ function AllMembers() {
     setIsUpdateMode(true);
     router.push(`/member/update/${member_ID}`);
   };
+  const handleIdTransfer = (member_ID: string) => {
+    router.push(`/member/transferID/${member_ID}`);
+  };
 
   if (user_isLoading) return <LoadingDots />;
   return (
@@ -204,7 +206,7 @@ function AllMembers() {
       <div className="rounded-md border my-2 font-secondary">
         <Table className="">
           <TableHeader>
-            <TableRow className=" text-center font-bold h-14 bg-[#f9fafb] ">
+            <TableRow className=" text-center font-bold h-14 bg-[#f9fafb] dark:bg-accent">
               <TableHead className=" text-black dark:text-white font-bold  ">
                 ID
               </TableHead>
@@ -320,16 +322,10 @@ function AllMembers() {
                         >
                           <Pencil className="h-4 w-4" /> Update
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2">
-                          {true ? (
-                            <>
-                              <X className="h-4 w-4" /> Suspend
-                            </>
-                          ) : (
-                            <>
-                              <Check className="h-4 w-4" /> Activate
-                            </>
-                          )}
+                        <DropdownMenuItem className="gap-2"
+                        onClick={() => handleIdTransfer(user.member_ID)}
+                        >
+                          <TrainTrackIcon className="h-4 w-4" /> Transfer ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive gap-2">

@@ -38,7 +38,7 @@ const initialValues = {
 
 export default function EmergencyContactStep() {
   const router = useRouter();
-  const queryClient = useQueryClient(); // <CHANGE> Added queryClient
+  const queryClient = useQueryClient();
 
   const {
     currentStep,
@@ -115,7 +115,7 @@ export default function EmergencyContactStep() {
     useMutation({
       mutationFn: async (userData: any) => {
         const res = await axiosInstance.patch(
-          `/api/member/v1/members/emergency_contact/${memberID}`,
+          `/api/member/v1/members/emergency_contact/${memberID}/`,
           userData
         );
         return res.data;
