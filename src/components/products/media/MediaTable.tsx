@@ -71,7 +71,7 @@ export default function MediaTable({ media }: Props) {
   };
 
   return (
-    <Card className="shadow-md border rounded-2xl bg-white">
+    <div>
       <CardHeader className="flex flex-row items-center gap-2">
         <Layers className=" h-6 w-6 opacity-75" />
         <CardTitle className="text-xl font-bold opacity-75">
@@ -82,7 +82,7 @@ export default function MediaTable({ media }: Props) {
         <Table className="w-full text-sm text-gray-700">
           <TableHeader className="bg-gray-100">
             <TableRow className="bg-gray-100 font-extrabold text-sm">
-              <TableHead className="w-10 text-gray-600">Id</TableHead>
+              <TableHead className="w-10 text-gray-600">ID</TableHead>
               <TableHead className="w-10 text-gray-600">Image</TableHead>
               <TableHead className="text-gray-600 ">Product Name</TableHead>
               <TableHead className="text-gray-600">Product SKU</TableHead>
@@ -194,6 +194,6 @@ export default function MediaTable({ media }: Props) {
           categoryId={selectedMedia.id}
         />
       )}
-    </Card>
+    </div>
   );
 }

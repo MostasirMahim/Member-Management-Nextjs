@@ -62,7 +62,7 @@ export default function BrandTable({ brands }: Props) {
   };
 
   return (
-    <Card className="shadow-md border rounded-2xl bg-white">
+    <div>
       <CardHeader className="flex flex-row items-center gap-2">
         <Layers className="h-6 w-6 opacity-75" />
         <CardTitle className="text-xl font-bold opacity-75">
@@ -168,6 +168,6 @@ export default function BrandTable({ brands }: Props) {
           brandId={selectedBrand.id}
         />
       )}
-    </Card>
+    </div>
   );
 }

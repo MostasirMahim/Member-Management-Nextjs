@@ -19,7 +19,6 @@ export default async function ProductsPage() {
   } catch (error) {
     console.error("Failed to fetch products", error);
   }
-  console.log("Product Prices:", product_prices);
 
   return (
     <div className="p-6 space-y-6">

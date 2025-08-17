@@ -32,7 +32,7 @@ const formSchema = z.object({
   price: z.coerce.number().min(0, "Price is required"),
   sku: z.string().min(1, "SKU is required"),
   category: z.coerce.number().min(1, "Select a category"),
-  quantity_in_stock: z.coerce.number().min(0, "Quantity is required"),
+  quantity_in_stock: z.coerce.number().min(1, "Quantity is required"),
   brand: z.coerce.number().optional().or(z.literal(NaN)),
   discount_rate: z.coerce.number().min(0, "Discount rate is required"),
 });
