@@ -417,19 +417,22 @@ const navigation = [
   },
 ];
 
+interface SubItem {
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  subItems?: SubItem[];
+}
+
 interface NavItemProps {
   icon: React.ReactNode;
   label: string;
   href: string;
   active?: boolean;
   badge?: number;
-  subItems?: Array<{
-    icon: React.ReactNode;
-    label: string;
-    href: string;
-  }>;
+  subItems?: SubItem[];
+  level?: number;
 }
-
 const NavItem = ({
   icon,
   label,
@@ -437,14 +440,23 @@ const NavItem = ({
   active,
   badge,
   subItems,
+  level = 0,
 }: NavItemProps) => {
   const pathname = usePathname();
 
-  const hasActiveSubItem = subItems?.some(
-    (subItem) => pathname === subItem.href
-  );
-  const isParentActive = active || hasActiveSubItem;
+  const hasActiveSubItem = (items?: SubItem[]): boolean => {
+    if (!items) return false;
+    return items.some((item) => {
+      if (pathname === item.href) return true;
+      return hasActiveSubItem(item.subItems);
+    });
+  };
+
+  const isParentActive = active || hasActiveSubItem(subItems);
   const [isOpen, setIsOpen] = useState(isParentActive);
+
+  const paddingLeft = level * 16 + 12;
+  const buttonWidth = level > 0 ? "w-full" : "w-[98%]";
 
   if (subItems && subItems?.length > 0) {
     return (
@@ -453,16 +465,22 @@ const NavItem = ({
           <Button
             variant="ghost"
             className={cn(
-              "w-[98%] hover:translate-y-1 transition-transform duration-300 ease-in-out  justify-between gap-1  h-10 px-3 ",
-              isParentActive && "bg-primary hover:bg-primaryhover:text-white rounded-xl dark:bg-accent text-white"
+              `${buttonWidth} hover:translate-y-1 transition-transform duration-300 ease-in-out justify-between gap-1 h-10 px-3`,
+              isParentActive &&
+                "bg-primary hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-white"
             )}
+            style={{ paddingLeft: `${paddingLeft}px` }}
           >
             <div className="flex items-center gap-2">
               {icon}
-              <span className=" text-left">{label}</span>
+              <span className="text-left">{label}</span>
             </div>
-
-            <div className="flex items-center ">
+            <div className="flex items-center">
+              {badge && (
+                <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full mr-2">
+                  {badge}
+                </span>
+              )}
               {isOpen ? (
                 <ChevronDown className="h-4 w-4" />
               ) : (
@@ -471,22 +489,18 @@ const NavItem = ({
             </div>
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-1 ">
-          <div className="ml-6 space-y-1">
+        <CollapsibleContent className="space-y-1">
+          <div className="space-y-1">
             {subItems.map((subItem, index) => (
-              <Link key={index} href={subItem.href}>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full hover:translate-y-1 transition-transform duration-300 ease-in-out my-1 justify-start gap-3 h-9 px-3 text-sm",
-                    pathname === subItem.href &&
-                      "bg-primary py-1 hover:bg-primary hover:text-white rounded-xl  dark:bg-accent text-white"
-                  )}
-                >
-                  {subItem.icon}
-                  <span>{subItem.label}</span>
-                </Button>
-              </Link>
+              <NavItem
+                key={index}
+                icon={subItem.icon}
+                label={subItem.label}
+                href={subItem.href}
+                active={pathname === subItem.href}
+                subItems={subItem.subItems}
+                level={level + 1}
+              />
             ))}
           </div>
         </CollapsibleContent>
@@ -499,9 +513,11 @@ const NavItem = ({
       <Button
         variant="ghost"
         className={cn(
-          "w-full hover:translate-y-1 transition-transform duration-300 ease-in-out  justify-start gap-3 h-10 px-3",
-          active && "bg-primary hover:bg-primary hover:text-white rounded-xl  dark:bg-accent text-white"
+          `${buttonWidth} hover:translate-y-1 transition-transform duration-300 ease-in-out justify-start gap-3 h-10 px-3`,
+          active &&
+            "bg-primary hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-white"
         )}
+        style={{ paddingLeft: `${paddingLeft}px` }}
       >
         {icon}
         <span className="flex-1 text-left">{label}</span>
