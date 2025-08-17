@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useCartStore } from "@/store/cartStore"; // ✅ এখানে নতুন store ইম্পোর্ট হচ্ছে
+import { useCartStore } from "@/store/cartStore"; 
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableFooter } from "@/components/ui/table";
@@ -61,7 +61,7 @@ export default function ProductTable({ products }: Props) {
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
   const itemsPerPage = 10;
 
-  // 🔍 Filtering
+  // filtering
   const filteredProducts = products?.data?.filter((p) => {
     if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     if (selectedCategory !== "all" && p.category !== selectedCategory) return false;
@@ -83,7 +83,7 @@ export default function ProductTable({ products }: Props) {
     router.push(`?${params.toString()}`);
   };
 
-  // ✅ Selected products state
+  // Selected products state
   const [selected, setSelected] = useState<{ [key: number]: { checked: boolean; quantity: number } }>({});
 
   const handleCheckboxChange = (id: number) => {
@@ -124,7 +124,7 @@ export default function ProductTable({ products }: Props) {
   };
 
   return (
-    <Card className="shadow-md border rounded-2xl bg-white">
+    <div >
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-row items-center gap-2">
           <Package className="h-6 w-6 opacity-75" />
@@ -138,7 +138,8 @@ export default function ProductTable({ products }: Props) {
         />
       </CardHeader>
 
-      <CardContent>
+   
+
         <Table className="w-full text-sm text-gray-700">
           <TableHeader className="bg-gray-100">
             <TableRow>
@@ -205,7 +206,7 @@ export default function ProductTable({ products }: Props) {
         </Table>
 
         {/* Pagination */}
-        <Pagination className="mt-4 justify-center flex">
+        <Pagination className="mt-4 justify-center flex cursor-pointer">
           <PaginationPrevious onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} />
           <PaginationContent>
             {Array.from({ length: totalPages }).map((_, i) => {
@@ -219,7 +220,7 @@ export default function ProductTable({ products }: Props) {
           </PaginationContent>
           <PaginationNext onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} />
         </Pagination>
-      </CardContent>
-    </Card>
+
+    </div>
   );
 }

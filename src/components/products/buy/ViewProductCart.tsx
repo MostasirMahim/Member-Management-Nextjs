@@ -145,7 +145,7 @@ export default function InvoicePage({ member_ids = [] }: InvoiceProps) {
             </TableBody>
           </Table>
 
-          <Pagination className="mt-4 justify-center flex">
+          <Pagination className="mt-4 justify-center flex cursor-pointer">
             <PaginationPrevious
               onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
               disabled={currentPage === 1}

@@ -124,7 +124,7 @@ export default function ProductTable({ products }: Props) {
 };
 
   return (
-    <Card className="shadow-md border rounded-2xl bg-white">
+    <div >
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-row items-center gap-2">
           <Package className="h-6 w-6 opacity-75" />
@@ -206,7 +206,7 @@ export default function ProductTable({ products }: Props) {
                   )}
                 </TableCell>
 
-                <TableCell className="text-gray-600">{prod.sku}</TableCell>
+                <TableCell className="text-gray-600 font-semibold">{prod.sku}</TableCell>
 
                 <TableCell>
                   <Badge
@@ -220,9 +220,9 @@ export default function ProductTable({ products }: Props) {
                   </Badge>
                 </TableCell>
 
-                <TableCell>{prod.category}</TableCell>
+                <TableCell className="font-semibold">{prod.category}</TableCell>
 
-                <TableCell>{prod.brand}</TableCell>
+                <TableCell className="font-semibold">{prod.brand}</TableCell>
 
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -259,7 +259,7 @@ export default function ProductTable({ products }: Props) {
         </Table>
 
         {/* Pagination */}
-        <Pagination className="mt-4 justify-center flex">
+        <Pagination className="mt-4 justify-center flex cursor-pointer">
           <PaginationPrevious
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
@@ -284,6 +284,6 @@ export default function ProductTable({ products }: Props) {
           />
         </Pagination>
       </CardContent>
-    </Card>
+    </div>
   );
 }

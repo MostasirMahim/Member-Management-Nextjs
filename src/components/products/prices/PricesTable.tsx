@@ -75,7 +75,7 @@ export default function ProductPricesTable({ productPrices }: Props) {
   };
 
   return (
-    <Card className="shadow-md border rounded-2xl bg-white">
+    <div>
       <CardHeader className="flex flex-row items-center gap-2">
         <Layers className="h-6 w-6 opacity-75" />
         <CardTitle className="text-xl font-bold opacity-75">
@@ -86,7 +86,7 @@ export default function ProductPricesTable({ productPrices }: Props) {
         <Table className="w-full text-sm text-gray-700">
           <TableHeader className="bg-gray-100">
             <TableRow className="bg-gray-100 font-extrabold text-sm">
-              <TableHead className="w-10 text-gray-600">Id</TableHead>
+              <TableHead className="w-10 text-gray-600">ID</TableHead>
               <TableHead className="text-gray-600">Product Name</TableHead>
               <TableHead className="text-gray-600">Product SKU</TableHead>
               <TableHead className="text-gray-600">Membership Type</TableHead>
@@ -118,7 +118,7 @@ export default function ProductPricesTable({ productPrices }: Props) {
                   {price.membership_type.name}
                 </TableCell>
                 <TableCell className="font-semibold text-gray-900">
-                  {price.price} ৳
+                  {price.price} $
                 </TableCell>
                 <TableCell>
                   <Badge
@@ -194,6 +194,6 @@ export default function ProductPricesTable({ productPrices }: Props) {
           priceId={selectedPrice.id}
         />
       )} */}
-    </Card>
+    </div>
   );
 }

@@ -5,7 +5,8 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCartStore } from "@/store/cartStore"; // ✅ zustand import
+import { useCartStore } from "@/store/cartStore";
+import Link from "next/link";
 
 type Media = {
   id: number;
@@ -59,7 +60,8 @@ export default function ProductPage({ product }: ProductPageProps) {
     let val = Number(e.target.value);
     if (isNaN(val)) return;
     if (val < 1) val = 1;
-    if (val > product.data.quantity_in_stock) val = product.data.quantity_in_stock;
+    if (val > product.data.quantity_in_stock)
+      val = product.data.quantity_in_stock;
     setQuantity(val);
   };
 
@@ -154,7 +156,9 @@ export default function ProductPage({ product }: ProductPageProps) {
           <p className="text-3xl font-bold text-red-600">${discountedPrice}</p>
           {discountNum > 0 && (
             <>
-              <p className="text-gray-400 line-through">${product.data.price}</p>
+              <p className="text-gray-400 line-through">
+                ${product.data.price}
+              </p>
               <span className="bg-red-600 text-white text-xs px-2 py-1 rounded">
                 -{discountNum.toFixed(0)}%
               </span>
@@ -189,14 +193,21 @@ export default function ProductPage({ product }: ProductPageProps) {
         {/* Add to cart */}
         <div className="mt-6 flex space-x-4">
           <Button
-            className="flex-1"
+            className="flex-1 bg-blue-900 font-bold"
             size="lg"
             disabled={product.data.quantity_in_stock === 0}
-            onClick={handleAddToCart} 
+            onClick={handleAddToCart}
           >
             Add to cart
           </Button>
-
+        </div>
+        {/* view to cart */}
+        <div className="mt-6 flex space-x-4">
+          <Link href="/products/buy" className="flex-1">
+            <Button className="w-full text-white font-bold" size="lg">
+              View Cart
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
