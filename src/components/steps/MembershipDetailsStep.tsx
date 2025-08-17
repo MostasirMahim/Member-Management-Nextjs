@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
@@ -19,13 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
-  Upload,
-  X,
-} from "lucide-react";
+import { CalendarIcon, ChevronRight, Upload, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";

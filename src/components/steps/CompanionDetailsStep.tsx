@@ -161,7 +161,7 @@ export default function CompanionDetailsStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
             member_ID: memberID,
             id: memberData[0]?.id || 0,
@@ -406,7 +406,6 @@ export default function CompanionDetailsStep() {
                 variant="ghost"
                 onClick={() => {
                   fileInputRef.current?.click();
-                  console.log("Clicked to upload companion picture");
                 }}
                 className="w-full"
               >
