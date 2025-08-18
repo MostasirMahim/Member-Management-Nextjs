@@ -30,13 +30,13 @@ interface Props {
 export default function DashboardStats({ data }: Props) {
   const stats = data.data;
   return (
-    <div className="flex gap-4 flex-wrap  align-baseline items-center">
+    <div className="flex gap-4 flex-wrap justify-evenly  align-baseline items-center">
       <motion.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
-        <div className="flex items-center  border rounded-sm overflow-hidden shadow">
+        <div className="flex items-center  border rounded-sm overflow-hidden shadow w-[300px]">
           <div className="p-4 bg-green-400">
             <Users className="h-12 w-12 text-white" />
           </div>
@@ -53,7 +53,7 @@ export default function DashboardStats({ data }: Props) {
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
-        <div className="flex items-center  border rounded-sm overflow-hidden shadow">
+        <div className="flex items-center  border rounded-sm overflow-hidden shadow w-[300px]">
           <div className="p-4 bg-[#B3A7B8]">
             <Zap className="h-12 w-12 text-white" />
           </div>
@@ -70,7 +70,7 @@ export default function DashboardStats({ data }: Props) {
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
-        <div className="flex items-center border rounded-sm overflow-hidden shadow">
+        <div className="flex items-center border rounded-sm overflow-hidden shadow w-[300px]">
           <div className="p-4 bg-[#D54B38]">
             <ZapOff className="h-12 w-12 text-white" />
           </div>
@@ -87,7 +87,7 @@ export default function DashboardStats({ data }: Props) {
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
-        <div className="flex items-center  border rounded-sm overflow-hidden shadow">
+        <div className="flex items-center  border rounded-sm overflow-hidden shadow w-[300px]">
           <div className="p-4 bg-[#ED983B]">
             <Store className="h-12 w-12 text-white" />
           </div>
@@ -104,7 +104,7 @@ export default function DashboardStats({ data }: Props) {
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
-        <div className="flex items-center  border rounded-sm overflow-hidden shadow">
+        <div className="flex items-center  border rounded-sm overflow-hidden shadow w-[300px]">
           <div className="p-4 bg-[#315047]">
             <ShoppingCart className="h-12 w-12 text-white" />
           </div>
@@ -121,7 +121,7 @@ export default function DashboardStats({ data }: Props) {
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
-        <div className="flex items-center  border rounded-sm overflow-hidden shadow">
+        <div className="flex items-center  border rounded-sm overflow-hidden shadow w-[300px]">
           <div className="p-4 bg-[#AC8D72]">
             <Calendar className="h-12 w-12 text-white" />
           </div>

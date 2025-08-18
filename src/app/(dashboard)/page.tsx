@@ -39,45 +39,18 @@ import { useQuery } from "@tanstack/react-query";
 
 import { LoadingPage } from "@/components/ui/loading";
 import DashBoardCard from "@/components/DashBoard/DashBoardCard";
+import DashboardFilterButton from "@/components/DashBoard/DashboardFilterButton";
 
-function Home() {
+interface Props {
+  searchParams: Promise<{
+    created_at?: string;
+    created_at_after?: string;
+    created_at_before?: string;
+  }>;
+}
+
+function Home({ searchParams }: Props) {
   const allArticles = [...articles, ...userArticles];
-
-  // const { data: admin_data, isLoading: admin_isLoading } = useQuery({
-  //   queryKey: ["adminStat"],
-  //   queryFn: () => getAdminData(),
-  // });
-
-  const stats = [
-    {
-      title: "Total Users",
-      value: 100,
-      change: "+12.5%",
-      trend: "up",
-      icon: <Users className="h-5 w-5" />,
-    },
-    {
-      title: "Total Posts",
-      value: 230,
-      change: "+8.2%",
-      trend: "up",
-      icon: <FileText className="h-5 w-5" />,
-    },
-    {
-      title: "Pending Posts",
-      value: "5",
-      change: "-2.1%",
-      trend: "down",
-      icon: <Clock className="h-5 w-5" />,
-    },
-    {
-      title: "Categories",
-      value: "12",
-      change: "+0%",
-      trend: "neutral",
-      icon: <FolderOpen className="h-5 w-5" />,
-    },
-  ];
 
   const recentActivity = [
     {
@@ -135,12 +108,6 @@ function Home() {
     .sort((a, b) => b.likeCount - a.likeCount)
     .slice(0, 5);
 
-  // if (admin_isLoading)
-  //   return (
-  //     <div className="flex justify-center items-center h-screen">
-  //       <LoadingPage />
-  //     </div>
-  //   );
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -151,13 +118,13 @@ function Home() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button size="sm">Filter</Button>
+          <DashboardFilterButton />
         </div>
       </div>
 
       {/* Stats Cards */}
       <Suspense fallback={<h1>loading..</h1>}>
-        <DashBoardCard />
+        <DashBoardCard searchParams={searchParams} />
       </Suspense>
 
       {/* Main Content */}
