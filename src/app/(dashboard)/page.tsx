@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -40,9 +38,9 @@ import { articles, userArticles } from "@/lib/dummy";
 import { useQuery } from "@tanstack/react-query";
 
 import { LoadingPage } from "@/components/ui/loading";
+import DashBoardCard from "@/components/DashBoard/DashBoardCard";
 
 function Home() {
-  const [timeRange, setTimeRange] = useState("week");
   const allArticles = [...articles, ...userArticles];
 
   // const { data: admin_data, isLoading: admin_isLoading } = useQuery({
@@ -149,48 +147,18 @@ function Home() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back, Admin! Here's what's happening with your news portal.
+            Welcome back, Here's what's happening with your club.
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            Download Report
-          </Button>
-          <Button size="sm">Add New Post</Button>
+          <Button size="sm">Filter</Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="bg-primary/10 p-2 rounded-md">{stat.icon}</div>
-                <div
-                  className={`flex items-center gap-1 text-xs font-medium ${
-                    stat.trend === "up"
-                      ? "text-green-600"
-                      : stat.trend === "down"
-                      ? "text-red-600"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  {stat.trend === "up" && <ArrowUpRight className="h-3 w-3" />}
-                  {stat.trend === "down" && (
-                    <ArrowDownRight className="h-3 w-3" />
-                  )}
-                  {stat.change}
-                </div>
-              </div>
-              <div className="mt-4">
-                <h3 className="text-3xl font-bold">{stat.value}</h3>
-                <p className="text-sm text-muted-foreground">{stat.title}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Suspense fallback={<h1>loading..</h1>}>
+        <DashBoardCard />
+      </Suspense>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -205,7 +173,7 @@ function Home() {
                   View your site traffic and engagement metrics
                 </CardDescription>
               </div>
-              <Tabs defaultValue={timeRange} onValueChange={setTimeRange}>
+              <Tabs>
                 <TabsList className="grid grid-cols-3 h-8">
                   <TabsTrigger value="week">Week</TabsTrigger>
                   <TabsTrigger value="month">Month</TabsTrigger>
