@@ -420,19 +420,17 @@ const navigation = [
     ],
   },
   {
-  icon: <Wallet className="h-5 w-5" />,
-  label: "Member financial management",
-  href: "#",
-  subItems: [
-    {
-      icon: <FileText  className="h-4 w-4" />,
-      label: "View all Invoices",
-      href: "/member_financial_management/invoices",
-    },
-    
-  ],
-},
-
+    icon: <Wallet className="h-5 w-5" />,
+    label: "Member financial management",
+    href: "#",
+    subItems: [
+      {
+        icon: <FileText className="h-4 w-4" />,
+        label: "View all Invoices",
+        href: "/mfm/invoices/",
+      },
+    ],
+  },
 ];
 
 interface SubItem {
