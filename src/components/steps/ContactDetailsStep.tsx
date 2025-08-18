@@ -194,7 +194,6 @@ export default function ContactDetailsStep() {
         data: values.contacts,
       };
       if (isUpdateMode) {
-        console.log("update", data);
         updateContactFunc(data);
       } else {
         addContactFunc(data);

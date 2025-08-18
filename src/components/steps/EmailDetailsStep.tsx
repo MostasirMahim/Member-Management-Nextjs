@@ -177,7 +177,7 @@ export default function EmailDetailsStep() {
         ? {
             data: memberData?.map((email: any) => ({
               id: email?.id || 0,
-              email_type: email?.email_type.id || 0,
+              email_type: email?.email_type.id || null,
               email: email?.email || "",
               is_primary: email?.is_primary || false,
             })),
@@ -200,7 +200,7 @@ export default function EmailDetailsStep() {
 
   const addEmail = () => {
     const newEmail = {
-      email_type: 1111,
+      email_type: null,
       email: "",
       is_primary: false,
     };
@@ -231,7 +231,7 @@ export default function EmailDetailsStep() {
       formik.setFieldValue(`data.${index}.${field}`, value);
     }
   };
-  
+
   const handleSkip = () => {
     nextStep();
   };
@@ -242,10 +242,9 @@ export default function EmailDetailsStep() {
     router.push("/");
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingMember) {
     return <LoadingCard />;
   }
-
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <div className="space-y-6">
@@ -372,11 +371,10 @@ export default function EmailDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending || isUpdating} // 🆕 disable during update
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
           {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
-          {/* 🆕 show Saving on update */}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
