@@ -65,7 +65,9 @@ async function Home({ searchParams }: Props) {
       </div>
 
       <div className="space-y-4">
-        <KPICards />
+        <Suspense fallback={<DashboardLoader />}>
+          <KPICards />
+        </Suspense>
       </div>
     </div>
   );
