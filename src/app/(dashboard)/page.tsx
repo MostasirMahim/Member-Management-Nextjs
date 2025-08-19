@@ -1,46 +1,8 @@
-import { Suspense, useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import {
-  Users,
-  FileText,
-  Clock,
-  FolderOpen,
-  Eye,
-  ThumbsUp,
-  MessageSquare,
-  BarChart3,
-  ArrowUpRight,
-  ArrowDownRight,
-  MoreHorizontal,
-  Check,
-  X,
-} from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import { articles, userArticles } from "@/lib/dummy";
-import { useQuery } from "@tanstack/react-query";
-
-import { LoadingPage } from "@/components/ui/loading";
+import { Suspense } from "react";
 import DashBoardCard from "@/components/DashBoard/DashBoardCard";
 import DashboardFilterButton from "@/components/DashBoard/DashboardFilterButton";
 import MemberPieChart from "@/components/DashBoard/MemberPieChart";
+import MemberPieChartSSR from "@/components/DashBoard/MemberPieChartSSR";
 
 interface Props {
   searchParams: Promise<{
@@ -73,8 +35,10 @@ function Home({ searchParams }: Props) {
       <div className="shadow p-4 rounded-lg border border-gray-200">
         <h4 className="text-xl font-bold mb-4">Analytical data</h4>
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 h-[500px]">
-            <MemberPieChart />
+          <div className="flex-1">
+            <Suspense fallback={<h1>loading..</h1>}>
+              <MemberPieChartSSR />
+            </Suspense>
           </div>
           <div className="flex-1">chart 2</div>
         </div>
