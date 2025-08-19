@@ -29,7 +29,7 @@ export async function KPICards() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 h-full">
-      <Card className="bg-white shadow-md rounded-lg overflow-hidden">
+      <Card className="shadow-md rounded-lg overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gray-50 p-4">
           <CardTitle className="text-sm font-semibold text-gray-800 flex items-center space-x-2">
             <Users className="w-4 h-4 text-indigo-500" />
@@ -46,7 +46,7 @@ export async function KPICards() {
           </p>
         </CardContent>
       </Card>
-      <Card className="bg-white shadow-md rounded-lg overflow-hidden">
+      <Card className=" shadow-md rounded-lg overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gray-50 p-4">
           <CardTitle className="text-sm font-semibold text-gray-800 flex items-center space-x-2">
             <Layers className="w-4 h-4 text-indigo-500" />
@@ -61,7 +61,7 @@ export async function KPICards() {
           <p className="text-sm text-gray-500">Total created groups</p>
         </CardContent>
       </Card>
-      <Card className="bg-white shadow-md rounded-lg overflow-hidden">
+      <Card className=" shadow-md rounded-lg overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gray-50 p-4">
           <CardTitle className="text-sm font-semibold text-gray-800 flex items-center space-x-2">
             <Activity className="w-4 h-4 text-indigo-500" />
