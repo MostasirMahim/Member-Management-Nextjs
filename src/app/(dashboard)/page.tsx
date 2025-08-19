@@ -6,6 +6,7 @@ import MemberPieChartSSR2 from "@/components/DashBoard/MemberPieChartSSR2";
 import DashboardLoader from "@/components/loader/DashboardLoader";
 import { DashBoardActivityLog } from "@/components/DashBoard/DashBoardActivityLog";
 import { DashBoardInfo } from "@/components/DashBoard/DashboardInfo";
+import { KPICards } from "@/components/DashBoard/DashBoardKPICard";
 
 interface Props {
   searchParams: Promise<{
@@ -61,6 +62,10 @@ async function Home({ searchParams }: Props) {
         <div className="flex-1  border-gray-200">
           <DashBoardInfo />
         </div>
+      </div>
+
+      <div className="space-y-4">
+        <KPICards />
       </div>
     </div>
   );
