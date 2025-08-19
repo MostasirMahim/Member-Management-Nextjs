@@ -29,12 +29,20 @@ import useGetAllChoice from "@/hooks/data/useGetAllChoice";
 import { useAddMemberStore } from "@/store/store";
 import { useRouter } from "next/navigation";
 import useGetMember from "@/hooks/data/useGetMember";
+import { LoadingCard } from "../ui/loading";
 
 const validationSchema = Yup.object({
   spouse_name: Yup.string().required("Spouse name is required"),
   contact_number: Yup.string().required("Contact number is required"),
   spouse_dob: Yup.date().required("Spouse date of birth is required"),
   image: Yup.mixed().nullable().required("Profile picture is required"),
+  current_status: Yup.string().required("Current status is required"),
+});
+const validationSchemaForUpdate = Yup.object({
+  spouse_name: Yup.string().required("Spouse name is required"),
+  contact_number: Yup.string().required("Contact number is required"),
+  spouse_dob: Yup.date().required("Spouse date of birth is required"),
+  image: Yup.mixed().nullable(),
   current_status: Yup.string().required("Current status is required"),
 });
 
@@ -169,7 +177,9 @@ export default function SpouseDetailsStep() {
             current_status: memberData[0]?.current_status?.toString() || "",
           }
         : initialValues,
-    validationSchema: isUpdateMode ? Yup.object({}) : validationSchema,
+    validationSchema: isUpdateMode
+      ? validationSchemaForUpdate
+      : validationSchema,
     onSubmit: (values) => {
       if (!memberID) {
         toast.error("No Member ID found.");
@@ -209,6 +219,7 @@ export default function SpouseDetailsStep() {
     setMemberID("");
     router.push("/");
   };
+  if(isLoading || isLoadingMember) return <LoadingCard />
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <div className="flex flex-col md:flex-row gap-6">
@@ -336,9 +347,14 @@ export default function SpouseDetailsStep() {
         </div>
       </div>
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-gray-700">
-          Spouse Picture
-        </Label>
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-medium text-gray-700">
+            Spouse Picture
+          </Label>
+          <p className="text-sm text-gray-500 pr-5">
+            {isUpdateMode ? memberData[0]?.image?.split("/").pop() : null}
+          </p>
+        </div>
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
           <input
             ref={fileInputRef}

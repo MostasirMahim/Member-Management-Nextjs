@@ -48,8 +48,26 @@ const validationSchema = Yup.object({
     .nullable()
     .required("Anniversary date is required"),
   profile_photo: Yup.mixed().required("Profile picture is required"),
-  blood_group: Yup.string(),
-  nationality: Yup.string(),
+  blood_group: Yup.string().required("Blood group is required"),
+  nationality: Yup.string().required("Nationality is required"),
+});
+const validationSchemaForUpdate = Yup.object({
+  member_ID: Yup.string().required("Member ID is required"),
+  first_name: Yup.string().required("First name is required"),
+  last_name: Yup.string(),
+  gender: Yup.string().required("Gender is required"),
+  date_of_birth: Yup.date().required("Date of birth is required"),
+  institute_name: Yup.string().required("Institute name is required"),
+  batch_number: Yup.string().required("Batch number is required"),
+  membership_status: Yup.string().required("Membership status is required"),
+  membership_type: Yup.string().required("Membership type is required"),
+  marital_status: Yup.string().required("Marital status is required"),
+  anniversary_date: Yup.date()
+    .nullable()
+    .required("Anniversary date is required"),
+  profile_photo: Yup.mixed().nullable(),
+  blood_group: Yup.string().required("Blood group is required"),
+  nationality: Yup.string().required("Nationality is required"),
 });
 
 export default function MembershipDetailsStep() {
@@ -94,7 +112,7 @@ export default function MembershipDetailsStep() {
           formik.setFieldValue("member_ID", member_ID);
           setMemberID(member_ID);
         }
-        toast.success("Member ID generated successfully");
+        toast.success("Member ID added successfully");
       }
     },
     onError: (error: any) => {
@@ -138,7 +156,6 @@ export default function MembershipDetailsStep() {
         toast.success(
           data.message || "Membership has been successfully added."
         );
-        formik.resetForm();
         markStepCompleted(currentStep);
         nextStep();
       }
@@ -224,7 +241,7 @@ export default function MembershipDetailsStep() {
             anniversary_date: memberData.anniversary_date || null,
             profile_photo: null as File | null,
             blood_group: memberData.blood_group || "",
-            nationality: memberData.nationality || "",
+            nationality: memberData.nationality || "Bangladesh",
           }
         : {
             member_ID: "",
@@ -240,9 +257,11 @@ export default function MembershipDetailsStep() {
             anniversary_date: null as Date | null,
             profile_photo: null as File | null,
             blood_group: "",
-            nationality: "",
+            nationality: "Bangladesh",
           },
-    validationSchema: isUpdateMode ? Yup.object({}) : validationSchema,
+    validationSchema: isUpdateMode
+      ? validationSchemaForUpdate
+      : validationSchema,
     onSubmit: (values) => {
       if (isUpdateMode) {
         if (values.id) {
@@ -306,7 +325,7 @@ export default function MembershipDetailsStep() {
     router.push("/");
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingMember) {
     return <LoadingCard />;
   }
   return (
@@ -473,9 +492,16 @@ export default function MembershipDetailsStep() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
-                Profile Picture
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-gray-700">
+                  Profile Picture
+                </Label>
+                <p className="text-sm text-gray-500 pr-5">
+                  {isUpdateMode
+                    ? memberData?.profile_photo?.split("/").pop()
+                    : null}
+                </p>
+              </div>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                 <input
                   ref={imgRef}
@@ -567,28 +593,7 @@ export default function MembershipDetailsStep() {
                 </p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label
-                htmlFor="batch_number"
-                className="text-sm font-medium text-gray-700"
-              >
-                Batch Number
-              </Label>
-              <Input
-                id="batch_number"
-                name="batch_number"
-                value={formik.values.batch_number}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Enter batch year"
-                className="w-full"
-              />
-              {formik.touched.batch_number && formik.errors.batch_number && (
-                <p className="text-sm text-red-600">
-                  {formik.errors.batch_number as string}
-                </p>
-              )}
-            </div>
+
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">
                 Membership Status
@@ -616,6 +621,28 @@ export default function MembershipDetailsStep() {
                     {formik.errors.membership_status as string}
                   </p>
                 )}
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="batch_number"
+                className="text-sm font-medium text-gray-700"
+              >
+                Batch Number
+              </Label>
+              <Input
+                id="batch_number"
+                name="batch_number"
+                value={formik.values.batch_number}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter batch year"
+                className="w-full"
+              />
+              {formik.touched.batch_number && formik.errors.batch_number && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.batch_number as string}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">
@@ -682,6 +709,12 @@ export default function MembershipDetailsStep() {
                   />
                 </PopoverContent>
               </Popover>
+              {formik.touched.anniversary_date &&
+                formik.errors.anniversary_date && (
+                  <p className="text-sm text-red-600">
+                    {formik.errors.anniversary_date as string}
+                  </p>
+                )}
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">

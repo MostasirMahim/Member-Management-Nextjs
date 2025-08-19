@@ -47,6 +47,21 @@ const validationSchema = Yup.object({
           "Contact number is required"
         ),
         dob: Yup.date().required("Date of birth is required"),
+        image: Yup.mixed().nullable().required("Profile picture is required"),
+        relation_type: Yup.string().required("Relation type is required"),
+      })
+    )
+    .min(1, "At least one descendant is required"),
+});
+const validationSchemaForUpdate = Yup.object({
+  data: Yup.array()
+    .of(
+      Yup.object({
+        name: Yup.string().required("Descendant name is required"),
+        descendant_contact_number: Yup.string().required(
+          "Contact number is required"
+        ),
+        dob: Yup.date().required("Date of birth is required"),
         image: Yup.mixed().nullable(),
         relation_type: Yup.string().required("Relation type is required"),
       })
@@ -269,7 +284,9 @@ export default function DescendantsDetailsStep() {
               },
             ],
           },
-    validationSchema,
+    validationSchema: isUpdateMode
+      ? validationSchemaForUpdate
+      : validationSchema,
     onSubmit: (values) => {
       if (!memberID) {
         toast.error("No Member ID found.");
@@ -282,10 +299,10 @@ export default function DescendantsDetailsStep() {
       }
     },
   });
-
+  console.log(memberData);
   const addDescendant = () => {
     const newDescendant = {
-      member_ID: memberID || "GM0001-PU",
+      member_ID: memberID,
       name: "",
       descendant_contact_number: "",
       dob: null as Date | null,
@@ -295,7 +312,7 @@ export default function DescendantsDetailsStep() {
     const updatedDescendants = [...formik.values.data, newDescendant];
     formik.setFieldValue("data", updatedDescendants);
   };
-
+  //TODO:NewDecandant Image Requried Validation
   const removeDescendant = (index: number) => {
     if (formik.values.data.length > 1) {
       const updatedDescendants = formik.values.data.filter(
@@ -462,9 +479,16 @@ export default function DescendantsDetailsStep() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Descendant Picture
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Descendant Picture
+                    </Label>
+                    <p className="text-sm text-gray-500 pr-5">
+                      {isUpdateMode
+                        ? memberData[index]?.image?.split("/").pop()
+                        : null}
+                    </p>
+                  </div>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                     <input
                       ref={(el) => {
