@@ -3,6 +3,7 @@ import DashBoardCard from "@/components/DashBoard/DashBoardCard";
 import DashboardFilterButton from "@/components/DashBoard/DashboardFilterButton";
 import MemberPieChart from "@/components/DashBoard/MemberPieChart";
 import MemberPieChartSSR from "@/components/DashBoard/MemberPieChartSSR";
+import MemberPieChartSSR2 from "@/components/DashBoard/MemberPieChartSSR2";
 
 interface Props {
   searchParams: Promise<{
@@ -40,7 +41,11 @@ function Home({ searchParams }: Props) {
               <MemberPieChartSSR />
             </Suspense>
           </div>
-          <div className="flex-1">chart 2</div>
+          <div className="flex-1">
+            <Suspense fallback={<h1>loading..</h1>}>
+              <MemberPieChartSSR2 />
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>
