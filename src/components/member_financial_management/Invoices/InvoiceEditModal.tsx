@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -31,11 +32,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// ✅ Zod Schema
+// Zod Schema (শুধু ২টা ফিল্ড দরকার)
 const formSchema = z.object({
-  balance_due: z.string().min(1, "Balance due is required"),
   paid_amount: z.string().min(1, "Paid amount is required"),
-  total_amount: z.string().min(1, "Total amount is required"),
   payment_method: z.string().min(1, "Payment method is required"),
 });
 
@@ -46,36 +45,42 @@ interface Props {
   onClose: () => void;
   invoice: {
     id: number;
-    total_amount: string;
     paid_amount: string;
-    balance_due: string;
   };
 }
 
 export default function EditInvoiceModal({ open, onClose, invoice }: Props) {
   const router = useRouter();
 
-  // ✅ Fetch Payment Methods
+  // Payment methods fetch
   const { data: paymentOptions, isLoading: loadingPayments } = useQuery({
     queryKey: ["payment-methods"],
     queryFn: async () => {
       const res = await axiosInstance.get(
         "/api/member_financial/v1/payment/options/"
       );
-      return res.data.data; // [{id, name}, ...]
+      return res.data.data;
     },
   });
 
-  // ✅ React Hook Form setup
+  // React Hook Form setup
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      balance_due: invoice.balance_due,
       paid_amount: invoice.paid_amount,
-      total_amount: invoice.total_amount,
       payment_method: "",
     },
   });
+
+  // invoice prop change হলে reset হবে
+  useEffect(() => {
+    if (invoice) {
+      form.reset({
+        paid_amount: invoice.paid_amount,
+        payment_method: "",
+      });
+    }
+  }, [invoice, form]);
 
   const { setError } = form;
 
@@ -84,7 +89,10 @@ export default function EditInvoiceModal({ open, onClose, invoice }: Props) {
     mutationFn: async (data: FormValues) => {
       return await axiosInstance.patch(
         `/api/member_financial/v1/invoices/${invoice.id}/`,
-        data
+        {
+          paid_amount: data.paid_amount,
+          payment_method: data.payment_method,
+        }
       );
     },
     onSuccess: (res) => {
@@ -98,6 +106,8 @@ export default function EditInvoiceModal({ open, onClose, invoice }: Props) {
     onError: (error: any) => {
       if (error?.response?.data?.errors) {
         const errors = error.response.data.errors;
+        
+        console.log(errors);
         for (const key in errors) {
           setError(key as keyof FormValues, {
             type: "server",
@@ -108,7 +118,8 @@ export default function EditInvoiceModal({ open, onClose, invoice }: Props) {
           position: "top-center",
           autoClose: 3000,
         });
-      } else {
+      }
+      else {
         toast.error("Unexpected error occurred", {
           position: "top-center",
           autoClose: 3000,
@@ -118,6 +129,7 @@ export default function EditInvoiceModal({ open, onClose, invoice }: Props) {
   });
 
   const onSubmit = (data: FormValues) => {
+    console.log(data, "Submitting invoice data");
     updateInvoice(data);
   };
 
@@ -129,21 +141,6 @@ export default function EditInvoiceModal({ open, onClose, invoice }: Props) {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Total Amount */}
-            <FormField
-              control={form.control}
-              name="total_amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Total Amount</FormLabel>
-                  <FormControl>
-                    <Input type="number" step="0.01" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Paid Amount */}
             <FormField
               control={form.control}
@@ -151,21 +148,6 @@ export default function EditInvoiceModal({ open, onClose, invoice }: Props) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Paid Amount</FormLabel>
-                  <FormControl>
-                    <Input type="number" step="0.01" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Balance Due */}
-            <FormField
-              control={form.control}
-              name="balance_due"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Balance Due</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" {...field} />
                   </FormControl>
@@ -182,10 +164,7 @@ export default function EditInvoiceModal({ open, onClose, invoice }: Props) {
                 <FormItem>
                   <FormLabel>Payment Method</FormLabel>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a payment method" />
                       </SelectTrigger>
@@ -196,7 +175,10 @@ export default function EditInvoiceModal({ open, onClose, invoice }: Props) {
                           </SelectItem>
                         ) : (
                           paymentOptions?.map((method: any) => (
-                            <SelectItem key={method.id} value={String(method.id)}>
+                            <SelectItem
+                              key={method.id}
+                              value={String(method.id)}
+                            >
                               {method.name}
                             </SelectItem>
                           ))
