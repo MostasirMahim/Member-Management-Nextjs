@@ -4,6 +4,8 @@ import DashboardFilterButton from "@/components/DashBoard/DashboardFilterButton"
 import MemberPieChartSSR from "@/components/DashBoard/MemberPieChartSSR";
 import MemberPieChartSSR2 from "@/components/DashBoard/MemberPieChartSSR2";
 import DashboardLoader from "@/components/loader/DashboardLoader";
+import { DashBoardActivityLog } from "@/components/DashBoard/DashBoardActivityLog";
+import { DashBoardInfo } from "@/components/DashBoard/DashboardInfo";
 
 interface Props {
   searchParams: Promise<{
@@ -50,12 +52,14 @@ async function Home({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className=" flex flex-col md:flex-row justify-between items-center  gap-4 space-y-4">
-        <div className="flex-1 shadow p-4 rounded-lg border border-gray-200">
-          container 1
+      <div className=" flex flex-col md:flex-row justify-between items-start  gap-4 space-y-4">
+        <div className="flex-1  border-gray-200">
+          <Suspense fallback={<DashboardLoader />}>
+            <DashBoardActivityLog />
+          </Suspense>
         </div>
-        <div className="flex-1 shadow p-4 rounded-lg border border-gray-200">
-          container 2
+        <div className="flex-1  border-gray-200">
+          <DashBoardInfo />
         </div>
       </div>
     </div>
