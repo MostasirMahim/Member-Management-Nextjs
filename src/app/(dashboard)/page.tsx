@@ -7,6 +7,7 @@ import DashboardLoader from "@/components/loader/DashboardLoader";
 import { DashBoardActivityLog } from "@/components/DashBoard/DashBoardActivityLog";
 import { DashBoardInfo } from "@/components/DashBoard/DashboardInfo";
 import { KPICards } from "@/components/DashBoard/DashBoardKPICard";
+import { cookies } from "next/headers";
 
 interface Props {
   searchParams: Promise<{
@@ -17,6 +18,12 @@ interface Props {
 }
 
 async function Home({ searchParams }: Props) {
+  const cookieStore = cookies();
+  const authToken = cookieStore.get("access_token")?.value || "";
+  if (authToken === "") {
+    return <DashboardLoader />;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
