@@ -48,6 +48,7 @@ import {
   FilePlus,
   CreditCard,
   ListChecks,
+  HandCoins,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -428,17 +429,17 @@ const navigation = [
     href: "#",
     subItems: [
       {
-        icon: <FileText className="h-4 w-4" />, 
+        icon: <FileText className="h-4 w-4" />,
         label: "View all Invoices",
         href: "/mfm/invoices",
       },
       {
-        icon: <ListChecks className="h-4 w-4" />, 
+        icon: <ListChecks className="h-4 w-4" />,
         label: "View Income Particulars",
         href: "/mfm/income_particulars",
       },
       {
-        icon: <CreditCard className="h-4 w-4" />, 
+        icon: <CreditCard className="h-4 w-4" />,
         label: "View Income ReceivingOptions",
         href: "/mfm/income_receiving_options",
       },
@@ -451,6 +452,11 @@ const navigation = [
         icon: <CircleDollarSign className="h-4 w-4" />,
         label: "Payment Invoice",
         href: "/mfm/payment_invoice",
+      },
+      {
+        icon: <HandCoins className="h-4 w-4" />,
+        label: "Pay member due",
+        href: "/mfm/pay_member_due",
       },
     ],
   },
@@ -712,9 +718,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
             </DropdownMenu>
           </div>
         </header>
-        <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 ">
-          {children}
-        </main>
+        <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 ">{children}</main>
       </div>
     </div>
   );
