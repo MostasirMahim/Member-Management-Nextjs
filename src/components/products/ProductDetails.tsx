@@ -38,7 +38,6 @@ export default function ProductPage({ product }: ProductPageProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
-  // ✅ zustand hook
   const addToCart = useCartStore((state) => state.addToCart);
 
   const discountNum = parseFloat(product.data.discount_rate);
@@ -75,7 +74,7 @@ export default function ProductPage({ product }: ProductPageProps) {
     setSelectedImageIndex((prev) => (prev === media.length - 1 ? 0 : prev + 1));
   };
 
-  // ✅ Add to cart handler
+  //  Add to cart handler
   const handleAddToCart = () => {
     addToCart([
       {

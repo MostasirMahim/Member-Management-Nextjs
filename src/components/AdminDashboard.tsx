@@ -42,6 +42,12 @@ import {
   BadgeDollarSign,
   List,
   Package,
+  Wallet,
+  CircleDollarSign,
+  WalletCards,
+  FilePlus,
+  CreditCard,
+  ListChecks,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -412,6 +418,39 @@ const navigation = [
         icon: <Eye className="h-4 w-4" />,
         label: "View applied promo codes",
         href: "/promo_codes/applied_promo_codes/",
+      },
+    ],
+  },
+
+  {
+    icon: <Wallet className="h-5 w-5" />,
+    label: "Member financial management",
+    href: "#",
+    subItems: [
+      {
+        icon: <FileText className="h-4 w-4" />, 
+        label: "View all Invoices",
+        href: "/mfm/invoices",
+      },
+      {
+        icon: <ListChecks className="h-4 w-4" />, 
+        label: "View Income Particulars",
+        href: "/mfm/income_particulars",
+      },
+      {
+        icon: <CreditCard className="h-4 w-4" />, 
+        label: "View Income ReceivingOptions",
+        href: "/mfm/income_receiving_options",
+      },
+      {
+        icon: <CreditCard className="h-4 w-4" />,
+        label: "View Invoice PaymentOptions",
+        href: "/mfm/payment_options",
+      },
+      {
+        icon: <CircleDollarSign className="h-4 w-4" />,
+        label: "Payment Invoice",
+        href: "/mfm/payment_invoice",
       },
     ],
   },
