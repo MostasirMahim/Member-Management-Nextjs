@@ -452,6 +452,12 @@ const navigation = [
         label: "Payment Invoice",
         href: "/mfm/payment_invoice",
       },
+      {
+        icon: <WalletCards className="h-4 w-4" />,
+        label: "View all Sales",
+        href: "/mfm/sales",
+      },
+      
     ],
   },
 ];
