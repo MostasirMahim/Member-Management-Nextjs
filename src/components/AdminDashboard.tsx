@@ -48,6 +48,7 @@ import {
   FilePlus,
   CreditCard,
   ListChecks,
+  HandCoins,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -112,41 +113,7 @@ const navigation = [
       },
     ],
   },
-  {
-    icon: <FileText className="h-5 w-5" />,
-    label: "Pulse360",
-    href: "",
-    subItems: [
-      {
-        icon: <Eye className="h-4 w-4" />,
-        label: "View Dues",
-        href: "/dues/view",
-      },
-      {
-        icon: <Edit className="h-4 w-4" />,
-        label: "Viwes",
-        href: "/dues/view",
-      },
-    ],
-  },
-  {
-    icon: <Clock className="h-5 w-5" />,
-    label: "Elevated",
-    href: "",
-    badge: 5,
-    subItems: [
-      {
-        icon: <Eye className="h-4 w-4" />,
-        label: "Upload Payment",
-        href: "/payments/upload",
-      },
-      {
-        icon: <Edit className="h-4 w-4" />,
-        label: "View Payments",
-        href: "/payments/view",
-      },
-    ],
-  },
+
   {
     icon: <FolderOpen className="h-5 w-5" />,
     label: "Attendance",
@@ -209,7 +176,7 @@ const navigation = [
   {
     icon: <Logs className="h-5 w-5" />,
     label: "My activity logs",
-    href: "/activity_logs/my",
+    href: "/activity_logs/my"
   },
   ,
   {
@@ -428,17 +395,17 @@ const navigation = [
     href: "#",
     subItems: [
       {
-        icon: <FileText className="h-4 w-4" />, 
+        icon: <FileText className="h-4 w-4" />,
         label: "View all Invoices",
         href: "/mfm/invoices",
       },
       {
-        icon: <ListChecks className="h-4 w-4" />, 
+        icon: <ListChecks className="h-4 w-4" />,
         label: "View Income Particulars",
         href: "/mfm/income_particulars",
       },
       {
-        icon: <CreditCard className="h-4 w-4" />, 
+        icon: <CreditCard className="h-4 w-4" />,
         label: "View Income ReceivingOptions",
         href: "/mfm/income_receiving_options",
       },
@@ -467,7 +434,16 @@ const navigation = [
         label: "View all Payments",
         href: "/mfm/payments",
       },
-      
+      {
+        icon: <HandCoins className="h-4 w-4" />,
+        label: "View member dues",
+        href: "/mfm/view_member_dues",
+      },
+      {
+        icon: <UserCheck className="h-4 w-4" />,
+        label: "View member accounts",
+        href: "/mfm/view_member_accounts",
+      },
     ],
   },
 ];
@@ -728,9 +704,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
             </DropdownMenu>
           </div>
         </header>
-        <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 ">
-          {children}
-        </main>
+        <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 ">{children}</main>
       </div>
     </div>
   );
