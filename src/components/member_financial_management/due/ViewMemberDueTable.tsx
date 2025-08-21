@@ -194,10 +194,10 @@ const CustomTableRow = ({ data }: Props) => {
             {/* Payment Invoice */}
             <DropdownMenuItem asChild>
               <Link
-                href={"/mfm/payment_invoice"}
+                href={`/mfm/pay_member_due/${id}`}
                 className="flex items-center text-sky-600 hover:bg-indigo-100 cursor-pointer"
               >
-                <DollarSign className="mr-2 h-4 w-4" /> Payment Invoice
+                <DollarSign className="mr-2 h-4 w-4" /> Pay due
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
