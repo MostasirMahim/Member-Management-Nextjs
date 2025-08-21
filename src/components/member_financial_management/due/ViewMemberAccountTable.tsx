@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -13,6 +14,23 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import axiosInstance from "@/lib/axiosInstance";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 import { DollarSign, Ban, MoreVertical, Eye } from "lucide-react"; // Or similar icon library
 
@@ -60,6 +78,34 @@ export default function ViewMemberAccountTable({ data }: Props) {
 }
 
 const CustomTableRow = ({ data }: Props) => {
+  const [amount, setAmount] = useState(0);
+  const router = useRouter();
+
+  const handleSubmit = async (member_ID: any) => {
+    if (amount <= 0) {
+      toast.error("Invalid amount");
+      return;
+    }
+    toast.info("Recharge process started!");
+    try {
+      const data = {
+        amount,
+        member_ID,
+      };
+      const response = await axiosInstance.post(
+        "/api/member_financial/v1/member_accounts/recharge/",
+        data
+      );
+      if (response.status == 200) {
+        toast.success("Amount recharged successfully");
+        router.refresh();
+      }
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    }
+  };
+
   const { id, member } = data;
 
   // Function to format dates
@@ -154,12 +200,37 @@ const CustomTableRow = ({ data }: Props) => {
             </DropdownMenuItem>
             {/* Payment Invoice */}
             <DropdownMenuItem asChild>
-              <Link
-                href={`/mfm/pay_member_due/${id}`}
-                className="flex items-center text-sky-600 hover:bg-indigo-100 cursor-pointer"
-              >
-                <DollarSign className="mr-2 h-4 w-4" /> Recharge
-              </Link>
+              <>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline">
+                      <DollarSign className="mr-2 h-4 w-4" /> Recharge
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Recharge member account #{member}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Enter the amount to recharge on the member account.
+                      </AlertDialogDescription>
+                      <Input
+                        value={amount}
+                        onChange={(e: any) => setAmount(e.target.value)}
+                        type="number"
+                        placeholder="Enter amount to recharge"
+                      />
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={(e) => handleSubmit(member)}>
+                        Submit
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

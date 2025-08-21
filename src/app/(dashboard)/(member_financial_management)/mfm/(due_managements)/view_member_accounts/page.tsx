@@ -23,7 +23,6 @@ async function ViewMemberAccountsPage({ searchParams }: Props) {
       }
     );
     responseData = data;
-    console.log(responseData);
   } catch (error: any) {
     console.log("Error occurred");
     console.log(error.response.data);
