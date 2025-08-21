@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, Printer, Check } from "lucide-react";
+import Link from "next/link";
 
 interface MemberDueStatementProps {
   data: any;
@@ -191,10 +192,12 @@ export function MemberDueStatement({ data }: MemberDueStatementProps) {
               <Printer className="h-4 w-4" />
               Print
             </Button>
-            <Button variant="outline" size="sm" className="gap-1">
-              <Check className="h-4 w-4" />
-              Pay due
-            </Button>
+            <Link href={`/mfm/pay_member_due/${data.id}`}>
+              <Button variant="outline" size="sm" className="gap-1">
+                <Check className="h-4 w-4" />
+                Pay due
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
