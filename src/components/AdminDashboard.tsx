@@ -462,6 +462,11 @@ const navigation = [
         label: "View all Transactions",
         href: "/mfm/transections",
       },
+      {
+        icon: <ListChecks className="h-4 w-4" />,
+        label: "View all Payments",
+        href: "/mfm/payments",
+      },
       
     ],
   },
