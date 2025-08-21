@@ -14,16 +14,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-import { Badge } from "@/components/ui/badge"; // Assuming you have a Badge component
-import {
-  CheckCircle,
-  XCircle,
-  Clock,
-  DollarSign,
-  Ban,
-  MoreVertical,
-  Eye,
-} from "lucide-react"; // Or similar icon library
+import { DollarSign, Ban, MoreVertical, Eye } from "lucide-react"; // Or similar icon library
 
 import Link from "next/link";
 import { PaginationPages } from "@/components/utils/PaginationPages";
@@ -155,7 +146,7 @@ const CustomTableRow = ({ data }: Props) => {
             {/* View Invoice */}
             <DropdownMenuItem asChild>
               <Link
-                href={`/mfm/view_member_dues/${id}`}
+                href={`/mfm/view_member_accounts/${member}`}
                 className="flex items-center text-indigo-600 hover:bg-indigo-100 cursor-pointer"
               >
                 <Eye className="mr-2 h-4 w-4" /> View
