@@ -455,8 +455,8 @@ const navigation = [
       },
       {
         icon: <HandCoins className="h-4 w-4" />,
-        label: "Pay member due",
-        href: "/mfm/pay_member_due",
+        label: "View member dues",
+        href: "/mfm/view_member_dues",
       },
     ],
   },
