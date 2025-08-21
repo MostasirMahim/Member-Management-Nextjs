@@ -32,29 +32,27 @@ interface Props {
   data: any;
 }
 
-export default function ViewMemberDueTable({ data }: Props) {
+export default function ViewMemberAccountTable({ data }: Props) {
   const dues = data?.data;
   const paginationData = data?.pagination;
 
   return (
     <div>
-      <div className="grid w-full [&>div]:max-h-[600px] [&>div]:border [&>div]:rounded">
+      <div className="grid w-full [&>div]:max-h-[500px] [&>div]:border [&>div]:rounded">
         <Table>
           <TableHeader>
             <TableRow className="[&>*]:whitespace-nowrap sticky top-0 bg-background after:content-[''] after:inset-x-0 after:h-px after:bg-border after:absolute after:bottom-0">
               <TableHead className="pl-4">ID</TableHead>
               <TableHead className="w-[100px]">Member</TableHead>
-              <TableHead>Amount due</TableHead>
-              <TableHead>Due date</TableHead>
-              <TableHead>Amount paid</TableHead>
-              <TableHead>Payment date</TableHead>
-              <TableHead>Overdue amount</TableHead>
-              <TableHead>Notes</TableHead>
-              <TableHead>Is due paid</TableHead>
-              <TableHead>Due reference</TableHead>
-              <TableHead>is active</TableHead>
-              <TableHead>Created at</TableHead>
-              <TableHead>Updated at</TableHead>
+              <TableHead>balance</TableHead>
+              <TableHead>total_credits</TableHead>
+              <TableHead>total_debits</TableHead>
+              <TableHead>last_transaction_date</TableHead>
+              <TableHead>status</TableHead>
+              <TableHead>overdue_amount</TableHead>
+              <TableHead>due_date</TableHead>
+              <TableHead>notes</TableHead>
+              <TableHead>credit_limit</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -71,41 +69,7 @@ export default function ViewMemberDueTable({ data }: Props) {
 }
 
 const CustomTableRow = ({ data }: Props) => {
-  const {
-    id,
-    member,
-    amount_due,
-    due_date,
-    amount_paid,
-    payment_date,
-    overdue_amount,
-    notes,
-    is_due_paid,
-    due_reference,
-    is_active,
-    created_at,
-    updated_at,
-  } = data;
-
-  const isOverdue = new Date(due_date) < new Date() && !is_due_paid;
-
-  // Use a status badge for clarity on the payment status
-  const statusBadge = is_due_paid ? (
-    <Badge variant="default" className="bg-green-100 text-green-700">
-      <CheckCircle className="mr-1 h-3 w-3" />
-      Paid
-    </Badge>
-  ) : isOverdue ? (
-    <Badge variant="destructive" className="bg-red-100 text-red-700">
-      <XCircle className="mr-1 h-3 w-3" />
-      Overdue
-    </Badge>
-  ) : (
-    <Badge className="bg-yellow-100 text-yellow-700">
-      <Clock className="mr-1 h-3 w-3" />
-      Pending
-    </Badge>
-  );
+  const { id, member } = data;
 
   // Function to format dates
   const formatDate = (dateString: any) => {
@@ -129,44 +93,50 @@ const CustomTableRow = ({ data }: Props) => {
         <div className="flex items-center">
           <p className="font-bold flex justify-center items-center">
             <DollarSign className="mr-1 h-4 w-4 text-green-500 " />
-            {`${amount_due}`}
+            {`${data.balance}`}
           </p>
         </div>
       </TableCell>
-      <TableCell className="text-gray-600">{formatDate(due_date)}</TableCell>
+      <TableCell className="font-semibold text-red-600">
+        <div className="flex items-center">
+          <p className="font-bold flex justify-center items-center">
+            <DollarSign className="mr-1 h-4 w-4 text-red-600" />
+            {data.total_credits}
+          </p>
+        </div>
+      </TableCell>
       <TableCell className="text-gray-600">
         <div className="flex items-center">
           <p className="font-bold flex justify-center items-center">
             <DollarSign className="mr-1 h-4 w-4 text-gray-500" />
-            {amount_paid !== "0.00" ? `${amount_paid}` : "-"}
+            {data.total_debits}
           </p>
         </div>
       </TableCell>
+
       <TableCell className="text-gray-600">
-        {payment_date ? formatDate(payment_date) : "-"}
+        {data.last_transaction_date ? (
+          formatDate(data.last_transaction_date)
+        ) : (
+          <Ban />
+        )}
       </TableCell>
-      <TableCell className="font-semibold text-red-600">
-        {overdue_amount !== "0.00" ? `${overdue_amount}` : <Ban />}
-      </TableCell>
-      <TableCell className="text-gray-600">{notes || <Ban />}</TableCell>
 
       {/* Status Cell with Badge */}
-      <TableCell>{statusBadge}</TableCell>
+      <TableCell>{data.status ? data.status : <Ban />}</TableCell>
 
-      <TableCell className="text-xs text-gray-500">{due_reference}</TableCell>
+      <TableCell className="text-xs text-gray-500">
+        {data.overdue_amount}
+      </TableCell>
       <TableCell>
-        <span
-          className={`h-2.5 w-2.5 rounded-full block ${
-            is_active ? "bg-green-500" : "bg-gray-400"
-          }`}
-        ></span>
+        {data.due_date ? formatDate(data.due_date) : <Ban />}
       </TableCell>
 
       <TableCell className="text-sm text-gray-500">
-        {formatDate(created_at)}
+        {data.notes ? data.notes : "-"}
       </TableCell>
       <TableCell className="text-sm text-gray-500">
-        {formatDate(updated_at)}
+        {data.credit_limit ? data.credit_limit : "-"}
       </TableCell>
 
       {/* Action Cell - Left empty for your buttons like Edit/Delete */}
@@ -197,7 +167,7 @@ const CustomTableRow = ({ data }: Props) => {
                 href={`/mfm/pay_member_due/${id}`}
                 className="flex items-center text-sky-600 hover:bg-indigo-100 cursor-pointer"
               >
-                <DollarSign className="mr-2 h-4 w-4" /> Pay due
+                <DollarSign className="mr-2 h-4 w-4" /> Recharge
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
