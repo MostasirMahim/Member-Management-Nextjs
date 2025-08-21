@@ -36,6 +36,7 @@ export default function page() {
   useEffect(() => {
     if (!isLoading && user) {
       router.replace("/");
+      router.refresh();
     }
   }, [user, isLoading]);
 
@@ -47,13 +48,14 @@ export default function page() {
     onSuccess: (data) => {
       if (data.code === 200 && data.status === "success") {
         router.replace("/");
+        router.refresh();
         toast.success(data.message || "You have been logged in successfully.");
         queryClient.invalidateQueries({ queryKey: ["authUser"] });
       }
     },
     onError: (error: any) => {
       console.log("Error in Login", error?.response);
-
+      console.log(error);
       const { message, errors } = error?.response?.data || {};
 
       if (errors) {
