@@ -13,14 +13,12 @@ function useGetMember(id: string, option = {}) {
           return result;
         } else {
           console.error("Failed to fetch :", res.data.message);
+          toast.error(res.data.message || "Failed to fetch Member");
           return [];
         }
       } catch (error: any) {
         console.error("Error fetching : ", error);
-        toast(
-          "Error",
-          error?.response?.data?.message || "Failed to fetch Member"
-        );
+        toast.error(error?.response?.data?.message || "Failed to fetch Member");
         return [];
       }
     },

@@ -206,7 +206,7 @@ function AllMembers() {
       <div className="rounded-md border my-2 font-secondary">
         <Table className="">
           <TableHeader>
-            <TableRow className=" text-center font-bold h-14 bg-[#f9fafb] dark:bg-accent">
+            <TableRow className=" text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
               <TableHead className=" text-black dark:text-white font-bold  ">
                 ID
               </TableHead>
@@ -244,7 +244,7 @@ function AllMembers() {
               <TableRow>
                 <TableCell
                   colSpan={5}
-                  className="text-center py-8 text-muted-foreground"
+                  className="text-center py-8 text-muted-foreground "
                 >
                   No users found. Try adjusting your filters.
                 </TableCell>
@@ -253,7 +253,7 @@ function AllMembers() {
               filteredUsers.map((user: any) => (
                 <TableRow
                   key={user.member_ID}
-                  className="  cursor-pointer hover:translate-y-1 transition-transform duration-300 ease-in-out "
+                  className="  cursor-pointer hover:translate-y-1 transition-transform duration-300 ease-in-out bg-background "
                 >
                   <TableCell
                     className="font-medium "

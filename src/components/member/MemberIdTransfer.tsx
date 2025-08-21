@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
@@ -38,6 +38,7 @@ export default function MemberIdTransfer() {
       enabled: !!params?.id,
     }
   );
+  console.log("Member Data:", data);
 
   const { member_info: memberData } = data ?? {};
   const { membership_type, institute_name } = choiceSections ?? {};
@@ -96,29 +97,29 @@ export default function MemberIdTransfer() {
       );
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async(data) => {
       if (data?.status === "success") {
-        queryClient.invalidateQueries({ queryKey: ["getAllMembers", 1] });
-        toast.success(data.message || "ID Transfer Successfully.");
+        await queryClient.refetchQueries({ queryKey: ["getAllMembers"], exact: false });
+          toast.success(data.message || "ID Transfer Successfully.");
         router.push("/members/view");
+        router.refresh();
       }
     },
     onError: (error: any) => {
       console.log("error", error?.response);
       const { message, errors, detail } = error?.response.data;
-      console.log(errors);
-      toast.error(errors?.member_ID[0]);
-      if (errors && typeof errors === "object") {
-        Object.entries(errors).forEach(([field, messages]) => {
-          if (Array.isArray(messages)) {
-            formik.setFieldError(field, messages[0]);
+      function toastApiErrors(errors: Record<string, string[]>) {
+        Object.keys(errors).forEach((key) => {
+          const message = errors[key]?.[0];
+          if (message) {
+            toast.error(message);
           }
         });
-        toast.error(message || detail || "Validation failed.");
+      }
+      if (errors) {
+        toastApiErrors(errors);
       } else {
-        toast.error(
-          detail || message || "An error occurred during submission."
-        );
+        toast.error(error?.response?.data?.message || "Something went wrong");
       }
     },
   });
@@ -133,7 +134,7 @@ export default function MemberIdTransfer() {
     },
     validationSchema,
     onSubmit: (values) => {
-      if (formik.dirty) {
+      if (formik.dirty && memberData) {
         const data = {
           id: memberData?.id,
           member_ID: values.new_member_ID,
@@ -156,7 +157,7 @@ export default function MemberIdTransfer() {
           nationality: memberData?.nationality,
         };
         updateMember(data);
-      }
+      } 
     },
   });
   const handleFieldChangeAndGenerateID = (fieldName: string, value: string) => {

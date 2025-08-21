@@ -673,7 +673,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
             </DropdownMenu>
           </div>
         </header>
-        <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 ">
+        <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f4f7fb] dark:bg-black/80">
           {children}
         </main>
       </div>
