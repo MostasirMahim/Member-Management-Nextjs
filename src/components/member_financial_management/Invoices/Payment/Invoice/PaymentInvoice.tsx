@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +24,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 const formSchema = z.object({
   invoice_id: z.number().min(1, "Invoice is required"),
@@ -40,54 +40,26 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function PaymentForm() {
+interface Props {
+  invoices: any[];
+  paymentMethods: any[];
+  incomeParticulars: any[];
+  receivedFromList: any[];
+}
+
+export default function PaymentForm({
+  invoices,
+  paymentMethods,
+  incomeParticulars,
+  receivedFromList,
+}: Props) 
+{
   const router = useRouter();
-
-  const [invoices, setInvoices] = useState<any[]>([]);
-  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
-  const [incomeParticulars, setIncomeParticulars] = useState<any[]>([]);
-  const [receivedFromList, setReceivedFromList] = useState<any[]>([]);
-
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      adjust_from_balance: false,
-    },
+    defaultValues: { adjust_from_balance: false },
   });
 
-  // Fetch options data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [invoiceRes, paymentRes, incomeRes, receivedRes] =
-          await Promise.all([
-            axiosInstance.get(
-              "/api/member_financial/v1/invoices/?fields=id,invoice_number"
-            ),
-            axiosInstance.get(
-              "/api/member_financial/v1/payment/options/?fields=id,name"
-            ),
-            axiosInstance.get(
-              "/api/member_financial/v1/income/particular/?fields=id,name"
-            ),
-            axiosInstance.get(
-              "/api/member_financial/v1/income/receiving_options/?fields=id,name"
-            ),
-          ]);
-
-        setInvoices(invoiceRes.data.data);
-        setPaymentMethods(paymentRes.data.data);
-        setIncomeParticulars(incomeRes.data.data);
-        setReceivedFromList(receivedRes.data.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to load form data.");
-      }
-    };
-    fetchData();
-  }, []);
-
-  // Mutation to submit form
   const mutation = useMutation({
     mutationFn: (data: FormValues) =>
       axiosInstance.post("/api/member_financial/v1/payment/invoice/", data),
@@ -101,22 +73,15 @@ export default function PaymentForm() {
       if (errors) {
         const firstKey = Object.keys(errors)[0];
         const firstMessage = errors[firstKey][0];
-        console.error("Validation errors:", errors);
         toast.error(firstMessage);
       } else {
-        toast.error(
-          error?.response?.data?.message || "Failed to submit payment."
-        );
+        toast.error(error?.response?.data?.message || "Failed to submit payment.");
       }
     },
   });
 
   const onSubmit = (values: FormValues) => {
-    const payload = {
-      ...values,
-      amount: Number(values.amount),
-    };
-    mutation.mutate(payload);
+    mutation.mutate({ ...values, amount: Number(values.amount) });
   };
 
   return (
@@ -145,7 +110,6 @@ export default function PaymentForm() {
                   <SelectTrigger>
                     <SelectValue placeholder="Select Invoice" />
                   </SelectTrigger>
-
                   <SelectContent>
                     <div className="p-2">
                       <Input
@@ -209,11 +173,7 @@ export default function PaymentForm() {
                 <Input
                   type="text"
                   {...field}
-                  value={
-                    field.value === undefined || field.value === null
-                      ? ""
-                      : String(field.value)
-                  }
+                  value={field.value ? String(field.value) : ""}
                   onChange={(e) => field.onChange(e.target.value)}
                 />
               </FormControl>
