@@ -1,21 +1,21 @@
 import { cookies } from "next/headers";
 import axiosInstance from "@/lib/axiosInstance";
-import SalesTable from "@/components/member_financial_management/Sales/SalesTable";
+import TransactionTable from "@/components/member_financial_management/Transections/TransectionTable";
 
 export default async function SalesPage() {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
 
-  let salesData = [];
+  let transactionData = [];
 
   try {
-    const { data } = await axiosInstance.get("/api/member_financial/v1/sales/", {
+    const { data } = await axiosInstance.get("/api/member_financial/v1/transactions/", {
       headers: {
         Cookie: `access_token=${authToken}`,
       },
     });
 
-    salesData = data;
+    transactionData = data;
 
 
   } catch (err: any) {
@@ -27,13 +27,13 @@ export default async function SalesPage() {
       throw new Error("No response from server");
     } else {
       // Other errors
-      throw new Error(err.message || "Failed to fetch invoices");
+      throw new Error(err.message || "Failed to fetch transactions");
     }
   }
 
   return (
     <div className="p-6 space-y-6">
-      <SalesTable sales={salesData} />
+      <TransactionTable transactions={transactionData} />
     </div>
   );
 }

@@ -457,6 +457,11 @@ const navigation = [
         label: "View all Sales",
         href: "/mfm/sales",
       },
+      {
+        icon: <FilePlus className="h-4 w-4" />,
+        label: "View all Transactions",
+        href: "/mfm/transections",
+      },
       
     ],
   },
