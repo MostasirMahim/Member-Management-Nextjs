@@ -185,7 +185,7 @@ const CustomTableRow = ({ data }: Props) => {
             {/* View Invoice */}
             <DropdownMenuItem asChild>
               <Link
-                href={`/mfm/invoices/`}
+                href={`/mfm/view_member_dues/${id}`}
                 className="flex items-center text-indigo-600 hover:bg-indigo-100 cursor-pointer"
               >
                 <Eye className="mr-2 h-4 w-4" /> View
