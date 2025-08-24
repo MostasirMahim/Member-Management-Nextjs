@@ -1,9 +1,14 @@
 import { cookies } from "next/headers";
 import axiosInstance from "@/lib/axiosInstance";
-import InvoiceDetails from "@/components/member_financial_management/Invoices/InvoiceDetails";
-import { AlertCircle } from "lucide-react";
 
-export default async function SingleInvoicePage({ params }: { params: { id: string } }) {
+import { AlertCircle } from "lucide-react";
+import InvoiceComponent from "@/components/member_financial_management/Invoices/InvoiceDetails";
+
+export default async function SingleInvoicePage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
   const invoiceId = params.id;
@@ -25,7 +30,10 @@ export default async function SingleInvoicePage({ params }: { params: { id: stri
     // throw error;
     if (error.response) {
       // Axios server responded with error status
-      throw new Error(error.response.data?.message || `Request failed with status code ${error.response.status}`);
+      throw new Error(
+        error.response.data?.message ||
+          `Request failed with status code ${error.response.status}`
+      );
     } else if (error.request) {
       // No response received from server
       throw new Error("No response from server");
@@ -35,11 +43,10 @@ export default async function SingleInvoicePage({ params }: { params: { id: stri
     }
   }
 
-  
-
   return (
     <div className="p-6 space-y-6">
-      <InvoiceDetails invoice={invoice} />
+      {/* <InvoiceDetails invoice={invoice} /> */}
+      <InvoiceComponent data={invoice} />
     </div>
   );
 }
