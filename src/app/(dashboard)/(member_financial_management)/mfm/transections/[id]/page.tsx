@@ -1,8 +1,12 @@
 import { cookies } from "next/headers";
 import axiosInstance from "@/lib/axiosInstance";
-import TransactionDetails from "@/components/member_financial_management/Transections/TransactionDetails";
+import { TransactionReceipt } from "@/components/member_financial_management/Transections/TransactionDetails";
 
-export default async function SingleTransactionPage({ params }: { params: { id: string } }) {
+export default async function SingleTransactionPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
   const transactionId = params.id;
@@ -24,7 +28,10 @@ export default async function SingleTransactionPage({ params }: { params: { id: 
     // throw error;
     if (error.response) {
       // Axios server responded with error status
-      throw new Error(error.response.data?.message || `Request failed with status code ${error.response.status}`);
+      throw new Error(
+        error.response.data?.message ||
+          `Request failed with status code ${error.response.status}`
+      );
     } else if (error.request) {
       // No response received from server
       throw new Error("No response from server");
@@ -34,11 +41,9 @@ export default async function SingleTransactionPage({ params }: { params: { id: 
     }
   }
 
-  
-
   return (
     <div className="p-6 space-y-6">
-      <TransactionDetails transaction={transaction} />
+      <TransactionReceipt data={transaction} />
     </div>
   );
 }
