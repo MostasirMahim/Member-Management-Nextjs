@@ -1,9 +1,14 @@
 import { cookies } from "next/headers";
 import axiosInstance from "@/lib/axiosInstance";
-import SalesDetails from "@/components/member_financial_management/Sales/SalesDetails";
-import { AlertCircle } from "lucide-react";
 
-export default async function SingleSalesPage({ params }: { params: { id: string } }) {
+import { AlertCircle } from "lucide-react";
+import { SaleReceipt } from "@/components/member_financial_management/Sales/SalesDetails";
+
+export default async function SingleSalesPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
   const salesId = params.id;
@@ -25,7 +30,10 @@ export default async function SingleSalesPage({ params }: { params: { id: string
     // throw error;
     if (error.response) {
       // Axios server responded with error status
-      throw new Error(error.response.data?.message || `Request failed with status code ${error.response.status}`);
+      throw new Error(
+        error.response.data?.message ||
+          `Request failed with status code ${error.response.status}`
+      );
     } else if (error.request) {
       // No response received from server
       throw new Error("No response from server");
@@ -35,11 +43,9 @@ export default async function SingleSalesPage({ params }: { params: { id: string
     }
   }
 
-  
-
   return (
     <div className="p-6 space-y-6">
-      <SalesDetails sale={sales} />
+      <SaleReceipt data={sales} />
     </div>
   );
 }
