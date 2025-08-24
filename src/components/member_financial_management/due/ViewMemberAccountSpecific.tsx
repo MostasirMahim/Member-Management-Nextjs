@@ -5,12 +5,18 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { FileText, Printer } from "lucide-react";
+import { useRef } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toast } from "react-toastify";
 
 interface MemberAccountStatementProps {
   data: any;
 }
 
 export function MemberAccountStatement({ data }: MemberAccountStatementProps) {
+  const pdfRef = useRef<HTMLDivElement>(null);
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -69,6 +75,61 @@ export function MemberAccountStatement({ data }: MemberAccountStatementProps) {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!pdfRef.current) return;
+
+    try {
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        position,
+        imgWidth,
+        imgHeight,
+        undefined,
+        "FAST"
+      );
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(
+          imgData,
+          "PNG",
+          0,
+          position,
+          imgWidth,
+          imgHeight,
+          undefined,
+          "FAST"
+        );
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`Member-Account-${data.id}-Receipt.pdf`);
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("There was an error generating the PDF. Please try again.");
+    }
+  };
+
   const handlePrint = () => {
     if (typeof window !== "undefined") {
       window.print();
@@ -76,7 +137,10 @@ export function MemberAccountStatement({ data }: MemberAccountStatementProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8 flex justify-center items-start">
+    <div
+      ref={pdfRef}
+      className="min-h-screen bg-background p-4 md:p-8 flex justify-center items-start"
+    >
       <Card className="w-full max-w-3xl shadow-lg border-border bg-card print:shadow-none print:border-0 print:bg-transparent">
         <CardHeader className="pb-3 border-b border-border print:border-b-foreground/20">
           <div className="flex justify-between items-start">
@@ -248,7 +312,12 @@ export function MemberAccountStatement({ data }: MemberAccountStatementProps) {
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2 pt-4 print:hidden">
-            <Button variant="outline" size="sm" className="gap-1">
+            <Button
+              onClick={handleDownloadPDF}
+              variant="outline"
+              size="sm"
+              className="gap-1"
+            >
               <FileText className="h-4 w-4" />
               Save PDF
             </Button>
