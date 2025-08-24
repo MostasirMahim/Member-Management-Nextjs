@@ -411,6 +411,11 @@ const navigation = [
       },
       {
         icon: <CreditCard className="h-4 w-4" />,
+        label: "View all incomes",
+        href: "/mfm/income",
+      },
+      {
+        icon: <CreditCard className="h-4 w-4" />,
         label: "View Invoice PaymentOptions",
         href: "/mfm/payment_options",
       },
@@ -444,6 +449,8 @@ const navigation = [
         label: "View member accounts",
         href: "/mfm/view_member_accounts",
       },
+      
+
     ],
   },
 ];
