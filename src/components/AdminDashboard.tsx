@@ -176,7 +176,7 @@ const navigation = [
   {
     icon: <Logs className="h-5 w-5" />,
     label: "My activity logs",
-    href: "/activity_logs/my",
+    href: "/activity_logs/my"
   },
   ,
   {
@@ -418,6 +418,21 @@ const navigation = [
         icon: <CircleDollarSign className="h-4 w-4" />,
         label: "Payment Invoice",
         href: "/mfm/payment_invoice",
+      },
+      {
+        icon: <WalletCards className="h-4 w-4" />,
+        label: "View all Sales",
+        href: "/mfm/sales",
+      },
+      {
+        icon: <FilePlus className="h-4 w-4" />,
+        label: "View all Transactions",
+        href: "/mfm/transections",
+      },
+      {
+        icon: <ListChecks className="h-4 w-4" />,
+        label: "View all Payments",
+        href: "/mfm/payments",
       },
       {
         icon: <HandCoins className="h-4 w-4" />,

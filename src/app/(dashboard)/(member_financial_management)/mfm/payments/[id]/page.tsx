@@ -1,32 +1,30 @@
 import { cookies } from "next/headers";
 import axiosInstance from "@/lib/axiosInstance";
+import { PaymentReceipt } from "@/components/member_financial_management/Payments/PaymentDetails";
 
-import { AlertCircle } from "lucide-react";
-import InvoiceComponent from "@/components/member_financial_management/Invoices/InvoiceDetails";
-
-export default async function SingleInvoicePage({
+export default async function SinglePaymentPage({
   params,
 }: {
   params: { id: string };
 }) {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
-  const invoiceId = params.id;
-  console.log("Fetching invoice with ID:", invoiceId);
-  let invoice = null;
+  const paymentId = params.id;
+  console.log("Fetching payment with ID:", paymentId);
+  let payment = null;
 
   try {
     const { data } = await axiosInstance.get(
-      `/api/member_financial/v1/invoices/${params.id}/`,
+      `/api/member_financial/v1/payments/${params.id}/`,
       {
         headers: {
           Cookie: `access_token=${authToken}`,
         },
       }
     );
-    invoice = data.data;
+    payment = data.data;
   } catch (error: any) {
-    console.error(`Failed to fetch invoice ID: ${params.id}`, error);
+    console.error(`Failed to fetch payment ID: ${params.id}`, error);
     // throw error;
     if (error.response) {
       // Axios server responded with error status
@@ -39,14 +37,13 @@ export default async function SingleInvoicePage({
       throw new Error("No response from server");
     } else {
       // Other errors
-      throw new Error(error.message || "Failed to fetch invoice");
+      throw new Error(error.message || "Failed to fetch payment");
     }
   }
 
   return (
     <div className="p-6 space-y-6">
-      {/* <InvoiceDetails invoice={invoice} /> */}
-      <InvoiceComponent data={invoice} />
+      <PaymentReceipt data={payment} />
     </div>
   );
 }
