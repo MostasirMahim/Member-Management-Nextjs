@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "../use-toast";
+import { toast } from "react-toastify";
 
 function useGetAllChoice() {
   return useQuery({
@@ -19,12 +19,7 @@ function useGetAllChoice() {
         }
       } catch (error: any) {
         console.error("Error fetching Choices stats:", error);
-        toast({
-          title: "Error",
-          description:
-            error?.response?.data?.message || "Failed to fetch Choices",
-          variant: "destructive",
-        });
+       toast.error("Error fetching Choices");
         return [];
       }
     },

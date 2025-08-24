@@ -132,12 +132,14 @@ function AllMembers() {
   };
   const resetFilters = () => {
     setFilters(initialFilters);
+    setSearchQuery("");
+    setTimeout(() => refetch(), 0);
   };
   const resetRetry = () => {
     setFilters(initialFilters);
     setSearchQuery("");
     setIsFilterOpen(false);
-    refetch();
+    setTimeout(() => refetch(), 0);
   };
 
   const filteredUsers =
@@ -190,7 +192,7 @@ function AllMembers() {
   const handleIdTransfer = (member_ID: string) => {
     router.push(`/member/transferID/${member_ID}`);
   };
-  console.log("Filters:", filters);
+
   if (user_isLoading) return <LoadingDots />;
   return (
     <div className="space-y-6 ">
@@ -227,7 +229,10 @@ function AllMembers() {
           </div>
           <Button
             variant="outline"
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            onClick={() => {
+              setIsFilterOpen(!isFilterOpen);
+              if (!isFilterOpen) setIsUserFilterOpen(false);
+            }}
             className="gap-2 border-0 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <Filter className="h-4 w-4" />
@@ -235,7 +240,10 @@ function AllMembers() {
           </Button>
           <Button
             variant="outline"
-            onClick={() => setIsUserFilterOpen(!isUserFilterOpen)}
+            onClick={() => {
+              setIsUserFilterOpen(!isUserFilterOpen);
+              if (!isUserFilterOpen) setIsFilterOpen(false);
+            }}
             className="gap-2 border-0 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <UserRoundSearch className="h-4 w-4" />
@@ -431,7 +439,7 @@ function AllMembers() {
         )}
         {isUserFilterOpen && (
           <div className="border-t-2 rounded-b-md mt-1 border-primary bg-background p-6">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Member ID</Label>
                 <Input

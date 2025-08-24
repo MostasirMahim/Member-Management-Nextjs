@@ -1,16 +1,16 @@
 "use client";
-
 import { useState } from "react";
 import {
   Search,
   Filter,
   MoreHorizontal,
-  ArrowUpDown,
-  Check,
-  X,
   Pencil,
   Trash2,
-  UserPlus,
+  FileSpreadsheet,
+  TrainTrackIcon,
+  Calendar,
+  Users,
+  UserRoundSearch,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -40,275 +39,612 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { LoadingDots, LoadingPage } from "@/components/ui/loading";
+import useGetAllMembers from "@/hooks/data/useGetAllMembers";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination";
+import { useAddMemberStore } from "@/store/store";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import useGetAllChoice from "@/hooks/data/useGetAllChoice";
+import { Card } from "../ui/card";
+import { getNames } from "country-list";
 
-import { useQuery } from "@tanstack/react-query";
-import { formatJoinedDate } from "@/lib/date_modify";
-import { LoadingPage } from "@/components/ui/loading";
-import { DummyUsers } from "@/lib/dummy";
+interface FilterState {
+  date_of_birth?: Date;
+  membership_type?: string;
+  membership_status?: string;
+  blood_group?: string;
+  gender?: string;
+  institute_name?: string;
+  marital_status?: string;
+  download_excel?: boolean | undefined;
+  nationality?: string;
+  contact_number?: string;
+  email?: string;
+  member_ID?: string;
+  name?: string;
+}
+const initialFilters: FilterState = {
+  date_of_birth: undefined,
+  membership_type: "",
+  membership_status: "pending",
+  blood_group: "",
+  gender: "",
+  institute_name: "",
+  marital_status: "",
+  download_excel: undefined,
 
-function PendingMembers() {
+  nationality: "",
+  contact_number: "",
+  email: "",
+  member_ID: "",
+  name: "",
+};
+function AllMembers() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRole, setSelectedRole] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const { setMemberID, memberID, setIsUpdateMode, isUpdateMode } =
+    useAddMemberStore();
+  const searchParams = useSearchParams();
+  const countries = getNames();
+  const [filters, setFilters] = useState<FilterState>(initialFilters);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isUserFilterOpen, setIsUserFilterOpen] = useState(false);
+  const page = Number(searchParams.get("page")) || 1;
+  const {
+    data: allMembersReq,
+    isLoading: user_isLoading,
+    refetch,
+    isFetching,
+  } = useGetAllMembers(page, filters);
+  const allMembers = allMembersReq?.data;
+  const paginationData = allMembersReq?.pagination;
+  const { current_page, total_pages } = paginationData || {};
+  const { data: choiceSections } = useGetAllChoice();
 
-  // const { data: allUsers, isLoading: user_isLoading } = useQuery({
-  //   queryKey: ["all_Users"],
-  //   queryFn: () => getAllUsers(),
-  // });
+  const {
+    membership_type,
+    institute_name,
+    gender,
+    membership_status,
+    marital_status,
+  } = choiceSections ?? {};
+
+  const updateFilter = (
+    key: keyof FilterState,
+    value: string | boolean | Date | undefined
+  ) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+  const resetFilters = () => {
+    setFilters(initialFilters);
+    setSearchQuery("");
+    setTimeout(() => refetch(), 0);
+  };
+  const resetRetry = () => {
+    setFilters(initialFilters);
+    setSearchQuery("");
+    setIsFilterOpen(false);
+    setTimeout(() => refetch(), 0);
+  };
 
   const filteredUsers =
-    DummyUsers?.filter((user) => {
+    allMembers?.filter((user: any) => {
       const matchesSearch =
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesRole = "author";
-
-      return matchesSearch && matchesRole;
+        user.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.member_ID.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch;
     }) || [];
+  const router = useRouter();
+  const handleMemberClick = (member_ID: string) => {
+    router.push(`/member/view/${member_ID}`);
+  };
 
-  // if (user_isLoading) return <LoadingPage />;
+  const goToPage = (page: number) => {
+    if (page !== current_page) {
+      router.push(`?page=${page}`);
+      router.refresh();
+    }
+  };
+  const handleExport = () => {
+    updateFilter("download_excel", true);
+    refetch();
+  };
+
+  const renderPageLinks = () => {
+    const pagesToShow = [];
+
+    for (let i = 1; i <= total_pages; i++) {
+      pagesToShow.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => goToPage(i)}
+            isActive={i === current_page}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return pagesToShow;
+  };
+  const handleUpdate = (member_ID: string) => {
+    setMemberID(member_ID);
+    setIsUpdateMode(true);
+    router.push(`/member/update/${member_ID}`);
+  };
+  const handleIdTransfer = (member_ID: string) => {
+    router.push(`/member/transferID/${member_ID}`);
+  };
+
+  if (user_isLoading) return <LoadingDots />;
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="space-y-6 ">
+      <div className="flex flex-row items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Pending Members</h1>
           <p className="text-muted-foreground">
-            Manage user accounts and permissions
+            A list of all of the pending members in the system.
           </p>
         </div>
 
-        <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-1">
-              <UserPlus className="h-4 w-4" /> Add User
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New User</DialogTitle>
-              <DialogDescription>
-                Create a new user account. The user will receive an email with
-                login instructions.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input id="name" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
-                  Username
-                </Label>
-                <Input id="username" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="email" className="text-right">
-                  Email
-                </Label>
-                <Input id="email" type="email" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="role" className="text-right">
-                  Role
-                </Label>
-                <Select defaultValue="reader">
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrator</SelectItem>
-                    <SelectItem value="editor">Editor</SelectItem>
-                    <SelectItem value="author">Author</SelectItem>
-                    <SelectItem value="reader">Reader</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="col-start-2 col-span-3 flex items-center space-x-2">
-                  <Checkbox id="send-email" />
-                  <label
-                    htmlFor="send-email"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Send welcome email
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  console.log("Adding new user");
-                  setIsAddUserOpen(false);
-                }}
-              >
-                Create User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div>
+          <Button className="gap-1" onClick={handleExport}>
+            <FileSpreadsheet className="h-4 w-4" />
+            {isFetching ? "Exporting..." : "Export"}
+          </Button>
+        </div>
       </div>
-
-      {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1 flex gap-2">
+      <div
+        className={`w-full  ${
+          isFilterOpen ? "shadow-lg border rounded-lg" : ""
+        }`}
+      >
+        <div className="flex gap-2 ">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search users..."
-              className="pl-8"
+              className="pl-10 border-0 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsFilterOpen(!isFilterOpen);
+              if (!isFilterOpen) setIsUserFilterOpen(false);
+            }}
+            className="gap-2 border-0 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+          >
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsUserFilterOpen(!isUserFilterOpen);
+              if (!isUserFilterOpen) setIsFilterOpen(false);
+            }}
+            className="gap-2 border-0 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+          >
+            <UserRoundSearch className="h-4 w-4" />
+            Query
+          </Button>
+        </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-1">
-                <Filter className="h-4 w-4" /> Filter
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[200px]">
-              <DropdownMenuLabel>Filter Users</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-
-              <div className="p-2">
-                <Label htmlFor="role-filter" className="text-xs">
-                  Role
+        {isFilterOpen && (
+          <div className="border-t-2 rounded-b-md mt-1 border-primary bg-background p-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Date of Birth
                 </Label>
-                <Select value={selectedRole} onValueChange={setSelectedRole}>
-                  <SelectTrigger id="role-filter">
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="Admin">Administrator</SelectItem>
-                    <SelectItem value="Editor">Editor</SelectItem>
-                    <SelectItem value="Author">Author</SelectItem>
-                    <SelectItem value="Reader">Reader</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal bg-transparent"
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {filters.date_of_birth ? (
+                        format(filters.date_of_birth, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <CalendarComponent
+                      mode="single"
+                      selected={filters.date_of_birth}
+                      onSelect={(date) => updateFilter("date_of_birth", date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
-              <div className="p-2">
-                <Label htmlFor="status-filter" className="text-xs">
-                  Status
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Membership Type
                 </Label>
                 <Select
-                  value={selectedStatus}
-                  onValueChange={setSelectedStatus}
+                  value={filters.membership_type}
+                  onValueChange={(value) =>
+                    updateFilter("membership_type", value)
+                  }
                 >
-                  <SelectTrigger id="status-filter">
-                    <SelectValue placeholder="Select status" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose Membership Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Suspended">Suspended</SelectItem>
-                    <SelectItem value="Pending">Pending</SelectItem>
+                    {membership_type?.map((choice: any, index: number) => (
+                      <SelectItem key={index} value={choice.name}>
+                        {choice.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  setSelectedRole("all");
-                  setSelectedStatus("all");
-                }}
-              >
-                Reset Filters
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Membership Status
+                </Label>
+                <Select
+                  value={filters.membership_status}
+                  onValueChange={(value) =>
+                    updateFilter("membership_status", value)
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose Membership Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {membership_status?.map((choice: any, index: number) => (
+                      <SelectItem key={index} value={choice.name}>
+                        {choice.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-      {/* Users Table */}
-      <div className="rounded-md border">
-        <Table>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Blood Group
+                </Label>
+                <Select
+                  value={filters.blood_group}
+                  onValueChange={(value) => updateFilter("blood_group", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose Blood Group" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="A+">A+</SelectItem>
+                    <SelectItem value="A-">A-</SelectItem>
+                    <SelectItem value="B+">B+</SelectItem>
+                    <SelectItem value="B-">B-</SelectItem>
+                    <SelectItem value="AB+">AB+</SelectItem>
+                    <SelectItem value="AB-">AB-</SelectItem>
+                    <SelectItem value="O+">O+</SelectItem>
+                    <SelectItem value="O-">O-</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Institute Name
+                </Label>
+                <Select
+                  value={filters.institute_name}
+                  onValueChange={(value) =>
+                    updateFilter("institute_name", value)
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose Institute" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {institute_name?.map((choice: any, index: number) => (
+                      <SelectItem key={index} value={choice.name}>
+                        {choice.name} - {choice.code}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Marital Status
+                </Label>
+                <Select
+                  value={filters.marital_status}
+                  onValueChange={(value) =>
+                    updateFilter("marital_status", value)
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="What's Marital Status?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {marital_status?.map((choice: any, index: number) => (
+                      <SelectItem key={index} value={choice.name}>
+                        {choice.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Gender
+                </Label>
+                <Select
+                  value={filters.gender}
+                  onValueChange={(value) => updateFilter("gender", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose Gender">
+                      {filters.gender}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gender?.map((choice: any, index: number) => (
+                      <SelectItem key={index} value={choice.name}>
+                        {choice.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className=" flex items-center justify-center gap-2">
+                <Button className="mt-4" onClick={() => refetch()}>
+                  <Filter className="h-4 w-4" />
+                  {isFetching ? "Filtering..." : "Apply"}
+                </Button>
+                <Button
+                  className="mt-4"
+                  variant="destructive"
+                  onClick={() => resetFilters()}
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        {isUserFilterOpen && (
+          <div className="border-t-2 rounded-b-md mt-1 border-primary bg-background p-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Member ID</Label>
+                <Input
+                  type="text"
+                  placeholder="Search by ID..."
+                  className="bg-background"
+                  value={filters.member_ID}
+                  onChange={(e) => updateFilter("member_ID", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Name</Label>
+                <Input
+                  type="text"
+                  placeholder="Search by name..."
+                  className="bg-background"
+                  value={filters.name}
+                  onChange={(e) => updateFilter("name", e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Contact Number</Label>
+                <Input
+                  type="text"
+                  placeholder="Search by contact..."
+                  className="bg-background"
+                  value={filters.contact_number}
+                  onChange={(e) =>
+                    updateFilter("contact_number", e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Email</Label>
+                <Input
+                  type="text"
+                  placeholder="Search by email..."
+                  className="bg-background"
+                  value={filters.email}
+                  onChange={(e) => updateFilter("email", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Nationality
+                </Label>
+                <Select
+                  value={filters.nationality}
+                  onValueChange={(value) => updateFilter("nationality", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Nationality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries?.map((name: any, index: number) => (
+                      <SelectItem key={index} value={name}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className=" flex items-center justify-center gap-2">
+                <Button className="mt-4" onClick={() => refetch()}>
+                  <Filter className="h-4 w-4" />
+                  {isFetching ? "Filtering..." : "Apply"}
+                </Button>
+                <Button
+                  className="mt-4"
+                  variant="destructive"
+                  onClick={() => resetFilters()}
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="rounded-md border my-2 font-secondary">
+        <Table className="">
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[300px]">
-                <div className="flex items-center gap-1">
-                  User
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <ArrowUpDown className="h-3 w-3" />
-                  </Button>
-                </div>
+            <TableRow className=" text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
+              <TableHead className=" text-black dark:text-white font-bold  ">
+                ID
               </TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Joined</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
+                Member
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
+                Type
+              </TableHead>
+              <TableHead className=" text-black dark:text-white font-bold">
+                Status
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
+                Batch
+              </TableHead>
+              <TableHead className=" text-black dark:text-white font-bold text-center">
+                Martial St.
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold text-center">
+                DOB
+              </TableHead>
+              <TableHead className=" text-black dark:text-white font-bold">
+                Blood Group
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold ">
+                Nationality
+              </TableHead>
+              <TableHead className="text-black dark:text-white text-right font-bold">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredUsers.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
-                  className="text-center py-8 text-muted-foreground"
+                  colSpan={9}
+                  className="text-center py-8 text-red-500 font-medium"
                 >
-                  No users found. Try adjusting your filters.
+                  <Card className="p-8 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <Users className="h-12 w-12 text-muted-foreground" />
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-medium">No users found</h3>
+                        <p className="text-sm text-muted-foreground">
+                          No members match your current filter criteria. Try
+                          adjusting your filters or reset to see all members.
+                        </p>
+                      </div>
+                      <Button
+                        onClick={resetRetry}
+                        variant="outline"
+                        className="gap-2 bg-transparent text-green-600"
+                      >
+                        <Search className="h-4 w-4" />
+                        {isFetching ? "Retrying Search.." : "Reset Filters"}
+                      </Button>
+                    </div>
+                  </Card>
                 </TableCell>
               </TableRow>
             ) : (
-              filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={user.avatar || "user.png"}
-                          alt={user.name}
-                        />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
+              filteredUsers.map((user: any) => (
+                <TableRow
+                  key={user.member_ID}
+                  className="  cursor-pointer hover:translate-y-1 transition-transform duration-300 ease-in-out bg-background "
+                >
+                  <TableCell
+                    className="font-medium "
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
+                    {user.member_ID}
+                  </TableCell>
+                  <TableCell
+                    className="flex justify-start items-center"
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
+                    <div className="space-y-1 ">
+                      <p className="font-medium text-left">
+                        {user.first_name + " " + user.last_name}
+                      </p>
+                      <p className="text-xs text-muted-foreground text-left">
+                        {user.institute_name}
+                      </p>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">auther</Badge>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    <p>{user.membership_type}</p>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
                     <Badge
                       variant={"default"}
                       className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
                     >
-                      Active
+                      {user.membership_status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{formatJoinedDate(user.createdAt)}</TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    {user.batch_number || "-"}
+                  </TableCell>
+                  <TableCell
+                    className="text-center"
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
+                    {user.marital_status || "-"}
+                  </TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    {user.date_of_birth || "-"}
+                  </TableCell>
+                  <TableCell
+                    className="text-center"
+                    onClick={() => handleMemberClick(user.member_ID)}
+                  >
+                    {user.blood_group || "-"}
+                  </TableCell>
+                  <TableCell onClick={() => handleMemberClick(user.member_ID)}>
+                    {user.nationality || "-"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -319,19 +655,17 @@ function PendingMembers() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="gap-2">
-                          <Pencil className="h-4 w-4" /> Edit
+                        <DropdownMenuItem
+                          className="gap-2"
+                          onClick={() => handleUpdate(user.member_ID)}
+                        >
+                          <Pencil className="h-4 w-4" /> Update
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2">
-                          {true ? (
-                            <>
-                              <X className="h-4 w-4" /> Suspend
-                            </>
-                          ) : (
-                            <>
-                              <Check className="h-4 w-4" /> Activate
-                            </>
-                          )}
+                        <DropdownMenuItem
+                          className="gap-2"
+                          onClick={() => handleIdTransfer(user.member_ID)}
+                        >
+                          <TrainTrackIcon className="h-4 w-4" /> Transfer ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive gap-2">
@@ -347,24 +681,41 @@ function PendingMembers() {
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing <strong>1</strong> to <strong>{filteredUsers.length}</strong>{" "}
-          of <strong>{filteredUsers.length}</strong> users
-        </p>
+      {/* -- PAGINATION -- */}
+      <div className=" flex justify-center">
+        <Pagination>
+          <PaginationContent>
+            {/* Previous Button */}
+            {paginationData?.previous && (
+              <PaginationItem className="cursor-pointer">
+                <PaginationPrevious
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goToPage(current_page - 1);
+                  }}
+                />
+              </PaginationItem>
+            )}
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" disabled>
-            Next
-          </Button>
-        </div>
+            {/* Page Numbers */}
+            {renderPageLinks()}
+
+            {/* Next Button */}
+            {paginationData?.next && (
+              <PaginationItem>
+                <PaginationNext
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goToPage(current_page + 1);
+                  }}
+                />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );
 }
 
-export default PendingMembers;
+export default AllMembers;
