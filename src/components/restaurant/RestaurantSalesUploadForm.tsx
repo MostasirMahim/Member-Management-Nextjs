@@ -34,6 +34,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import Link from "next/link";
+import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "react-toastify";
 
 interface Props {
   incomeParticular: any;
@@ -58,8 +60,32 @@ export default function RestaurantSalesUploadForm({
   });
   const router = useRouter();
 
-  function onSubmit(values: any) {
-    console.log(values);
+  async function onSubmit(values: any) {
+    const formData = new FormData();
+    formData.append("restaurant", values.restaurant);
+    formData.append("income_particular", values.income_particular);
+    formData.append("received_from", values.received_from);
+
+    if (values.excel_file?.[0]) {
+      formData.append("excel_file", values.excel_file[0]);
+    }
+    try {
+      const response = await axiosInstance.post(
+        "/api/restaurants/v1/restaurants/upload/excel",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (response.status === 201) {
+        toast.success("Sales uploaded successfully!");
+      }
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Something went wrong!");
+    }
   }
 
   function onReset() {
@@ -123,7 +149,11 @@ export default function RestaurantSalesUploadForm({
                         type="file"
                         id="excel_file"
                         className=" ps-9"
-                        {...field}
+                        name={field.name}
+                        onChange={(e) => {
+                          field.onChange(e.target.files);
+                        }}
+                        ref={field.ref}
                       />
                       <div
                         className={
