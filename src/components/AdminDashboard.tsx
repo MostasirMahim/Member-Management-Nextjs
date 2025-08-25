@@ -116,40 +116,6 @@ const navigation = [
   },
 
   {
-    icon: <FolderOpen className="h-5 w-5" />,
-    label: "Attendance",
-    href: "",
-    subItems: [
-      {
-        icon: <Eye className="h-4 w-4" />,
-        label: "Upload Attendance",
-        href: "/attendance/upload",
-      },
-      {
-        icon: <Plus className="h-4 w-4" />,
-        label: "View Attendance",
-        href: "/attendance/view",
-      },
-    ],
-  },
-  {
-    icon: <FolderOpen className="h-5 w-5" />,
-    label: "Email",
-    href: "",
-    subItems: [
-      {
-        icon: <Eye className="h-4 w-4" />,
-        label: "Send Email",
-        href: "/email/send",
-      },
-      {
-        icon: <Plus className="h-4 w-4" />,
-        label: "View Emails",
-        href: "/email/view",
-      },
-    ],
-  },
-  {
     icon: <Users className="h-5 w-5" />,
     label: "All Users",
     href: "/users",
