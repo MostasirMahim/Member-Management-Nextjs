@@ -49,6 +49,7 @@ import {
   CreditCard,
   ListChecks,
   HandCoins,
+  FileChartColumn,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -176,7 +177,7 @@ const navigation = [
   {
     icon: <Logs className="h-5 w-5" />,
     label: "My activity logs",
-    href: "/activity_logs/my"
+    href: "/activity_logs/my",
   },
   ,
   {
@@ -449,8 +450,28 @@ const navigation = [
         label: "View member accounts",
         href: "/mfm/view_member_accounts",
       },
-      
-
+    ],
+  },
+  {
+    icon: <Upload className="h-5 w-5" />,
+    label: "Upload sales",
+    href: "#",
+    subItems: [
+      {
+        icon: <FileChartColumn className="h-4 w-4" />,
+        label: "upload restaurant sale",
+        href: "/restaurants/sales/upload",
+      },
+      {
+        icon: <FileChartColumn className="h-4 w-4" />,
+        label: "Upload lounge sale",
+        href: "/upload/sales/lounge",
+      },
+      {
+        icon: <FileChartColumn className="h-4 w-4" />,
+        label: "Upload others sales",
+        href: "/upload/sales/others",
+      },
     ],
   },
 ];
