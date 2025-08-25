@@ -49,6 +49,7 @@ import {
   CreditCard,
   ListChecks,
   HandCoins,
+  FileChartColumn,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -176,7 +177,7 @@ const navigation = [
   {
     icon: <Logs className="h-5 w-5" />,
     label: "My activity logs",
-    href: "/activity_logs/my"
+    href: "/activity_logs/my",
   },
   ,
   {
@@ -396,34 +397,49 @@ const navigation = [
     subItems: [
       {
         icon: <FileText className="h-4 w-4" />,
-        label: "View all Invoices",
-        href: "/mfm/invoices",
-      },
-      {
-        icon: <ListChecks className="h-4 w-4" />,
-        label: "View Income Particulars",
-        href: "/mfm/income_particulars",
+        label: "Invoices",
+        href: "#",
+        subItems: [
+          {
+            icon: <FileText className="h-3 w-3" />,
+            label: "View all invoices",
+            href: "/mfm/invoices",
+          },
+          {
+            icon: <CircleDollarSign className="h-4 w-4" />,
+            label: "Payment Invoice",
+            href: "/mfm/payment_invoice",
+          },
+        ],
       },
       {
         icon: <CreditCard className="h-4 w-4" />,
-        label: "View Income ReceivingOptions",
-        href: "/mfm/income_receiving_options",
-      },
-      {
-        icon: <CreditCard className="h-4 w-4" />,
-        label: "View all incomes",
-        href: "/mfm/income",
+        label: "Incomes",
+        href: "#",
+        subItems: [
+          {
+            icon: <CreditCard className="h-4 w-4" />,
+            label: "View all incomes",
+            href: "/mfm/income",
+          },
+          {
+            icon: <ListChecks className="h-4 w-4" />,
+            label: "View Income Particulars",
+            href: "/mfm/income_particulars",
+          },
+          {
+            icon: <CreditCard className="h-4 w-4" />,
+            label: "View Income Receiving Options",
+            href: "/mfm/income_receiving_options",
+          },
+        ],
       },
       {
         icon: <CreditCard className="h-4 w-4" />,
         label: "View Invoice PaymentOptions",
         href: "/mfm/payment_options",
       },
-      {
-        icon: <CircleDollarSign className="h-4 w-4" />,
-        label: "Payment Invoice",
-        href: "/mfm/payment_invoice",
-      },
+
       {
         icon: <WalletCards className="h-4 w-4" />,
         label: "View all Sales",
@@ -449,8 +465,28 @@ const navigation = [
         label: "View member accounts",
         href: "/mfm/view_member_accounts",
       },
-      
-
+    ],
+  },
+  {
+    icon: <Upload className="h-5 w-5" />,
+    label: "Upload sales",
+    href: "#",
+    subItems: [
+      {
+        icon: <FileChartColumn className="h-4 w-4" />,
+        label: "upload restaurant sale",
+        href: "/restaurants/sales/upload",
+      },
+      {
+        icon: <FileChartColumn className="h-4 w-4" />,
+        label: "Upload lounge sale",
+        href: "/upload/sales/lounge",
+      },
+      {
+        icon: <FileChartColumn className="h-4 w-4" />,
+        label: "Upload others sales",
+        href: "/upload/sales/others",
+      },
     ],
   },
 ];
