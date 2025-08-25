@@ -113,7 +113,7 @@
 //     onSuccess: () => {
 //       toast.success(" Payment submitted successfully!");
 //       form.reset();
-//       router.refresh(); 
+//       router.refresh();
 //     },
 //     onError: (error: any) => {
 //       let message = "Failed to submit payment.";
@@ -354,10 +354,6 @@
 //   );
 // }
 
-
-
-
-
 // ----------------------------------
 "use client";
 
@@ -406,21 +402,6 @@ interface PaymentFormProps {
   receivedFromList: { id: number; name: string }[];
 }
 
-// Zod Schema
-const formSchema = z.object({
-  invoice_id: z.number().min(1, "Invoice is required"),
-  payment_method: z.number().min(1, "Payment method is required"),
-  income_particular: z.number().min(1, "Income particular is required"),
-  received_from: z.number().min(1, "Received from is required"),
-  amount: z.preprocess((val) => {
-    if (typeof val === "string") return Number(val);
-    return val;
-  }, z.number().min(1, "Amount must be greater than 0")),
-  adjust_from_balance: z.boolean().default(false),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
 export default function PaymentForm({
   invoice,
   invoices,
@@ -430,7 +411,9 @@ export default function PaymentForm({
 }: PaymentFormProps) {
   const router = useRouter();
 
-  const getInvoiceData = (inv: Invoice | null | undefined): InvoiceData | null => {
+  const getInvoiceData = (
+    inv: Invoice | null | undefined
+  ): InvoiceData | null => {
     if (!inv) return null;
     if ("data" in inv) return inv.data;
     return inv;
@@ -450,14 +433,13 @@ export default function PaymentForm({
     currentPage * pageSize
   );
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
       invoice_id: selectedInvoice ? selectedInvoice.id : undefined,
-      amount: undefined,
-      payment_method: undefined,
-      income_particular: undefined,
-      received_from: undefined,
+      amount: 0,
+      payment_method: "",
+      income_particular: "",
+      received_from: "",
       adjust_from_balance: false,
     },
   });
@@ -472,7 +454,7 @@ export default function PaymentForm({
 
   // Submit mutation
   const mutation = useMutation({
-    mutationFn: async (data: FormValues) => {
+    mutationFn: async (data: any) => {
       return await axiosInstance.post(
         "/api/member_financial/v1/payment/invoice/",
         data
@@ -497,7 +479,7 @@ export default function PaymentForm({
     },
   });
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = (values: any) => {
     if (!selectedInvoice) {
       toast.error("Please select an invoice first!");
       return;
@@ -561,7 +543,9 @@ export default function PaymentForm({
             onValueChange={(val) => {
               const found = invoices.find((i) => i.id.toString() === val);
               setSelectedInvoice(found || null);
-              form.setValue("invoice_id", Number(val), { shouldValidate: true });
+              form.setValue("invoice_id", Number(val), {
+                shouldValidate: true,
+              });
             }}
           >
             <SelectTrigger>
@@ -585,17 +569,19 @@ export default function PaymentForm({
                   Prev
                 </Button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    type="button"
-                    variant={page === currentPage ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </Button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <Button
+                      key={page}
+                      type="button"
+                      variant={page === currentPage ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </Button>
+                  )
+                )}
 
                 <Button
                   type="button"
@@ -622,7 +608,9 @@ export default function PaymentForm({
         <Label>Payment Method</Label>
         <Select
           onValueChange={(val) =>
-            form.setValue("payment_method", Number(val), { shouldValidate: true })
+            form.setValue("payment_method", val, {
+              shouldValidate: true,
+            })
           }
         >
           <SelectTrigger>
@@ -643,7 +631,9 @@ export default function PaymentForm({
         <Label>Income Particular</Label>
         <Select
           onValueChange={(val) =>
-            form.setValue("income_particular", Number(val), { shouldValidate: true })
+            form.setValue("income_particular", val, {
+              shouldValidate: true,
+            })
           }
         >
           <SelectTrigger>
@@ -664,7 +654,9 @@ export default function PaymentForm({
         <Label>Received From</Label>
         <Select
           onValueChange={(val) =>
-            form.setValue("received_from", Number(val), { shouldValidate: true })
+            form.setValue("received_from", val, {
+              shouldValidate: true,
+            })
           }
         >
           <SelectTrigger>
@@ -683,7 +675,11 @@ export default function PaymentForm({
       {/* Amount */}
       <div className="space-y-2">
         <Label>Amount</Label>
-        <Input type="number" placeholder="Enter amount" {...form.register("amount")} />
+        <Input
+          type="number"
+          placeholder="Enter amount"
+          {...form.register("amount")}
+        />
       </div>
 
       {/* Adjust From Balance */}
@@ -708,7 +704,11 @@ export default function PaymentForm({
         >
           Reset
         </Button>
-        <Button type="submit" className="px-6 py-2 shadow-md" disabled={mutation.isPending}>
+        <Button
+          type="submit"
+          className="px-6 py-2 shadow-md"
+          disabled={mutation.isPending}
+        >
           {mutation.isPending ? "Submitting..." : "Submit Payment"}
         </Button>
       </div>
