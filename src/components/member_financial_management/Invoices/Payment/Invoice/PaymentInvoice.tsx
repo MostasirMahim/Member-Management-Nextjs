@@ -1,263 +1,355 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import axiosInstance from "@/lib/axiosInstance";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import axios from "axios";
+
+interface InvoiceData {
+  id: number;
+  invoice_number: string;
+  total_amount: string;
+  paid_amount: string;
+  balance_due: string;
+  status: string;
+  currency: string;
+}
+interface InvoiceWithData {
+  data: InvoiceData;
+}
+type Invoice = InvoiceData | InvoiceWithData;
+
+interface PaymentFormProps {
+  invoice?: Invoice | null;
+  invoices: InvoiceData[];
+  paymentMethods: { id: number; name: string }[];
+  incomeParticulars: { id: number; name: string }[];
+  receivedFromList: { id: number; name: string }[];
+}
+
+// Zod Schema
 const formSchema = z.object({
   invoice_id: z.number().min(1, "Invoice is required"),
   payment_method: z.number().min(1, "Payment method is required"),
+  income_particular: z.number().min(1, "Income particular is required"),
+  received_from: z.number().min(1, "Received from is required"),
   amount: z.preprocess((val) => {
     if (typeof val === "string") return Number(val);
     return val;
   }, z.number().min(1, "Amount must be greater than 0")),
-  income_particular: z.number().min(1, "Income particular is required"),
-  received_from: z.number().min(1, "Received from is required"),
-  adjust_from_balance: z.boolean(),
+  adjust_from_balance: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-interface Props {
-  invoices: any[];
-  paymentMethods: any[];
-  incomeParticulars: any[];
-  receivedFromList: any[];
-}
-
 export default function PaymentForm({
+  invoice,
   invoices,
   paymentMethods,
   incomeParticulars,
   receivedFromList,
-}: Props) 
-{
+}: PaymentFormProps) {
   const router = useRouter();
-  const form = useForm({
+
+  // Helper: extract invoiceData from invoice (handle both cases)
+  const getInvoiceData = (inv: Invoice | null | undefined): InvoiceData | null => {
+    if (!inv) return null;
+    if ("data" in inv) return inv.data;
+    return inv;
+  };
+
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData | null>(
+    getInvoiceData(invoice)
+  );
+
+  // React Hook Form setup
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { adjust_from_balance: false },
+    defaultValues: {
+      invoice_id: selectedInvoice ? selectedInvoice.id : undefined,
+      amount: undefined,
+      payment_method: undefined,
+      income_particular: undefined,
+      received_from: undefined,
+      adjust_from_balance: false,
+    },
   });
 
+  useEffect(() => {
+    const invData = getInvoiceData(invoice);
+    if (invData) {
+      setSelectedInvoice(invData);
+      form.setValue("invoice_id", invData.id, { shouldValidate: true });
+    }
+  }, [invoice, form]);
+
+  // API call with error handling
   const mutation = useMutation({
-    mutationFn: (data: FormValues) =>
-      axiosInstance.post("/api/member_financial/v1/payment/invoice/", data),
+    mutationFn: async (data: FormValues) => {
+      return await axiosInstance.post(
+        "/api/member_financial/v1/payment/invoice/",
+        data
+      );
+    },
     onSuccess: () => {
-      toast.success("Payment submitted successfully!");
-      router.refresh();
+      toast.success(" Payment submitted successfully!");
       form.reset();
+      router.refresh(); 
     },
     onError: (error: any) => {
-      const errors = error?.response?.data?.errors;
-      if (errors) {
-        const firstKey = Object.keys(errors)[0];
-        const firstMessage = errors[firstKey][0];
-        toast.error(firstMessage);
+      let message = "Failed to submit payment.";
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          const status = error.response.status;
+          if (status === 400) {
+            if (error.response.data?.errors) {
+              const errors = error.response.data.errors;
+              message = Object.values(errors).flat().join("\n");
+            } else if (error.response.data?.detail) {
+              message = error.response.data.detail;
+            } else {
+              message = "Invalid request. Please check your input.";
+            }
+          } else if (status === 401) {
+            message = "Unauthorized. Please login again.";
+          } else if (status === 403) {
+            message = "You don’t have permission to perform this action.";
+          } else if (status === 404) {
+            message = "Requested resource not found.";
+          } else if (status >= 500) {
+            message = "Server error. Please try again later.";
+          }
+        } else if (error.request) {
+          message = "No response from server. Please check your connection.";
+        } else {
+          message = error.message || "Something went wrong.";
+        }
       } else {
-        toast.error(error?.response?.data?.message || "Failed to submit payment.");
+        message = "An unexpected error occurred.";
       }
+      toast.error(message);
+      console.error("Payment submission error:", error);
     },
   });
 
   const onSubmit = (values: FormValues) => {
-    mutation.mutate({ ...values, amount: Number(values.amount) });
+    if (!selectedInvoice) {
+      toast.error("Please select an invoice first!");
+      return;
+    }
+    mutation.mutate({ ...values, invoice_id: selectedInvoice.id });
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 max-w-md mx-auto p-4 border rounded-lg shadow"
-      >
-        {/* Invoice with search */}
-        <FormField
-          control={form.control}
-          name="invoice_id"
-          render={({ field }) => {
-            const [search, setSearch] = useState("");
-            const filteredInvoices = invoices.filter((inv) =>
-              inv.invoice_number.toLowerCase().includes(search.toLowerCase())
-            );
-
-            return (
-              <FormItem>
-                <FormLabel>Invoice</FormLabel>
-                <Select
-                  onValueChange={(val) => field.onChange(Number(val))}
-                  value={String(field.value)}
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="max-w-3xl mx-auto space-y-6 p-6 shadow-lg rounded-xl border bg-white"
+    >
+      {/* Invoice Summary */}
+      {selectedInvoice && (
+        <Card className="shadow-md border border-gray-200">
+          <CardContent className="p-4 flex justify-between items-center">
+            <div>
+              <p className="text-lg font-semibold">
+                Invoice: {selectedInvoice.invoice_number}
+              </p>
+              <p className="text-sm text-gray-500">
+                Status:
+                <Badge
+                  className={`ml-2 ${
+                    selectedInvoice.status === "paid"
+                      ? "bg-green-600"
+                      : selectedInvoice.status === "unpaid"
+                      ? "bg-red-600"
+                      : "bg-yellow-600"
+                  }`}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Invoice" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <div className="p-2">
-                      <Input
-                        placeholder="Search invoice..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="mb-2"
-                      />
-                    </div>
-                    {filteredInvoices.map((inv) => (
-                      <SelectItem key={inv.id} value={String(inv.id)}>
-                        {inv.invoice_number}
-                      </SelectItem>
-                    ))}
-                    {filteredInvoices.length === 0 && (
-                      <div className="p-2 text-gray-500">No invoice found</div>
-                    )}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
+                  {selectedInvoice.status}
+                </Badge>
+              </p>
+            </div>
+            <div className="text-right">
+              <p>
+                <strong>Total:</strong> {selectedInvoice.total_amount}{" "}
+                {selectedInvoice.currency}
+              </p>
+              <p>
+                <strong>Paid:</strong> {selectedInvoice.paid_amount}{" "}
+                {selectedInvoice.currency}
+              </p>
+              <p>
+                <strong>Due:</strong> {selectedInvoice.balance_due}{" "}
+                {selectedInvoice.currency}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Payment Method */}
-        <FormField
-          control={form.control}
-          name="payment_method"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Payment Method</FormLabel>
-              <Select
-                onValueChange={(val) => field.onChange(Number(val))}
-                value={String(field.value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Payment Method" />
-                </SelectTrigger>
-                <SelectContent>
-                  {paymentMethods.map((pm) => (
-                    <SelectItem key={pm.id} value={String(pm.id)}>
-                      {pm.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      {/* Invoice Selector */}
+      {selectedInvoice ? (
+        <div className="space-y-2">
+          <Label>Invoice</Label>
+          <Input value={selectedInvoice.invoice_number} readOnly />
+          <input type="hidden" {...form.register("invoice_id")} />
+        </div>
+      ) : (
+        invoices.length > 0 && (
+          <div className="space-y-2">
+            <Label>Select Invoice</Label>
+            <Select
+              onValueChange={(val) => {
+                const found = invoices.find((i) => i.id.toString() === val);
+                setSelectedInvoice(found || null);
+                form.setValue("invoice_id", Number(val), { shouldValidate: true });
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select an invoice" />
+              </SelectTrigger>
+              <SelectContent>
+                {invoices.map((inv) => (
+                  <SelectItem key={inv.id} value={inv.id.toString()}>
+                    {inv.invoice_number}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {form.formState.errors.invoice_id && (
+              <p className="text-red-500 text-sm">
+                {form.formState.errors.invoice_id.message as string}
+              </p>
+            )}
+          </div>
+        )
+      )}
 
-        {/* Amount */}
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Amount</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  {...field}
-                  value={field.value ? String(field.value) : ""}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      {/* Payment Method */}
+      <div className="space-y-2">
+        <Label>Payment Method</Label>
+        <Select
+          onValueChange={(val) =>
+            form.setValue("payment_method", Number(val), { shouldValidate: true })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a payment method" />
+          </SelectTrigger>
+          <SelectContent>
+            {paymentMethods.map((pm) => (
+              <SelectItem key={pm.id} value={pm.id.toString()}>
+                {pm.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {form.formState.errors.payment_method && (
+          <p className="text-red-500 text-sm">
+            {form.formState.errors.payment_method.message as string}
+          </p>
+        )}
+      </div>
 
-        {/* Income Particular */}
-        <FormField
-          control={form.control}
-          name="income_particular"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Income Particular</FormLabel>
-              <Select
-                onValueChange={(val) => field.onChange(Number(val))}
-                value={String(field.value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Income Particular" />
-                </SelectTrigger>
-                <SelectContent>
-                  {incomeParticulars.map((ip) => (
-                    <SelectItem key={ip.id} value={String(ip.id)}>
-                      {ip.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      {/* Income Particular */}
+      <div className="space-y-2">
+        <Label>Income Particular</Label>
+        <Select
+          onValueChange={(val) =>
+            form.setValue("income_particular", Number(val), { shouldValidate: true })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select an income particular" />
+          </SelectTrigger>
+          <SelectContent>
+            {incomeParticulars.map((inc) => (
+              <SelectItem key={inc.id} value={inc.id.toString()}>
+                {inc.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {form.formState.errors.income_particular && (
+          <p className="text-red-500 text-sm">
+            {form.formState.errors.income_particular.message as string}
+          </p>
+        )}
+      </div>
 
-        {/* Received From */}
-        <FormField
-          control={form.control}
-          name="received_from"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Received From</FormLabel>
-              <Select
-                onValueChange={(val) => field.onChange(Number(val))}
-                value={String(field.value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Source" />
-                </SelectTrigger>
-                <SelectContent>
-                  {receivedFromList.map((rf) => (
-                    <SelectItem key={rf.id} value={String(rf.id)}>
-                      {rf.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      {/* Received From */}
+      <div className="space-y-2">
+        <Label>Received From</Label>
+        <Select
+          onValueChange={(val) =>
+            form.setValue("received_from", Number(val), { shouldValidate: true })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select received from" />
+          </SelectTrigger>
+          <SelectContent>
+            {receivedFromList.map((rcv) => (
+              <SelectItem key={rcv.id} value={rcv.id.toString()}>
+                {rcv.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {form.formState.errors.received_from && (
+          <p className="text-red-500 text-sm">
+            {form.formState.errors.received_from.message as string}
+          </p>
+        )}
+      </div>
 
-        {/* Adjust From Balance */}
-        <FormField
-          control={form.control}
-          name="adjust_from_balance"
-          render={({ field }) => (
-            <FormItem className="flex items-center space-x-2">
-              <FormLabel>Adjust from Balance</FormLabel>
-              <FormControl>
-                <input
-                  type="checkbox"
-                  checked={field.value}
-                  onChange={(e) => field.onChange(e.target.checked)}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
+      {/* Amount */}
+      <div className="space-y-2">
+        <Label>Amount</Label>
+        <Input type="number" placeholder="Enter amount" {...form.register("amount")} />
+        {form.formState.errors.amount && (
+          <p className="text-red-500 text-sm">
+            {form.formState.errors.amount.message as string}
+          </p>
+        )}
+      </div>
 
-        <Button type="submit" className="w-full" disabled={mutation.isPending}>
+      {/* Adjust From Balance */}
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="adjust_from_balance"
+          checked={form.watch("adjust_from_balance")}
+          onCheckedChange={(val) =>
+            form.setValue("adjust_from_balance", Boolean(val))
+          }
+        />
+        <Label htmlFor="adjust_from_balance">Adjust from Balance</Label>
+      </div>
+
+      {/* Submit */}
+      <div className="flex justify-end">
+        <Button type="submit" className="px-6 py-2 shadow-md" disabled={mutation.isPending}>
           {mutation.isPending ? "Submitting..." : "Submit Payment"}
         </Button>
-      </form>
-    </Form>
+      </div>
+    </form>
   );
 }
