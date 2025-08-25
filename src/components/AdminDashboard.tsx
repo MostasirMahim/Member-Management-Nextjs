@@ -397,34 +397,49 @@ const navigation = [
     subItems: [
       {
         icon: <FileText className="h-4 w-4" />,
-        label: "View all Invoices",
-        href: "/mfm/invoices",
-      },
-      {
-        icon: <ListChecks className="h-4 w-4" />,
-        label: "View Income Particulars",
-        href: "/mfm/income_particulars",
+        label: "Invoices",
+        href: "#",
+        subItems: [
+          {
+            icon: <FileText className="h-3 w-3" />,
+            label: "View all invoices",
+            href: "/mfm/invoices",
+          },
+          {
+            icon: <CircleDollarSign className="h-4 w-4" />,
+            label: "Payment Invoice",
+            href: "/mfm/payment_invoice",
+          },
+        ],
       },
       {
         icon: <CreditCard className="h-4 w-4" />,
-        label: "View Income ReceivingOptions",
-        href: "/mfm/income_receiving_options",
-      },
-      {
-        icon: <CreditCard className="h-4 w-4" />,
-        label: "View all incomes",
-        href: "/mfm/income",
+        label: "Incomes",
+        href: "#",
+        subItems: [
+          {
+            icon: <CreditCard className="h-4 w-4" />,
+            label: "View all incomes",
+            href: "/mfm/income",
+          },
+          {
+            icon: <ListChecks className="h-4 w-4" />,
+            label: "View Income Particulars",
+            href: "/mfm/income_particulars",
+          },
+          {
+            icon: <CreditCard className="h-4 w-4" />,
+            label: "View Income Receiving Options",
+            href: "/mfm/income_receiving_options",
+          },
+        ],
       },
       {
         icon: <CreditCard className="h-4 w-4" />,
         label: "View Invoice PaymentOptions",
         href: "/mfm/payment_options",
       },
-      {
-        icon: <CircleDollarSign className="h-4 w-4" />,
-        label: "Payment Invoice",
-        href: "/mfm/payment_invoice",
-      },
+
       {
         icon: <WalletCards className="h-4 w-4" />,
         label: "View all Sales",
