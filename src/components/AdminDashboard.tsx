@@ -85,8 +85,9 @@ import { cn } from "@/lib/utils";
 import { LoadingDots } from "./ui/loading";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
+import { filterNavigationByPermissions } from "./utils/Navigation_functions";
 
-const navigation = [
+const navigation_sidebar_links = [
   {
     icon: <LayoutDashboard className="h-5 w-5" />,
     label: "Dashboard",
@@ -575,6 +576,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [navigation, setNavigation] = useState<any>([]);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { mutate: logOutFunc, isPending } = useMutation({
@@ -612,6 +614,51 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
+  const [filteredNavigation, setFilteredNavigation] = useState([]);
+  const [userData, setUserData] = useState({
+    is_admin: false,
+    permissions: [],
+  });
+
+  useEffect(() => {
+    // Fetch user permissions on component mount
+    const fetchUserPermissions = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "/api/account/v1/authorization/get_user_all_permissions/"
+        ); // Your endpoint
+        const data = response.data;
+
+        if (data.status === "success") {
+          const user = data.data[0];
+          // Transform the API response into the shape our function expects
+          const permissionsList = user.permissions.map(
+            (p: any) => p.permission_name
+          );
+          setUserData({
+            is_admin: user.is_admin,
+            permissions: permissionsList,
+          });
+
+          // Filter the navigation based on the fetched permissions
+          const filteredNav = filterNavigationByPermissions(
+            navigation_sidebar_links,
+            permissionsList,
+            user.is_admin
+          );
+          console.log("filteredNav", filteredNav);
+          setNavigation(filteredNav);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user permissions:", error);
+        // Optional: Set to a default state, e.g., show nothing or a basic nav
+        setNavigation([]);
+      }
+    };
+
+    fetchUserPermissions();
+  }, []);
+
   if (!mounted) {
     return null;
   }
@@ -630,7 +677,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
       <ScrollArea className="flex-1  overflow-y-auto no-scrollbar">
         <nav className="space-y-1 px-2">
-          {navigation.map((item: any, index) => (
+          {navigation.map((item: any, index: number) => (
             <NavItem
               key={index}
               icon={item.icon}
