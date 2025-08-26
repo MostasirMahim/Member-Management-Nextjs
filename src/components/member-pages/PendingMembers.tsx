@@ -41,7 +41,9 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { LoadingDots, LoadingPage } from "@/components/ui/loading";
-import useGetAllMembers from "@/hooks/data/useGetAllMembers";
+import useGetAllMembers, {
+  exportMembersExcel,
+} from "@/hooks/data/useGetAllMembers";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Pagination,
@@ -63,6 +65,10 @@ import { format } from "date-fns";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
 import { Card } from "../ui/card";
 import { getNames } from "country-list";
+import { useMutation } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "react-toastify";
+import CustomAlertDialog from "../ui/custom-alert";
 
 interface FilterState {
   date_of_birth?: Date;
@@ -97,20 +103,23 @@ const initialFilters: FilterState = {
 };
 function AllMembers() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { setMemberID, memberID, setIsUpdateMode, isUpdateMode } =
-    useAddMemberStore();
+  const { setMemberID, setIsUpdateMode } = useAddMemberStore();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const countries = getNames();
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isUserFilterOpen, setIsUserFilterOpen] = useState(false);
   const page = Number(searchParams.get("page")) || 1;
+  const routes = 2;
   const {
     data: allMembersReq,
     isLoading: user_isLoading,
     refetch,
     isFetching,
-  } = useGetAllMembers(page, filters);
+  } = useGetAllMembers(page, filters, routes);
   const allMembers = allMembersReq?.data;
   const paginationData = allMembersReq?.pagination;
   const { current_page, total_pages } = paginationData || {};
@@ -123,6 +132,42 @@ function AllMembers() {
     membership_status,
     marital_status,
   } = choiceSections ?? {};
+
+  const { mutate: deleteMember, isPending } = useMutation({
+    mutationFn: async (memberId: string) => {
+      const res = await axiosInstance.delete(
+        `/api/member/v1/members/${memberId}/`
+      );
+      if (res.status === 204) {
+        toast.success("Member deleted successfully");
+        refetch();
+        setDeleteDialogOpen(false);
+        setSelectedMemberId(null);
+      }
+      return res.data;
+    },
+
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response.data;
+      if (errors) {
+        if (errors && typeof errors === "object") {
+          Object.entries(errors).forEach(([field, messages]) => {
+            if (Array.isArray(messages)) {
+              toast.error(field, messages[0]);
+            }
+          });
+          toast.error(detail || message || "Member Delete Failed");
+        }
+      } else {
+        toast.error(detail || message || "Member Delete Failed");
+      }
+    },
+  });
+
+  const handleDelete = (member_ID: string) => {
+    deleteMember(member_ID);
+  };
 
   const updateFilter = (
     key: keyof FilterState,
@@ -150,22 +195,30 @@ function AllMembers() {
         user.member_ID.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesSearch;
     }) || [];
-  const router = useRouter();
+
   const handleMemberClick = (member_ID: string) => {
     router.push(`/member/view/${member_ID}`);
   };
 
+  const handleExport = () => {
+    exportMembersExcel(page, filters);
+    refetch();
+  };
+
+  const handleUpdate = (member_ID: string) => {
+    setMemberID(member_ID);
+    setIsUpdateMode(true);
+    router.push(`/member/update/${member_ID}`);
+  };
+  const handleIdTransfer = (member_ID: string) => {
+    router.push(`/member/transferID/${member_ID}`);
+  };
   const goToPage = (page: number) => {
     if (page !== current_page) {
       router.push(`?page=${page}`);
       router.refresh();
     }
   };
-  const handleExport = () => {
-    updateFilter("download_excel", true);
-    refetch();
-  };
-
   const renderPageLinks = () => {
     const pagesToShow = [];
 
@@ -184,15 +237,6 @@ function AllMembers() {
 
     return pagesToShow;
   };
-  const handleUpdate = (member_ID: string) => {
-    setMemberID(member_ID);
-    setIsUpdateMode(true);
-    router.push(`/member/update/${member_ID}`);
-  };
-  const handleIdTransfer = (member_ID: string) => {
-    router.push(`/member/transferID/${member_ID}`);
-  };
-
   if (user_isLoading) return <LoadingDots />;
   return (
     <div className="space-y-6 ">
@@ -207,7 +251,7 @@ function AllMembers() {
         <div>
           <Button className="gap-1" onClick={handleExport}>
             <FileSpreadsheet className="h-4 w-4" />
-            {isFetching ? "Exporting..." : "Export"}
+            Export
           </Button>
         </div>
       </div>
@@ -276,6 +320,7 @@ function AllMembers() {
                   <PopoverContent className="w-auto p-0">
                     <CalendarComponent
                       mode="single"
+                      captionLayout="dropdown"
                       selected={filters.date_of_birth}
                       onSelect={(date) => updateFilter("date_of_birth", date)}
                       initialFocus
@@ -527,7 +572,7 @@ function AllMembers() {
         <Table className="">
           <TableHeader>
             <TableRow className=" text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
-              <TableHead className=" text-black dark:text-white font-bold  ">
+              <TableHead className=" text-black dark:text-white font-bold  text-center">
                 ID
               </TableHead>
               <TableHead className="text-black dark:text-white font-bold">
@@ -554,7 +599,7 @@ function AllMembers() {
               <TableHead className="text-black dark:text-white font-bold ">
                 Nationality
               </TableHead>
-              <TableHead className="text-black dark:text-white text-right font-bold">
+              <TableHead className="text-black dark:text-white font-bold text-center">
                 Actions
               </TableHead>
             </TableRow>
@@ -563,14 +608,16 @@ function AllMembers() {
             {filteredUsers.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={9}
+                  colSpan={10}
                   className="text-center py-8 text-red-500 font-medium"
                 >
                   <Card className="p-8 text-center">
                     <div className="flex flex-col items-center gap-4">
                       <Users className="h-12 w-12 text-muted-foreground" />
                       <div className="space-y-2">
-                        <h3 className="text-lg font-medium">No users found</h3>
+                        <h3 className="text-lg font-medium">
+                          No Members Found
+                        </h3>
                         <p className="text-sm text-muted-foreground">
                           No members match your current filter criteria. Try
                           adjusting your filters or reset to see all members.
@@ -645,7 +692,7 @@ function AllMembers() {
                   <TableCell onClick={() => handleMemberClick(user.member_ID)}>
                     {user.nationality || "-"}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -668,8 +715,15 @@ function AllMembers() {
                           <TrainTrackIcon className="h-4 w-4" /> Transfer ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive gap-2">
-                          <Trash2 className="h-4 w-4" /> Delete
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setDeleteDialogOpen(true);
+                            setSelectedMemberId(user.member_ID);
+                          }}
+                          className="text-destructive gap-2"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -714,6 +768,17 @@ function AllMembers() {
           </PaginationContent>
         </Pagination>
       </div>
+      <CustomAlertDialog
+        open={deleteDialogOpen}
+        title="Are you sure?"
+        description={`Do you want to delete ${selectedMemberId} member?`}
+        onCancel={() => setDeleteDialogOpen(false)}
+        onConfirm={() => {
+          if (selectedMemberId) handleDelete(selectedMemberId);
+        }}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 }
