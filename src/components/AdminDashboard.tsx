@@ -49,6 +49,8 @@ import {
   CreditCard,
   ListChecks,
   HandCoins,
+  FileChartColumn,
+  CircleUser,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -84,8 +86,9 @@ import { cn } from "@/lib/utils";
 import { LoadingDots } from "./ui/loading";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
+import { filterNavigationByPermissions } from "./utils/Navigation_functions";
 
-const navigation = [
+const navigation_sidebar_links = [
   {
     icon: <LayoutDashboard className="h-5 w-5" />,
     label: "Dashboard",
@@ -115,40 +118,6 @@ const navigation = [
   },
 
   {
-    icon: <FolderOpen className="h-5 w-5" />,
-    label: "Attendance",
-    href: "",
-    subItems: [
-      {
-        icon: <Eye className="h-4 w-4" />,
-        label: "Upload Attendance",
-        href: "/attendance/upload",
-      },
-      {
-        icon: <Plus className="h-4 w-4" />,
-        label: "View Attendance",
-        href: "/attendance/view",
-      },
-    ],
-  },
-  {
-    icon: <FolderOpen className="h-5 w-5" />,
-    label: "Email",
-    href: "",
-    subItems: [
-      {
-        icon: <Eye className="h-4 w-4" />,
-        label: "Send Email",
-        href: "/email/send",
-      },
-      {
-        icon: <Plus className="h-4 w-4" />,
-        label: "View Emails",
-        href: "/email/view",
-      },
-    ],
-  },
-  {
     icon: <Users className="h-5 w-5" />,
     label: "All Users",
     href: "/users",
@@ -176,7 +145,7 @@ const navigation = [
   {
     icon: <Logs className="h-5 w-5" />,
     label: "My activity logs",
-    href: "/activity_logs/my"
+    href: "/activity_logs/my",
   },
   ,
   {
@@ -396,29 +365,49 @@ const navigation = [
     subItems: [
       {
         icon: <FileText className="h-4 w-4" />,
-        label: "View all Invoices",
-        href: "/mfm/invoices",
-      },
-      {
-        icon: <ListChecks className="h-4 w-4" />,
-        label: "View Income Particulars",
-        href: "/mfm/income_particulars",
+        label: "Invoices",
+        href: "#",
+        subItems: [
+          {
+            icon: <FileText className="h-3 w-3" />,
+            label: "View all invoices",
+            href: "/mfm/invoices",
+          },
+          {
+            icon: <CircleDollarSign className="h-4 w-4" />,
+            label: "Payment Invoice",
+            href: "/mfm/payment_invoice",
+          },
+        ],
       },
       {
         icon: <CreditCard className="h-4 w-4" />,
-        label: "View Income ReceivingOptions",
-        href: "/mfm/income_receiving_options",
+        label: "Incomes",
+        href: "#",
+        subItems: [
+          {
+            icon: <CreditCard className="h-4 w-4" />,
+            label: "View all incomes",
+            href: "/mfm/income",
+          },
+          {
+            icon: <ListChecks className="h-4 w-4" />,
+            label: "View Income Particulars",
+            href: "/mfm/income_particulars",
+          },
+          {
+            icon: <CreditCard className="h-4 w-4" />,
+            label: "View Income Receiving Options",
+            href: "/mfm/income_receiving_options",
+          },
+        ],
       },
       {
         icon: <CreditCard className="h-4 w-4" />,
         label: "View Invoice PaymentOptions",
         href: "/mfm/payment_options",
       },
-      {
-        icon: <CircleDollarSign className="h-4 w-4" />,
-        label: "Payment Invoice",
-        href: "/mfm/payment_invoice",
-      },
+
       {
         icon: <WalletCards className="h-4 w-4" />,
         label: "View all Sales",
@@ -443,6 +432,28 @@ const navigation = [
         icon: <UserCheck className="h-4 w-4" />,
         label: "View member accounts",
         href: "/mfm/view_member_accounts",
+      },
+    ],
+  },
+  {
+    icon: <Upload className="h-5 w-5" />,
+    label: "Upload sales",
+    href: "#",
+    subItems: [
+      {
+        icon: <FileChartColumn className="h-4 w-4" />,
+        label: "upload restaurant sale",
+        href: "/restaurants/sales/upload",
+      },
+      {
+        icon: <FileChartColumn className="h-4 w-4" />,
+        label: "Upload lounge sale",
+        href: "/upload/sales/lounge",
+      },
+      {
+        icon: <FileChartColumn className="h-4 w-4" />,
+        label: "Upload others sales",
+        href: "/upload/sales/others",
       },
     ],
   },
@@ -566,6 +577,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [navigation, setNavigation] = useState<any>([]);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { mutate: logOutFunc, isPending } = useMutation({
@@ -603,6 +615,53 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
+  const [filteredNavigation, setFilteredNavigation] = useState([]);
+  const [userData, setUserData] = useState({
+    is_admin: false,
+    permissions: [],
+    username: "",
+  });
+
+  useEffect(() => {
+    // Fetch user permissions on component mount
+    const fetchUserPermissions = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "/api/account/v1/authorization/get_user_all_permissions/"
+        ); // Your endpoint
+        const data = response.data;
+
+        if (data.status === "success") {
+          const user = data.data[0];
+          // Transform the API response into the shape our function expects
+          const permissionsList = user.permissions.map(
+            (p: any) => p.permission_name
+          );
+          setUserData({
+            is_admin: user.is_admin,
+            permissions: permissionsList,
+            username: user?.username,
+          });
+
+          // Filter the navigation based on the fetched permissions
+          const filteredNav = filterNavigationByPermissions(
+            navigation_sidebar_links,
+            permissionsList,
+            user.is_admin
+          );
+          console.log("filteredNav", filteredNav);
+          setNavigation(filteredNav);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user permissions:", error);
+        // Optional: Set to a default state, e.g., show nothing or a basic nav
+        setNavigation([]);
+      }
+    };
+
+    fetchUserPermissions();
+  }, []);
+
   if (!mounted) {
     return null;
   }
@@ -621,7 +680,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
       <ScrollArea className="flex-1  overflow-y-auto no-scrollbar">
         <nav className="space-y-1 px-2">
-          {navigation.map((item: any, index) => (
+          {navigation.map((item: any, index: number) => (
             <NavItem
               key={index}
               icon={item.icon}
@@ -674,18 +733,18 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={USER?.avatar || "/user.png"}
-                      alt={USER?.name}
-                    />
-                    <AvatarFallback>{USER?.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full border border-gray-500"
+                >
+                  <CircleUser className="h-10 w-10" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  {userData?.username || "My account"}
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Link href={`/reset-password`} className="flex w-full">

@@ -1,15 +1,22 @@
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, Printer, Check } from "lucide-react";
 import Link from "next/link";
+import { toast } from "react-toastify";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { useRef } from "react";
 
 interface MemberDueStatementProps {
   data: any;
 }
 
 export function MemberDueStatement({ data }: MemberDueStatementProps) {
+  const pdfRef = useRef<HTMLDivElement>(null);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -50,8 +57,66 @@ export function MemberDueStatement({ data }: MemberDueStatementProps) {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!pdfRef.current) return;
+
+    try {
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        position,
+        imgWidth,
+        imgHeight,
+        undefined,
+        "FAST"
+      );
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(
+          imgData,
+          "PNG",
+          0,
+          position,
+          imgWidth,
+          imgHeight,
+          undefined,
+          "FAST"
+        );
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`Due-${data.id}-Receipt.pdf`);
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("There was an error generating the PDF. Please try again.");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8 flex justify-center items-start">
+    <div
+      ref={pdfRef}
+      className="min-h-screen bg-background p-4 md:p-8 flex justify-center items-start"
+    >
       {/* Card uses border and background semantic colors */}
       <Card className="w-full max-w-3xl shadow-lg border-border bg-card">
         {/* Header - Uses border and text semantic colors */}
@@ -184,7 +249,12 @@ export function MemberDueStatement({ data }: MemberDueStatementProps) {
           {/* Action Buttons */}
           <Separator className="my-6" />
           <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" size="sm" className="gap-1">
+            <Button
+              onClick={handleDownloadPDF}
+              variant="outline"
+              size="sm"
+              className="gap-1"
+            >
               <FileText className="h-4 w-4" />
               Save PDF
             </Button>

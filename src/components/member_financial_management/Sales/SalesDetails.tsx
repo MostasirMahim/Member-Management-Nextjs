@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { FileText, Printer } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toast } from "react-toastify";
 
 interface SaleData {
   id: number;
@@ -31,6 +34,8 @@ interface SaleReceiptProps {
 }
 
 export function SaleReceipt({ data }: SaleReceiptProps) {
+  const pdfRef = useRef<HTMLDivElement>(null);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -98,8 +103,66 @@ export function SaleReceipt({ data }: SaleReceiptProps) {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!pdfRef.current) return;
+
+    try {
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        position,
+        imgWidth,
+        imgHeight,
+        undefined,
+        "FAST"
+      );
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(
+          imgData,
+          "PNG",
+          0,
+          position,
+          imgWidth,
+          imgHeight,
+          undefined,
+          "FAST"
+        );
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`Sale-${data.id}-Receipt.pdf`);
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("There was an error generating the PDF. Please try again.");
+    }
+  };
+
   return (
-    <div className="min-h-screen  md:p-8 flex justify-center items-start">
+    <div
+      ref={pdfRef}
+      className="min-h-screen  md:p-8 flex justify-center items-start"
+    >
       <Card className="w-full max-w-2xl shadow-lg border-blue-100 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm print:shadow-none print:border-0 print:bg-white">
         {/* Header */}
         <CardHeader className="pb-4 border-b border-blue-200 dark:border-gray-700 print:border-b-gray-300">
@@ -304,6 +367,7 @@ export function SaleReceipt({ data }: SaleReceiptProps) {
           <Separator className="my-6 bg-blue-200 dark:bg-gray-700" />
           <div className="flex justify-center gap-4 pt-4 print:hidden">
             <Button
+              onClick={handleDownloadPDF}
               variant="outline"
               size="sm"
               className="gap-1 bg-white dark:bg-gray-700 border-blue-200 dark:border-gray-600"

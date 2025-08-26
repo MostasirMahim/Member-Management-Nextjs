@@ -1,12 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { DollarSignIcon, FileText, Printer } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toast } from "react-toastify";
 
 interface InvoiceItem {
   products?: { name: string; sku: string }[];
@@ -48,6 +51,7 @@ interface Props2 {
 }
 
 export default function InvoiceComponent({ data }: Props2) {
+  const pdfRef = useRef<HTMLDivElement>(null);
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -96,10 +100,68 @@ export default function InvoiceComponent({ data }: Props2) {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!pdfRef.current) return;
+
+    try {
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        position,
+        imgWidth,
+        imgHeight,
+        undefined,
+        "FAST"
+      );
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(
+          imgData,
+          "PNG",
+          0,
+          position,
+          imgWidth,
+          imgHeight,
+          undefined,
+          "FAST"
+        );
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`Invoice-${data.id}-Receipt.pdf`);
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("There was an error generating the PDF. Please try again.");
+    }
+  };
+
   const hasItems = data.invoice_items && data.invoice_items.length > 0;
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8 flex justify-center items-start">
+    <div
+      ref={pdfRef}
+      className="min-h-screen bg-background p-4 md:p-8 flex justify-center items-start"
+    >
       <Card className="w-full max-w-4xl shadow-lg border-border bg-card print:shadow-none print:border-0 print:bg-transparent">
         {/* Invoice Header */}
         <CardHeader className="pb-4 border-b border-border print:border-b-foreground/20">
@@ -353,7 +415,12 @@ export default function InvoiceComponent({ data }: Props2) {
           {/* Action Buttons */}
           <Separator className="my-6" />
           <div className="flex justify-end gap-2 pt-4 print:hidden">
-            <Button variant="outline" size="sm" className="gap-1">
+            <Button
+              onClick={handleDownloadPDF}
+              variant="outline"
+              size="sm"
+              className="gap-1"
+            >
               <FileText className="h-4 w-4" />
               Save PDF
             </Button>

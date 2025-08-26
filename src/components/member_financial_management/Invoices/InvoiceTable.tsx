@@ -248,7 +248,7 @@ export default function InvoiceTable({ invoices }: Props) {
                       {/* Payment Invoice */}
                       <DropdownMenuItem asChild>
                         <Link
-                          href={"/mfm/payment_invoice"}
+                          href={`/mfm/payment_invoice?id=${inv.id}`}
                           className="flex items-center text-sky-600 hover:bg-indigo-100 cursor-pointer"
                         >
                           <DollarSign className="mr-2 h-4 w-4" /> Payment Invoice
