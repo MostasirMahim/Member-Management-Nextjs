@@ -16,8 +16,17 @@ export default async function ProductsPage() {
       },
     });
     products = data;
-  } catch (error) {
-    console.error("Failed to fetch products", error);
+  } catch (err: any) {
+    if (err.response) {
+      // Axios server responded with error status
+      throw new Error(err.response.data?.message || `Request failed with status code ${err.response.status}`);
+    } else if (err.request) {
+      // No response received from server
+      throw new Error("No response from server");
+    } else {
+      // Other errors
+      throw new Error(err.message || "Failed to fetch products");
+    }
   }
 
   return (
@@ -29,3 +38,4 @@ export default async function ProductsPage() {
     </div>
   );
 }
+

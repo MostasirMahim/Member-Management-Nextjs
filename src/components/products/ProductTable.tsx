@@ -151,7 +151,7 @@ export default function ProductTable({ products }: Props) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedProducts.map((prod) => (
+            {paginatedProducts?.map((prod) => (
               <TableRow
                 key={prod.id}
                 className="hover:bg-indigo-50 transition-all duration-200"
