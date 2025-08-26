@@ -11,8 +11,7 @@ import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation, useQueryClient } from "@tanstack/react-query"; // <CHANGE> Added useQueryClient
-// <CHANGE> Added useGetMember import
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
@@ -239,7 +238,7 @@ export default function CertificateDetailsStep() {
               },
             ],
           },
-    validationSchema: isUpdateMode ? Yup.object({}) : validationSchema,
+    validationSchema,
     onSubmit: (values) => {
       if (!memberID) {
         toast.error("Member ID not found");
@@ -307,7 +306,6 @@ export default function CertificateDetailsStep() {
     setMemberID("");
     router.push("/");
   };
-
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <div className="space-y-6">
@@ -357,9 +355,16 @@ export default function CertificateDetailsStep() {
                     )}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Upload Certificate
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Upload Certificate
+                    </Label>
+                    <p className="text-sm text-gray-500 pr-5">
+                      {isUpdateMode
+                        ? memberData[index]?.certificate_document?.split("/").pop()
+                        : null}
+                    </p>
+                  </div>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                     <input
                       ref={(el) => {

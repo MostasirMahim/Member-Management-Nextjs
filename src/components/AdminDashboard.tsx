@@ -649,7 +649,6 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
             permissionsList,
             user.is_admin
           );
-          console.log("filteredNav", filteredNav);
           setNavigation(filteredNav);
         }
       } catch (error) {

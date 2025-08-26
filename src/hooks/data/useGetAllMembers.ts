@@ -28,7 +28,6 @@ function useGetAllMembers(
       try {
         const params = new URLSearchParams();
         params.append("page", page.toString());
-        console.log("filters", filters);
         Object.entries(filters).forEach(([key, value]) => {
           if (value === null || value === undefined || value === "") return;
           if (key === "date_of_birth" && value instanceof Date) {

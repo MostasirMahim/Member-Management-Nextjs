@@ -297,6 +297,7 @@ export default function SpecialDaysStep() {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
+                      captionLayout="dropdown"
                       selected={
                         formik.values.data[index].date
                           ? new Date(formik.values.data[index].date)

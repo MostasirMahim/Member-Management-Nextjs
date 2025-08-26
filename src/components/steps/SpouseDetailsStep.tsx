@@ -293,6 +293,7 @@ export default function SpouseDetailsStep() {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
+                captionLayout="dropdown"
                 selected={
                   formik.values.spouse_dob
                     ? new Date(formik.values.spouse_dob)
