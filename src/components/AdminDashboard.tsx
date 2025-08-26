@@ -50,6 +50,7 @@ import {
   ListChecks,
   HandCoins,
   FileChartColumn,
+  CircleUser,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -618,6 +619,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   const [userData, setUserData] = useState({
     is_admin: false,
     permissions: [],
+    username: "",
   });
 
   useEffect(() => {
@@ -638,6 +640,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
           setUserData({
             is_admin: user.is_admin,
             permissions: permissionsList,
+            username: user?.username,
           });
 
           // Filter the navigation based on the fetched permissions
@@ -730,18 +733,18 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={USER?.avatar || "/user.png"}
-                      alt={USER?.name}
-                    />
-                    <AvatarFallback>{USER?.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full border border-gray-500"
+                >
+                  <CircleUser className="h-10 w-10" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  {userData?.username || "My account"}
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Link href={`/reset-password`} className="flex w-full">
