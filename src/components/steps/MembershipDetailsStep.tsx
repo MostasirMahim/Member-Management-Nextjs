@@ -324,7 +324,7 @@ export default function MembershipDetailsStep() {
     setCurrentStep(0);
     router.push("/");
   };
-
+  
   if (isLoading || isLoadingMember) {
     return <LoadingCard />;
   }
@@ -572,6 +572,7 @@ export default function MembershipDetailsStep() {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
+                    captionLayout="dropdown"
                     selected={
                       formik.values.date_of_birth
                         ? new Date(formik.values.date_of_birth)
@@ -694,6 +695,7 @@ export default function MembershipDetailsStep() {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
+                    captionLayout="dropdown"
                     selected={
                       formik.values.anniversary_date
                         ? new Date(formik.values.anniversary_date)

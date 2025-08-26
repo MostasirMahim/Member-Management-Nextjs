@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Search, User, X } from "lucide-react";
-import useGetAllUsers from "@/hooks/data/useGetAllusers";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
 import { LoadingDots } from "../ui/loading";
+import useGetAllUsers from "@/hooks/data/useGetAllUsers";
+import { toast } from "react-toastify";
 
 interface AddMemberFormProps {
   groupId: string;
@@ -20,7 +21,7 @@ interface AddMemberFormProps {
 
 export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: ALL_USERS, isLoading: isLoadinAllUsers } = useGetAllUsers();
+  const { data, isLoading: isLoadinAllUsers } = useGetAllUsers();
   const queryClient = useQueryClient();
 
   const { mutate: addedMember, isPending } = useMutation({
@@ -31,15 +32,13 @@ export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
       );
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data?.status === "success") {
-        queryClient.invalidateQueries({ queryKey: ["getGroup"] });
-        toast({
-          title: data?.details || "Users Added successfully",
-          description: data?.message || "Users has been successfully added.",
-          variant: "default",
-        });
-
+       await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["getGroup"] }),
+          queryClient.invalidateQueries({ queryKey: ["getGroups"] }),
+        ]);
+        toast.success("Users Added Successfully");
         formik.resetForm();
         setSearchTerm("");
         onCancel();
@@ -50,17 +49,9 @@ export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
       const { message, errors, detail } = error?.response.data;
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Users Added Failed",
-          description: allErrors,
-          variant: "destructive",
-        });
+       toast.error(allErrors || "Failed to add users");
       } else {
-        toast({
-          title: detail || "Users Added Failed",
-          description: message || "An error occurred during Added",
-          variant: "destructive",
-        });
+        toast.error(message || detail || "Failed to add users");
       }
     },
   });
@@ -78,7 +69,7 @@ export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
   });
   const isFormValid = formik.values.selectedUsers.length > 0;
 
-  const filteredUsers = ALL_USERS?.filter((user: any) =>
+  const filteredUsers = data?.data?.filter((user: any) =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

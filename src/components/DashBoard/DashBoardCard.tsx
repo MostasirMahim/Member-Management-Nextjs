@@ -13,6 +13,7 @@ interface Props {
 async function DashBoardCard({ searchParams }: Props) {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
+  if(authToken === '') return null;
   const { created_at, created_at_after, created_at_before } =
     await searchParams;
 
@@ -41,7 +42,7 @@ async function DashBoardCard({ searchParams }: Props) {
   }
   return (
     <div>
-      <DashboardStats data={responseData} />
+      {authToken && <DashboardStats data={responseData} /> }
     </div>
   );
 }

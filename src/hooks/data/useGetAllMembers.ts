@@ -10,27 +10,29 @@ type Filters = {
   gender?: string;
   institute_name?: string;
   marital_status?: string;
-  download_excel?: boolean;
-
   nationality?: string;
   contact_number?: string;
   email?: string;
   member_ID?: string;
   name?: string;
 };
-function useGetAllMembers(page: number = 1, filters: Filters = {}) {
+
+function useGetAllMembers(
+  page: number = 1,
+  filters: Filters = {},
+  routes: number = 1
+) {
   return useQuery({
-    queryKey: ["getAllMembers", page],
+    queryKey: ["getAllMembers", page, routes],
     queryFn: async () => {
       try {
         const params = new URLSearchParams();
         params.append("page", page.toString());
-
+        console.log("filters", filters);
         Object.entries(filters).forEach(([key, value]) => {
           if (value === null || value === undefined || value === "") return;
-
           if (key === "date_of_birth" && value instanceof Date) {
-            params.append(key, value.toISOString().split("T")[0]); // format date
+            params.append(key, value.toISOString().split("T")[0]);
           } else {
             params.append(key, String(value));
           }
@@ -40,10 +42,9 @@ function useGetAllMembers(page: number = 1, filters: Filters = {}) {
           `/api/member/v1/members/list/?${params.toString()}`
         );
         if (res?.data?.status == "success") {
-          const result = res.data;
-          return result;
+          return res.data;
         } else {
-          console.error("Failed to fetch Choices:", res.data.message);
+          toast.error("Failed to fetch Members");
           return [];
         }
       } catch (error: any) {
@@ -56,6 +57,50 @@ function useGetAllMembers(page: number = 1, filters: Filters = {}) {
       }
     },
   });
+}
+
+export async function exportMembersExcel(
+  page: number = 1,
+  filters: Filters = {}
+) {
+  try {
+    const params = new URLSearchParams();
+    params.append("page", page.toString());
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === "") return;
+      if (key === "date_of_birth" && value instanceof Date) {
+        params.append(key, value.toISOString().split("T")[0]);
+      } else {
+        params.append(key, String(value));
+      }
+    });
+
+    params.append("download_excel", "true");
+
+    const res = await axiosInstance.get(
+      `/api/member/v1/members/list/?${params.toString()}`,
+      { responseType: "blob" }
+    );
+    const blob = new Blob([res.data], {
+      type: res.headers["content-type"],
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "memberlist.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    if (res?.status === 200) {
+      toast.success("Excel exported successfully");
+    } else {
+      toast.error("Failed to export Members");
+    }
+  } catch (error: any) {
+    toast.error("Failed to export Members");
+  }
 }
 
 export default useGetAllMembers;
