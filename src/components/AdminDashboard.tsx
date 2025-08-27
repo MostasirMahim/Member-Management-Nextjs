@@ -51,6 +51,7 @@ import {
   HandCoins,
   FileChartColumn,
   CircleUser,
+  History,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -113,6 +114,11 @@ const navigation_sidebar_links = [
         icon: <UserX className="h-4 w-4" />,
         label: "View Members",
         href: "/members/view",
+      },
+      {
+        icon: <History className="h-4 w-4" />,
+        label: "Transfer History",
+        href: "/members/history",
       },
     ],
   },

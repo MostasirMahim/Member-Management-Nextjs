@@ -1,5 +1,5 @@
 "use client";
-import { Users } from "lucide-react";
+import { HistoryIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -27,6 +27,9 @@ function SpecificIdHistory(memberId: { memberId: string }) {
                 ID
               </TableHead>
               <TableHead className="text-black dark:text-white font-bold">
+                Current ID
+              </TableHead>
+              <TableHead className="text-black dark:text-white font-bold">
                 Transferred ID
               </TableHead>
               <TableHead className="text-black dark:text-white font-bold">
@@ -47,12 +50,12 @@ function SpecificIdHistory(memberId: { memberId: string }) {
             {filteredUsers?.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={9}
+                  colSpan={6}
                   className="text-center py-8 text-red-500 font-medium"
                 >
                   <Card className="p-8 text-center">
                     <div className="flex flex-col items-center gap-4">
-                      <Users className="h-12 w-12 text-muted-foreground" />
+                      <HistoryIcon className="h-12 w-12 text-muted-foreground" />
                       <div className="space-y-2">
                         <h3 className="text-lg font-medium">
                           No History Found
@@ -72,6 +75,11 @@ function SpecificIdHistory(memberId: { memberId: string }) {
                   className="  cursor-pointer hover:translate-y-1 transition-transform duration-300 ease-in-out bg-background "
                 >
                   <TableCell className="font-medium ">{user.id}</TableCell>
+                  <TableCell>
+                    <p className="font-medium text-left">
+                      {user.member}
+                    </p>
+                  </TableCell>
                   <TableCell>
                     <p className="font-medium text-left">
                       {user.stored_member_id}

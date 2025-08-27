@@ -55,7 +55,6 @@ export default function DocumentDetailsStep() {
 
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { document_type } = choiceSections ?? {};
-console.log("memberData", memberData);
   const { mutate: addDocumentFunc, isPending } = useMutation({
     mutationFn: async (userData: any[]) => {
       const errors: Record<string, string> = {};
