@@ -38,8 +38,6 @@ export default function MemberIdTransfer() {
       enabled: !!params?.id,
     }
   );
-  console.log("Member Data:", data);
-
   const { member_info: memberData } = data ?? {};
   const { membership_type, institute_name } = choiceSections ?? {};
 
