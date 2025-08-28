@@ -30,7 +30,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface Media {
@@ -112,167 +111,201 @@ export default function ProductTable({ products }: Props) {
   };
 
   return (
-    <div>
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-row items-center gap-2">
-          <Package className="h-6 w-6 opacity-75" />
-          <CardTitle className="text-xl font-bold opacity-75">
-            All Products
-          </CardTitle>
-        </div>
+    <div className="max-w-7xl mx-auto">
+      <div className="">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r rounded-t-2xl py-6 px-4 ">
+          <div className="flex flex-row items-center gap-2">
+            <Package className="h-7 w-7 text-indigo-600" />
+            <CardTitle className="text-xl md:text-2xl font-bold text-indigo-600 tracking-tight drop-shadow ">
+              Product Inventory
+            </CardTitle>
+          </div>
+          <SearchFilterSection
+            filterOptions={{
+              categories: Array.from(
+                new Set(products?.data?.map((p) => p.category))
+              ),
+              brands: Array.from(new Set(products?.data?.map((p) => p.brand))),
+            }}
+          />
+        </CardHeader>
 
-        {/* Filter & Search Section */}
-        <SearchFilterSection
-          filterOptions={{
-            categories: Array.from(
-              new Set(products?.data?.map((p) => p.category))
-            ),
-            brands: Array.from(new Set(products?.data?.map((p) => p.brand))),
-          }}
-        />
-      </CardHeader>
-
-      <CardContent>
-        <Table className="w-full text-sm text-gray-700">
-          <TableHeader className="bg-gray-100">
-            <TableRow>
-              <TableHead className="text-gray-500">Image</TableHead>
-              <TableHead className="text-gray-600">Name</TableHead>
-              <TableHead className="text-gray-600">Price</TableHead>
-              <TableHead className="text-gray-600">Discount</TableHead>
-              <TableHead className="text-gray-600">Stock</TableHead>
-              <TableHead className="text-gray-600">SKU</TableHead>
-              <TableHead className="text-gray-600">Status</TableHead>
-              <TableHead className="text-gray-600">Category</TableHead>
-              <TableHead className="text-gray-600">Brand</TableHead>
-              <TableHead className="text-right text-gray-500">
-                Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedProducts?.map((prod) => (
-              <TableRow
-                key={prod.id}
-                className="hover:bg-indigo-50 transition-all duration-200"
-              >
-                <TableCell>
-                  <Image
-                    src={
-                      `http://127.0.0.1:8000/${prod.media[0]?.image}` ||
-                      "/placeholder.png"
-                    }
-                    alt={prod.name}
-                    width={56}
-                    height={56}
-                    className="w-14 h-14 rounded-md object-cover border"
-                  />
-                </TableCell>
-
-                <TableCell className="font-semibold text-gray-900">
-                  {prod.name}
-                </TableCell>
-
-                <TableCell className="font-medium text-gray-800">
-                  ${prod.price}
-                </TableCell>
-
-                <TableCell>
-                  {parseFloat(prod.discount_rate) > 0 ? (
-                    <Badge className="bg-yellow-500 text-white">
-                      {prod.discount_rate}%
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-gray-300 text-gray-700">
-                      No Discount
-                    </Badge>
-                  )}
-                </TableCell>
-
-                <TableCell>
-                  {prod.quantity_in_stock > 0 ? (
-                    <Badge className="bg-green-500 text-white">
-                      {prod.quantity_in_stock} in stock
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-red-500 text-white">
-                      Out of stock
-                    </Badge>
-                  )}
-                </TableCell>
-
-                <TableCell className="text-gray-600 font-semibold">
-                  {prod.sku}
-                </TableCell>
-
-                <TableCell>
-                  <Badge
-                    className={
-                      prod.is_active
-                        ? "bg-green-600 text-white"
-                        : "bg-red-500 text-white"
-                    }
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table className="min-w-[1100px] text-sm">
+              <TableHeader className="">
+                <TableRow className="bg-gradient-to-r from-indigo-100 via-blue-200 to-indigo-200">
+                  <TableHead className="text-gray-700 font-bold text-base py-4">
+                    Image
+                  </TableHead>
+                  <TableHead className="text-yellow-700 font-bold text-base py-4">
+                    Name
+                  </TableHead>
+                  <TableHead className="text-green-700 font-bold text-base py-4">
+                    Price
+                  </TableHead>
+                  <TableHead className="text-yellow-700 font-bold text-base py-4">
+                    Discount
+                  </TableHead>
+                  <TableHead className="text-green-700 font-bold text-base py-4">
+                    Stock
+                  </TableHead>
+                  <TableHead className="text-indigo-700 font-bold text-base py-4">
+                    SKU
+                  </TableHead>
+                  <TableHead className="text-green-700 font-bold text-base py-4">
+                    Status
+                  </TableHead>
+                  <TableHead className="text-blue-700 font-bold text-base py-4">
+                    Category
+                  </TableHead>
+                  <TableHead className="text-purple-700 font-bold text-base py-4">
+                    Brand
+                  </TableHead>
+                  <TableHead className="text-gray-700 font-bold text-base py-4 text-right">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedProducts?.map((prod) => (
+                  <TableRow
+                    key={prod.id}
+                    className="hover:bg-indigo-50 transition-all duration-200 border-b border-gray-100"
                   >
-                    {prod.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
-
-                <TableCell className="font-semibold">{prod.category}</TableCell>
-
-                <TableCell className="font-semibold">{prod.brand}</TableCell>
-
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-gray-500 hover:text-indigo-600"
+                    <TableCell>
+                      <Image
+                        src={
+                          prod.media[0]?.image
+                            ? `http://127.0.0.1:8000/${prod.media[0]?.image}`
+                            : "/placeholder.png"
+                        }
+                        alt={prod.name}
+                        width={56}
+                        height={56}
+                        className="w-14 h-14 rounded-md object-cover border"
+                      />
+                    </TableCell>
+                    <TableCell className="font-semibold text-yellow-800">
+                      <span className="text-base font-semibold">{prod.name}</span>
+                    </TableCell>
+                    <TableCell className="font-medium text-green-800">
+                      <span className="text-base">${prod.price}</span>
+                    </TableCell>
+                    <TableCell>
+                      {parseFloat(prod.discount_rate) > 0 ? (
+                        <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-200 hover:bg-yellow-200 transition-colors">
+                          {prod.discount_rate}%
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition-colors">
+                          No Discount
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {prod.quantity_in_stock > 0 ? (
+                        <Badge className="bg-green-100 text-green-800 border border-green-200 hover:bg-green-200 transition-colors">
+                          {prod.quantity_in_stock} in stock
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition-colors">
+                          Out of stock
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-indigo-800 font-semibold">
+                      <span className="text-base">{prod.sku}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={
+                          prod.is_active
+                            ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200 transition-colors"
+                            : "bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition-colors"
+                        }
                       >
-                        <MoreVertical className="h-5 w-5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href={`/products/${prod.id}`}
-                          className="flex items-center text-indigo-600 hover:bg-indigo-100 cursor-pointer"
-                        >
-                          <Eye className="mr-2 h-4 w-4" /> View
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-indigo-600 hover:bg-indigo-100 cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4" /> Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600 hover:bg-red-100 cursor-pointer">
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                        {prod.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-semibold text-blue-800">
+                      <span className="text-base">{prod.category}</span>
+                    </TableCell>
+                    <TableCell className="font-semibold text-purple-800">
+                      <span className="text-base">{prod.brand}</span>
+                    </TableCell>
+                    <TableCell className="bg-gray-50 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-gray-500 hover:text-indigo-600"
+                          >
+                            <MoreVertical className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href={`/products/${prod.id}`}
+                              className="flex items-center text-indigo-600 hover:bg-indigo-100 cursor-pointer"
+                            >
+                              <Eye className="mr-2 h-4 w-4" /> View
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-indigo-600 hover:bg-indigo-100 cursor-pointer">
+                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600 hover:bg-red-100 cursor-pointer">
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
-        {/* Pagination */}
-        <Pagination className="mt-4 justify-center flex cursor-pointer">
-          <PaginationPrevious onClick={() => goToPage(currentPage - 1)} />
-          <PaginationContent>
+          {/* Pagination */}
+          <div className="mt-6 flex justify-center items-center gap-2">
+            <button
+              className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 font-semibold hover:bg-indigo-100 transition"
+              disabled={currentPage === 1}
+              onClick={() => goToPage(currentPage - 1)}
+            >
+              Previous
+            </button>
             {Array.from({ length: totalPages }).map((_, i) => {
               const page = i + 1;
               return (
-                <PaginationItem key={page} onClick={() => goToPage(page)}>
-                  <PaginationLink isActive={page === currentPage}>
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
+                <button
+                  key={page}
+                  className={`px-3 py-1 rounded-md font-semibold border transition
+          ${page === currentPage
+                      ? "bg-indigo-600 text-white border-indigo-600"
+                      : "bg-white text-indigo-700 border-gray-200 hover:bg-indigo-50"
+                    }`}
+                  onClick={() => goToPage(page)}
+                >
+                  {page}
+                </button>
               );
             })}
-          </PaginationContent>
-          <PaginationNext onClick={() => goToPage(currentPage + 1)} />
-        </Pagination>
-      </CardContent>
+            <button
+              className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 font-semibold hover:bg-indigo-100 transition"
+              disabled={currentPage === totalPages}
+              onClick={() => goToPage(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </CardContent>
+      </div>
     </div>
   );
 }
+
+
