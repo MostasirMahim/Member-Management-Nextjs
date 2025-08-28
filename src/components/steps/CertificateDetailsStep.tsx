@@ -11,8 +11,7 @@ import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation, useQueryClient } from "@tanstack/react-query"; // <CHANGE> Added useQueryClient
-// <CHANGE> Added useGetMember import
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useGetMember from "@/hooks/data/useGetMember";
 
 const validationSchema = Yup.object({
@@ -239,7 +238,7 @@ export default function CertificateDetailsStep() {
               },
             ],
           },
-    validationSchema: isUpdateMode ? Yup.object({}) : validationSchema,
+    validationSchema,
     onSubmit: (values) => {
       if (!memberID) {
         toast.error("Member ID not found");
@@ -303,11 +302,8 @@ export default function CertificateDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    setMemberID("");
-    router.push("/");
+    formik.resetForm();
   };
-
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <div className="space-y-6">
@@ -357,9 +353,16 @@ export default function CertificateDetailsStep() {
                     )}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Upload Certificate
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Upload Certificate
+                    </Label>
+                    <p className="text-sm text-gray-500 pr-5">
+                      {isUpdateMode
+                        ? memberData[index]?.certificate_document?.split("/").pop()
+                        : null}
+                    </p>
+                  </div>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                     <input
                       ref={(el) => {
@@ -401,7 +404,6 @@ export default function CertificateDetailsStep() {
                       </Button>
                     )}
                   </div>
-                  {/* <CHANGE> Updated to use consistent touch/error pattern */}
                   {(formik.touched.data as any[])?.[index]
                     ?.certificate_document &&
                     (formik.errors.data as any[])?.[index]
@@ -432,7 +434,6 @@ export default function CertificateDetailsStep() {
                     name={`data.${index}.certificate_number`}
                     className="w-full"
                   />
-                  {/* <CHANGE> Updated to use consistent touch/error pattern */}
                   {(formik.touched.data as any[])?.[index]
                     ?.certificate_number &&
                     (formik.errors.data as any[])?.[index]
@@ -472,7 +473,7 @@ export default function CertificateDetailsStep() {
             onClick={() => handleSaveAndExit()}
             className="flex-1 sm:flex-none bg-transparent"
           >
-            Exit
+            Reset
           </Button>
           <Button
             type="button"
@@ -485,11 +486,10 @@ export default function CertificateDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending || isUpdating} // <CHANGE> Added isUpdating to disabled state
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
           {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
-          {/* <CHANGE> Added isUpdating check */}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

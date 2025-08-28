@@ -6,13 +6,6 @@ import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -65,7 +58,6 @@ export default function CompanionDetailsStep() {
     enabled: isUpdateMode && !!memberID,
   });
   const { companion: memberData } = data ?? {};
-
   const { mutate: addCompanionFunc, isPending } = useMutation({
     mutationFn: async (userData: any) => {
       const formData = new FormData();
@@ -222,9 +214,7 @@ export default function CompanionDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    setMemberID("");
-    router.push("/");
+       formik.resetForm();
   };
 
   return (
@@ -276,6 +266,7 @@ export default function CompanionDetailsStep() {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
+                captionLayout="dropdown"
                 selected={
                   formik.values.companion_dob
                     ? new Date(formik.values.companion_dob)
@@ -375,9 +366,16 @@ export default function CompanionDetailsStep() {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">
-            Companion Picture
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium text-gray-700">
+              Companion Picture
+            </Label>
+            <p className="text-sm text-gray-500 pr-5">
+              {isUpdateMode
+                ? memberData[0]?.companion_image?.split("/").pop()
+                : null}
+            </p>
+          </div>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
             <input
               ref={fileInputRef}
@@ -426,7 +424,7 @@ export default function CompanionDetailsStep() {
             onClick={() => handleSaveAndExit()}
             className="flex-1 sm:flex-none bg-transparent"
           >
-            Exit
+            Reset
           </Button>
           <Button
             type="button"

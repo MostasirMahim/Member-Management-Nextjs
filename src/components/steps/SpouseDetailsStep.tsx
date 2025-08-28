@@ -74,7 +74,6 @@ export default function SpouseDetailsStep() {
     enabled: isUpdateMode && !!memberID,
   });
   const { spouse: memberData } = data ?? {};
-
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { spouse_status_choice } = choiceSections ?? {};
 
@@ -215,9 +214,7 @@ export default function SpouseDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    setMemberID("");
-    router.push("/");
+    formik.resetForm();
   };
   if(isLoading || isLoadingMember) return <LoadingCard />
   return (
@@ -293,6 +290,7 @@ export default function SpouseDetailsStep() {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
+                captionLayout="dropdown"
                 selected={
                   formik.values.spouse_dob
                     ? new Date(formik.values.spouse_dob)
@@ -404,7 +402,7 @@ export default function SpouseDetailsStep() {
             onClick={() => handleSaveAndExit()}
             className="flex-1 sm:flex-none bg-transparent"
           >
-            Exit
+            Reset
           </Button>
           <Button
             type="button"

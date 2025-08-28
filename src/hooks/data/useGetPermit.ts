@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "../use-toast";
+import { toast } from "react-toastify";
 
 
 function useGetPermit() {
@@ -17,11 +17,7 @@ function useGetPermit() {
           }
         } catch (error:any) {
           console.error("Error fetching all permissions", error);
-          toast({
-            title: "Error",
-            description: error?.response?.data?.message || "Failed to fetch all permissions",
-            variant: "destructive",
-          });
+          toast.error(error?.response?.data?.message || error.message || "Error fetching all permissions");
           return [];
         }
       },

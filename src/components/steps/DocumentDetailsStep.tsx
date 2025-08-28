@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -56,7 +55,6 @@ export default function DocumentDetailsStep() {
 
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { document_type } = choiceSections ?? {};
-
   const { mutate: addDocumentFunc, isPending } = useMutation({
     mutationFn: async (userData: any[]) => {
       const errors: Record<string, string> = {};
@@ -244,7 +242,7 @@ export default function DocumentDetailsStep() {
               },
             ],
           },
-    validationSchema: isUpdateMode ? Yup.object({}) : validationSchema,
+    validationSchema,
     onSubmit: (values) => {
       if (!memberID) {
         toast.error("Member ID not found");
@@ -298,9 +296,7 @@ export default function DocumentDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    setMemberID("");
-    router.push("/");
+        formik.resetForm();
   };
 
   return (
@@ -330,9 +326,16 @@ export default function DocumentDetailsStep() {
               )}
               <div className="grid gap-4 md:grid-cols-1">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Upload Document
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Upload Document
+                    </Label>
+                    <p className="text-sm text-gray-500 pr-5">
+                      {isUpdateMode
+                        ? memberData[index]?.document_document?.split("/").pop()
+                        : null}
+                    </p>
+                  </div>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                     <input
                       ref={(el) => {
@@ -453,7 +456,7 @@ export default function DocumentDetailsStep() {
             onClick={() => handleSaveAndExit()}
             className="flex-1 sm:flex-none bg-transparent"
           >
-            Exit
+            Reset
           </Button>
           <Button
             type="button"

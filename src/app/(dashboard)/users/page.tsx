@@ -168,13 +168,8 @@ function page() {
                   >
                     {user.id}
                   </TableCell>
-                  <TableCell
-                    className="flex justify-start items-center"
-                    onClick={() => handleMemberClick(user.id)}
-                  >
-                    <div className="space-y-1 ">
-                      <p className="font-medium text-left">{user.username}</p>
-                    </div>
+                  <TableCell onClick={() => handleMemberClick(user.id)}>
+                    <p className="font-medium text-left">{user.username}</p>
                   </TableCell>
                   <TableCell onClick={() => handleMemberClick(user.id)}>
                     <p className="font-medium text-left">{user.first_name}</p>

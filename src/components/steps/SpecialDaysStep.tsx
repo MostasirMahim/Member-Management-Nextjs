@@ -227,9 +227,7 @@ export default function SpecialDaysStep() {
   };
 
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    setMemberID("");
-    router.push("/");
+    formik.resetForm();
   };
 
   return (
@@ -297,6 +295,7 @@ export default function SpecialDaysStep() {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
+                      captionLayout="dropdown"
                       selected={
                         formik.values.data[index].date
                           ? new Date(formik.values.data[index].date)
@@ -347,7 +346,7 @@ export default function SpecialDaysStep() {
             onClick={() => handleSaveAndExit()}
             className="flex-1 sm:flex-none bg-transparent"
           >
-            Exit
+            Reset
           </Button>
           <Button
             type="button"

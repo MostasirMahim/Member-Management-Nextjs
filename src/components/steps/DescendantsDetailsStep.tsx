@@ -57,12 +57,24 @@ const validationSchemaForUpdate = Yup.object({
   data: Yup.array()
     .of(
       Yup.object({
+        id: Yup.number().nullable(),
         name: Yup.string().required("Descendant name is required"),
         descendant_contact_number: Yup.string().required(
           "Contact number is required"
         ),
         dob: Yup.date().required("Date of birth is required"),
-        image: Yup.mixed().nullable(),
+        image: Yup.mixed()
+          .nullable()
+          .test(
+            "image-required-if-no-id",
+            "Profile picture is required",
+            function (value: any) {
+              if (!this.parent.id && !value) {
+                return false;
+              }
+              return true;
+            }
+          ),
         relation_type: Yup.string().required("Relation type is required"),
       })
     )
@@ -88,10 +100,8 @@ export default function DescendantsDetailsStep() {
     enabled: isUpdateMode && !!memberID,
   });
   const { descendant: memberData } = data ?? {};
-
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { descendant_relation_choice } = choiceSections ?? {};
-
   const { mutate: addDescendantFunc, isPending } = useMutation({
     mutationFn: async (userData: any[]) => {
       const errors: Record<string, string> = {};
@@ -299,7 +309,7 @@ export default function DescendantsDetailsStep() {
       }
     },
   });
-  console.log(memberData);
+
   const addDescendant = () => {
     const newDescendant = {
       member_ID: memberID,
@@ -312,7 +322,7 @@ export default function DescendantsDetailsStep() {
     const updatedDescendants = [...formik.values.data, newDescendant];
     formik.setFieldValue("data", updatedDescendants);
   };
-  //TODO:NewDecandant Image Requried Validation
+
   const removeDescendant = (index: number) => {
     if (formik.values.data.length > 1) {
       const updatedDescendants = formik.values.data.filter(
@@ -348,9 +358,7 @@ export default function DescendantsDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    setMemberID("");
-    router.push("/");
+      formik.resetForm();
   };
 
   return (
@@ -456,6 +464,7 @@ export default function DescendantsDetailsStep() {
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
+                        captionLayout="dropdown"
                         selected={
                           descendant.dob ? new Date(descendant.dob) : undefined
                         }
@@ -510,7 +519,6 @@ export default function DescendantsDetailsStep() {
                           size="sm"
                           onClick={() => {
                             updateDescendant(index, "image", null);
-                            console.log(`Removed descendant ${index} picture`);
                           }}
                         >
                           <X className="w-4 h-4" />
@@ -522,9 +530,6 @@ export default function DescendantsDetailsStep() {
                         variant="ghost"
                         onClick={() => {
                           fileInputRefs.current[index]?.click();
-                          console.log(
-                            `Clicked to upload descendant ${index} picture`
-                          );
                         }}
                         className="w-full"
                       >
@@ -533,6 +538,12 @@ export default function DescendantsDetailsStep() {
                       </Button>
                     )}
                   </div>
+                  {(formik.touched.data as any[])?.[index]?.image &&
+                    (formik.errors.data as any[])?.[index]?.image && (
+                      <p className="text-sm text-red-600">
+                        {(formik.errors.data as any[])?.[index]?.image}
+                      </p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -598,7 +609,7 @@ export default function DescendantsDetailsStep() {
             onClick={() => handleSaveAndExit()}
             className="flex-1 sm:flex-none bg-transparent"
           >
-            Exit
+            Reset
           </Button>
           <Button
             type="button"
