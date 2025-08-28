@@ -324,8 +324,8 @@ export default function MembershipDetailsStep() {
     setCurrentStep(0);
     router.push("/");
   };
-  
-  if (isLoading || isLoadingMember) {
+
+  if (isLoading && isLoadingMember) {
     return <LoadingCard />;
   }
   return (
