@@ -199,9 +199,7 @@ export default function AddressDetailsStep() {
 
   const handleSkip = () => nextStep();
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    setMemberID("");
-    router.push("/");
+        formik.resetForm();
   };
 
   return (
@@ -312,7 +310,7 @@ export default function AddressDetailsStep() {
             onClick={handleSaveAndExit}
             className="flex-1 sm:flex-none bg-transparent"
           >
-            Exit
+            Reset
           </Button>
           <Button
             type="button"

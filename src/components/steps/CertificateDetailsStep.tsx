@@ -302,9 +302,7 @@ export default function CertificateDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    setMemberID("");
-    router.push("/");
+    formik.resetForm();
   };
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
@@ -406,7 +404,6 @@ export default function CertificateDetailsStep() {
                       </Button>
                     )}
                   </div>
-                  {/* <CHANGE> Updated to use consistent touch/error pattern */}
                   {(formik.touched.data as any[])?.[index]
                     ?.certificate_document &&
                     (formik.errors.data as any[])?.[index]
@@ -437,7 +434,6 @@ export default function CertificateDetailsStep() {
                     name={`data.${index}.certificate_number`}
                     className="w-full"
                   />
-                  {/* <CHANGE> Updated to use consistent touch/error pattern */}
                   {(formik.touched.data as any[])?.[index]
                     ?.certificate_number &&
                     (formik.errors.data as any[])?.[index]
@@ -477,7 +473,7 @@ export default function CertificateDetailsStep() {
             onClick={() => handleSaveAndExit()}
             className="flex-1 sm:flex-none bg-transparent"
           >
-            Exit
+            Reset
           </Button>
           <Button
             type="button"
@@ -490,11 +486,10 @@ export default function CertificateDetailsStep() {
         </div>
         <Button
           type="submit"
-          disabled={isPending || isUpdating} // <CHANGE> Added isUpdating to disabled state
+          disabled={isPending || isUpdating}
           className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
         >
           {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
-          {/* <CHANGE> Added isUpdating check */}
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

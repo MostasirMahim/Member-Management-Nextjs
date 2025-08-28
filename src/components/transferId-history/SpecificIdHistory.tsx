@@ -38,10 +38,10 @@ function SpecificIdHistory(memberId: { memberId: string }) {
               <TableHead className="text-black dark:text-white font-bold text-center">
                 Transferred
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold ">
+              <TableHead className="text-black dark:text-white font-bold text-center">
                 Start Date
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold ">
+              <TableHead className="text-black dark:text-white font-bold text-center">
                 End Date
               </TableHead>
             </TableRow>

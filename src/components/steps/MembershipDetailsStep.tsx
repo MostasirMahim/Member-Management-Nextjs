@@ -89,6 +89,8 @@ export default function MembershipDetailsStep() {
   });
 
   const { member_info: memberData } = data ?? {};
+
+  console.log("memberData", memberData);
   const {
     membership_type,
     institute_name,
@@ -199,7 +201,12 @@ export default function MembershipDetailsStep() {
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-        querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        const routes = 2;
+        const page = 1;
+        Promise.all([
+          querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] }),
+          querClient.invalidateQueries({ queryKey: ["getAllMembers", page, routes] }),
+        ])
         toast.success(data.message || "Membership Updated Successfully.");
       }
     },
@@ -274,7 +281,7 @@ export default function MembershipDetailsStep() {
       }
     },
   });
-
+  console.log(formik.values);
   const handleFieldChangeAndGenerateID = (fieldName: string, value: string) => {
     formik.setFieldValue(fieldName, value);
     const otherFieldValue =
@@ -321,16 +328,18 @@ export default function MembershipDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    router.push("/");
+    formik.resetForm();
   };
-  
-  if (isLoading || isLoadingMember) {
+
+  if (isLoading && isLoadingMember) {
     return <LoadingCard />;
   }
   return (
     <div className="">
-      <form onSubmit={formik.handleSubmit} className="space-y-6">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="space-y-6"
+      >
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Left Column */}
           <div className="space-y-4">
@@ -787,7 +796,7 @@ export default function MembershipDetailsStep() {
               onClick={() => handleSaveAndExit()}
               className="flex-1 sm:flex-none bg-transparent"
             >
-              Exit
+              Reset
             </Button>
             <Button
               type="button"

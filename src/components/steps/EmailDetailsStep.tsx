@@ -237,9 +237,7 @@ export default function EmailDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-    setCurrentStep(0);
-    setMemberID("");
-    router.push("/");
+        formik.resetForm();
   };
 
   if (isLoading || isLoadingMember) {
@@ -358,7 +356,7 @@ export default function EmailDetailsStep() {
             onClick={handleSaveAndExit}
             className="flex-1 sm:flex-none bg-transparent"
           >
-            Exit
+            Reset
           </Button>
           <Button
             type="button"
