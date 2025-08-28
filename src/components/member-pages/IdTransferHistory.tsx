@@ -1,6 +1,13 @@
 "use client";
 import { useState } from "react";
-import { Search, Filter, Calendar, HistoryIcon, Train, TrainTrackIcon } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Calendar,
+  HistoryIcon,
+  Train,
+  TrainTrackIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -237,7 +244,7 @@ function IdTransferHistory() {
                 </Popover>
               </div>
               <div className="space-y-2">
-                 <Label className="text-sm font-medium flex items-center gap-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
                   <TrainTrackIcon className="h-4 w-4" />
                   Transferred
                 </Label>
@@ -291,7 +298,7 @@ function IdTransferHistory() {
                 Current ID
               </TableHead>
               <TableHead className="text-black dark:text-white font-bold">
-                Transferred ID
+                Transferred from ID
               </TableHead>
               <TableHead className="text-black dark:text-white font-bold">
                 Reason
@@ -342,9 +349,7 @@ function IdTransferHistory() {
                 >
                   <TableCell className="font-medium ">{user.id}</TableCell>
                   <TableCell>
-                    <p className="font-medium text-left">
-                      {user.member}
-                    </p>
+                    <p className="font-medium text-left">{user.member}</p>
                   </TableCell>
                   <TableCell>
                     <p className="font-medium text-left">
