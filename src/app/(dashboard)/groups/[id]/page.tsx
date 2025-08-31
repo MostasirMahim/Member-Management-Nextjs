@@ -34,11 +34,11 @@ import { AddPermissionForm } from "@/components/groups/AddPermit";
 import { AddMemberForm } from "@/components/groups/AddUserGP";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
 import { LoadingDots } from "@/components/ui/loading";
 import { useFormik } from "formik";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "react-toastify";
 
 export default function GroupDetailPage() {
   const params = useParams();
@@ -70,21 +70,12 @@ export default function GroupDetailPage() {
           return res.data.data;
         } else {
           console.error("Failed to fetch groups:", res.data.message);
-          toast({
-            title: "Error",
-            description: res.data.message || "Failed to fetch group details",
-            variant: "destructive",
-          });
+          toast.error(res?.data?.message);
           return [];
         }
       } catch (error: any) {
         console.error("Error fetching user stats:", error);
-        toast({
-          title: "Error",
-          description:
-            error?.response?.data?.message || "Failed to fetch groups",
-          variant: "destructive",
-        });
+        toast.error(error?.response?.data?.message);
         return [];
       }
     },
@@ -101,14 +92,12 @@ export default function GroupDetailPage() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         Promise.all([
-          queryClient.invalidateQueries({ queryKey: ["getGroup"] }),
+          queryClient.invalidateQueries({ queryKey: ["getGroup", id] }),
           queryClient.invalidateQueries({ queryKey: ["getGroups"] }),
         ]);
-        toast({
-          title: data?.details || "Group updated successfully",
-          description: data?.message || "Group has been Updated.",
-          variant: "default",
-        });
+
+        router.refresh();
+        toast.success("Group Updated Successfully");
         formik.resetForm();
         setUpdateDialogOpen(false);
       }
@@ -118,17 +107,9 @@ export default function GroupDetailPage() {
       const { message, errors, detail } = error?.response.data;
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Group update Failed",
-          description: allErrors,
-          variant: "destructive",
-        });
+        toast.error(allErrors || "Group Update Failed");
       } else {
-        toast({
-          title: detail || "Group Update Failed",
-          description: message || "An error occurred during Update",
-          variant: "destructive",
-        });
+        toast.error(detail || message || "Group Update Failed");
       }
     },
   });
@@ -161,11 +142,7 @@ export default function GroupDetailPage() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         queryClient.invalidateQueries({ queryKey: ["getGroup"] });
-        toast({
-          title: data?.details || "Users Removed successfully",
-          description: data?.message || "Users has been successfully Removed.",
-          variant: "default",
-        });
+        toast.success("Users Removed Successfully");
         setDeleteDialogOpen(false);
         setDeleteTarget(null);
       }
@@ -175,17 +152,9 @@ export default function GroupDetailPage() {
       const { message, errors, detail } = error?.response.data;
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Users Removed Failed",
-          description: allErrors,
-          variant: "destructive",
-        });
+        toast.error(allErrors || "Users Removed Failed");
       } else {
-        toast({
-          title: detail || "Users Removed Failed",
-          description: message || "An error occurred during Removed",
-          variant: "destructive",
-        });
+        toast.error(detail || message || "Users Removed Failed");
       }
     },
   });
@@ -201,12 +170,7 @@ export default function GroupDetailPage() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         queryClient.invalidateQueries({ queryKey: ["getGroup"] });
-        toast({
-          title: data?.details || "Permission Removed successfully",
-          description:
-            data?.message || "Permission has been successfully Removed.",
-          variant: "default",
-        });
+        toast.success("Permission Removed Successfully");
         setDeleteDialogOpen(false);
         setDeleteTarget(null);
       }
@@ -216,17 +180,9 @@ export default function GroupDetailPage() {
       const { message, errors, detail } = error?.response.data;
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Permission Removed Failed",
-          description: allErrors,
-          variant: "destructive",
-        });
+        toast.error(allErrors || "Permission Removed Failed");
       } else {
-        toast({
-          title: detail || "Permission Removed Failed",
-          description: message || "An error occurred during Removed",
-          variant: "destructive",
-        });
+        toast.error(detail || message || "Permission Removed Failed");
       }
     },
   });
@@ -245,11 +201,7 @@ export default function GroupDetailPage() {
 
   const confirmDelete = () => {
     if (!deleteTarget) {
-      toast({
-        title: "Sorry, Invalid Action",
-        description: "Target Action Not found",
-        variant: "destructive",
-      });
+      toast.error("Please select a member or permission to delete.");
       return;
     }
 
