@@ -17,7 +17,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SmartPagination } from "../utils/SmartPagination";
-import { DollarSign } from "lucide-react";
+import {
+  DollarSign,
+  MoreVertical,
+  Pencil,
+  ShoppingCart,
+  Trash2,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import Link from "next/link";
+import { useFacilityCartStore } from "@/store/cartStore";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface Facility {
   id: number;
@@ -48,22 +65,17 @@ export function FacilitiesTable({ data, pagination }: FacilitiesTableProps) {
       minute: "2-digit",
     });
   };
+  const router = useRouter();
+  const setFacility = useFacilityCartStore((state) => state.setFacility);
 
-  const getStatusVariant = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "open":
-        return "success";
-      case "closed":
-        return "destructive";
-      case "maintenance":
-        return "warning";
-      default:
-        return "secondary";
+  const handleBuyFacility = (id: number) => {
+    const facility = data.find((facility) => facility.id === id);
+    if (facility) {
+      setFacility(facility);
+      router.push("/facilities/buy");
+    } else {
+      toast.error("Facility not found");
     }
-  };
-
-  const getActiveVariant = (isActive: boolean): "success" | "destructive" => {
-    return isActive ? "success" : "destructive";
   };
 
   return (
@@ -128,6 +140,30 @@ export function FacilitiesTable({ data, pagination }: FacilitiesTableProps) {
                   </TableCell>
                   <TableCell className="text-right text-sm text-muted-foreground bg-muted/10">
                     {formatDate(facility.updated_at)}
+                  </TableCell>
+                  <TableCell
+                    className="
+                  "
+                  >
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-gray-500 hover:text-indigo-600"
+                        >
+                          <MoreVertical className="h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => handleBuyFacility(facility.id)}
+                          className="text-indigo-600 hover:bg-indigo-100 cursor-pointer"
+                        >
+                          <ShoppingCart className="mr-2 h-4 w-4" /> Buy
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}

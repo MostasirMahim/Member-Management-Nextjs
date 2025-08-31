@@ -60,3 +60,16 @@ export const useCartStore = create<CartState>()(
     }
   )
 );
+
+
+
+
+export const useFacilityCartStore  =   create<any>()(
+  (set)=>(
+    {
+      facility: {},
+      setFacility: (item: any) => set({ facility: item }),
+      clearFacility: () => set({ facility: {} }),
+    }
+  )
+)
