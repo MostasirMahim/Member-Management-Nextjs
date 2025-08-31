@@ -30,9 +30,7 @@ type FormValues = {
 
 export default function AddMediaPage() {
   const [products, setProducts] = useState<any[]>([]);
-  const form = useForm<FormValues>({
-    
-  });
+  const form = useForm<FormValues>({});
   const router = useRouter();
   const { reset, setError } = form;
 
@@ -48,7 +46,7 @@ export default function AddMediaPage() {
     };
     fetchProducts();
   }, []);
-  console.log("Products:", products);
+
   const { mutate: addMedia, isPending } = useMutation({
     mutationFn: async (values: FormValues) => {
       const formData = new FormData();
@@ -66,7 +64,7 @@ export default function AddMediaPage() {
       );
       return response;
     },
-    onSuccess: (response) => {
+    onSuccess: () => {
       toast.success("Media added successfully!", {
         position: "top-center",
         autoClose: 3000,
@@ -75,17 +73,12 @@ export default function AddMediaPage() {
       router.refresh();
     },
     onError: (error: any) => {
-      if (error?.response?.data?.message) {
-        toast.error("" + error.response.data.message, {
-          position: "top-center",
-          autoClose: 3000,
-        });
-      } else {
-        toast.error("Unexpected error occurred", {
-          position: "top-center",
-          autoClose: 3000,
-        });
-      }
+      const message =
+        error?.response?.data?.message || "Unexpected error occurred";
+      toast.error(message, {
+        position: "top-center",
+        autoClose: 3000,
+      });
     },
   });
 
@@ -102,33 +95,32 @@ export default function AddMediaPage() {
   };
 
   return (
-    <div className="flex justify-center items-center px-4 py-5">
-      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg">
-        <h2 className="text-center md:text-2xl font-bold mb-6 text-gray-800">
+    <div className="flex justify-center items-center px-4 py-10 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 w-full max-w-lg transition-colors duration-300">
+        <h2 className="text-center md:text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
           Add Media
         </h2>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Product Select */}
             <FormField
               control={form.control}
               name="product"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Select Product</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Select Product
+                  </FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={(value) => field.onChange(Number(value))}
                       value={field.value?.toString() || ""}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600">
                         <SelectValue placeholder="Select a product" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         {products.map((p) => (
                           <SelectItem key={p.id} value={p.id.toString()}>
                             {p.name}
@@ -137,7 +129,7 @@ export default function AddMediaPage() {
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -148,15 +140,18 @@ export default function AddMediaPage() {
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Upload Image</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Upload Image
+                  </FormLabel>
                   <FormControl>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={(e) => field.onChange(e.target.files)}
+                      className="block w-full text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -166,10 +161,15 @@ export default function AddMediaPage() {
                 variant="outline"
                 type="reset"
                 onClick={() => reset()}
+                className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Reset
               </Button>
-              <Button type="submit" disabled={isPending}>
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+              >
                 {isPending ? "Submitting..." : "Submit"}
               </Button>
             </div>

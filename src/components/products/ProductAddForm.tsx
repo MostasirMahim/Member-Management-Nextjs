@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
@@ -128,9 +127,9 @@ export default function AddProductForm() {
   };
 
   return (
-    <div className="flex justify-center items-center bg-gray-100 px-4 py-5 bg-opacity-0">
-      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg">
-        <h2 className="text-center md:text-2xl font-bold mb-6 text-gray-800">
+    <div className="flex justify-center items-center bg-gray-100 dark:bg-gray-900 px-4 py-5 min-h-screen transition-colors">
+      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8 w-full max-w-lg border border-gray-200 dark:border-gray-700 transition-colors">
+        <h2 className="text-center md:text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
           Add Product
         </h2>
 
@@ -140,78 +139,109 @@ export default function AddProductForm() {
             onReset={() => reset()}
             className="space-y-6"
           >
+            {/* Product Name */}
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product Name</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Product Name
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter product name" {...field} />
+                    <Input
+                      placeholder="Enter product name"
+                      {...field}
+                      className="dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Description */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Description
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter description" {...field} />
+                    <Input
+                      placeholder="Enter description"
+                      {...field}
+                      className="dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Price */}
             <FormField
               control={form.control}
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Price
+                  </FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" {...field} />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      {...field}
+                      className="dark:bg-gray-700 dark:text-gray-100"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* SKU */}
             <FormField
               control={form.control}
               name="sku"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>SKU</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    SKU
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter SKU" {...field} />
+                    <Input
+                      placeholder="Enter SKU"
+                      {...field}
+                      className="dark:bg-gray-700 dark:text-gray-100"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Category Select */}
+            {/* Category */}
             <FormField
               control={form.control}
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Category
+                  </FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={(value) => field.onChange(Number(value))}
                       value={field.value?.toString() || ""}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="dark:bg-gray-700 dark:text-gray-100">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="dark:bg-gray-800 dark:text-gray-100">
                         {categories.map((cat: any) => (
                           <SelectItem key={cat.id} value={cat.id.toString()}>
                             {cat.name}
@@ -225,13 +255,15 @@ export default function AddProductForm() {
               )}
             />
 
-            {/* Brand Select */}
+            {/* Brand */}
             <FormField
               control={form.control}
               name="brand"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Brand (optional)</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Brand (optional)
+                  </FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={(value) =>
@@ -239,10 +271,10 @@ export default function AddProductForm() {
                       }
                       value={field.value?.toString() || ""}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="dark:bg-gray-700 dark:text-gray-100">
                         <SelectValue placeholder="Select brand (optional)" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="dark:bg-gray-800 dark:text-gray-100">
                         {brands.map((b: any) => (
                           <SelectItem key={b.id} value={b.id.toString()}>
                             {b.name}
@@ -256,36 +288,56 @@ export default function AddProductForm() {
               )}
             />
 
+            {/* Quantity */}
             <FormField
               control={form.control}
               name="quantity_in_stock"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Quantity</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Quantity
+                  </FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input
+                      type="number"
+                      {...field}
+                      className="dark:bg-gray-700 dark:text-gray-100"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Discount */}
             <FormField
               control={form.control}
               name="discount_rate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Discount Rate (%)</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Discount Rate (%)
+                  </FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" {...field} />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      {...field}
+                      className="dark:bg-gray-700 dark:text-gray-100"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Buttons */}
             <div className="flex justify-end gap-3 pt-4">
-              <Button variant="outline" type="reset">
+              <Button
+                variant="outline"
+                type="reset"
+                className="dark:border-gray-500 dark:text-gray-200"
+              >
                 Reset
               </Button>
               <Button type="submit" disabled={isPending}>

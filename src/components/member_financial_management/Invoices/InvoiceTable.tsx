@@ -17,24 +17,14 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MoreVertical, Eye, Trash2, Pencil,DollarSign } from "lucide-react";
+import { MoreVertical, Eye, Trash2, Pencil, DollarSign } from "lucide-react";
 import Link from "next/link";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
 
 import { InvoiceSearchFilterSection } from "./InvoiceSearchFilterSection";
 import InvoiceDeleteDialog from "./InvoiceDeleteDialog";
 import InvoiceEditModal from "./InvoiceEditModal";
-import PaymentInvoice from "./Payment/Invoice/PaymentInvoice";
+import { SmartPagination } from "@/components/utils/SmartPagination";
 
 interface Invoice {
   id: number;
@@ -72,19 +62,15 @@ export default function InvoiceTable({ invoices }: Props) {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [paymentInvoiceOpen, setPaymentInvoiceOpen] = useState(false);
 
-  // Pagination
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
   const itemsPerPage = 10;
 
-  // Filters from URL
   const filterMember = searchParams.get("member") || "";
   const filterType = searchParams.get("invoice_type") || "all";
   const filterStatus = searchParams.get("status") || "all";
   const filterFullPaid = searchParams.get("is_full_paid") || "all";
 
-  // Filter invoices
   const filteredInvoices = invoices?.data?.filter((inv) => {
     if (
       filterMember &&
@@ -101,19 +87,21 @@ export default function InvoiceTable({ invoices }: Props) {
     return true;
   });
 
-  // Pagination calculations
   const totalPages = Math.ceil(filteredInvoices?.length / itemsPerPage);
   const currentPage = pageParam > totalPages ? 1 : pageParam;
+
   const paginatedInvoices = filteredInvoices?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const goToPage = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    const params = new URLSearchParams(Array.from(searchParams.entries()));
-    params.set("page", page.toString());
-    router.push(`?${params.toString()}`);
+  const paginationData = {
+    count: filteredInvoices?.length || 0,
+    total_pages: totalPages,
+    current_page: currentPage,
+    next: currentPage < totalPages ? "next" : null,
+    previous: currentPage > 1 ? "prev" : null,
+    page_size: itemsPerPage,
   };
 
   return (
@@ -138,10 +126,10 @@ export default function InvoiceTable({ invoices }: Props) {
       </CardHeader>
 
       {/* Table */}
-      <CardContent>
-        <Table className="w-full text-sm text-gray-700">
-          <TableHeader className="bg-gray-100">
-            <TableRow className="bg-gray-150 font-bold text-sm">
+      <CardContent className=" ">
+        <Table className="w-full text-sm text-gray-800 dark:text-gray-200">
+          <TableHeader>
+            <TableRow className="  font-bold text-sm ">
               <TableHead>ID</TableHead>
               <TableHead>Invoice No</TableHead>
               <TableHead>Type</TableHead>
@@ -160,49 +148,39 @@ export default function InvoiceTable({ invoices }: Props) {
             {paginatedInvoices.map((inv) => (
               <TableRow
                 key={inv.id}
-                className="hover:bg-indigo-50 transition-all duration-200"
+                className="hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-all duration-200"
               >
                 <TableCell>{inv.id}</TableCell>
-                <TableCell className="font-medium">
-                  {inv.invoice_number}
-                </TableCell>
+                <TableCell className="font-medium">{inv.invoice_number}</TableCell>
                 <TableCell>{inv.invoice_type}</TableCell>
                 <TableCell>{inv.member}</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {inv.issue_date}
-                </TableCell>
-                <TableCell className="font-medium">
-                  {inv.total_amount} {inv.currency}
-                </TableCell>
-                <TableCell className="font-medium">
-                  {inv.paid_amount} {inv.currency}
-                </TableCell>
-                <TableCell className="font-medium">
-                  {inv.balance_due} {inv.currency}
-                </TableCell>
+                <TableCell className="hidden md:table-cell">{inv.issue_date}</TableCell>
+                <TableCell className="font-medium">{inv.total_amount} {inv.currency}</TableCell>
+                <TableCell className="font-medium">{inv.paid_amount} {inv.currency}</TableCell>
+                <TableCell className="font-medium">{inv.balance_due} {inv.currency}</TableCell>
                 <TableCell>
-                  <Badge
-                    className={
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       inv.status === "paid"
-                        ? "bg-green-600 text-white"
+                        ? "bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
                         : inv.status === "unpaid"
-                        ? "bg-red-500 text-white"
-                        : "bg-yellow-500 text-white"
-                    }
+                        ? "bg-red-100 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700 hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                        : "bg-yellow-100 text-yellow-800 border border-yellow-200 dark:bg-yellow-900 dark:text-yellow-300 dark:border-yellow-700 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors"
+                    }`}
                   >
                     {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
-                  </Badge>
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    className={
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       inv.is_active
-                        ? "bg-green-500 text-white"
-                        : "bg-red-500 text-white"
-                    }
+                        ? "bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
+                        : "bg-red-100 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700 hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                    }`}
                   >
-                    {inv.is_active ? "active" : "inactive"}
-                  </Badge>
+                    {inv.is_active ? "Active" : "Inactive"}
+                  </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -210,24 +188,22 @@ export default function InvoiceTable({ invoices }: Props) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-gray-500 hover:text-indigo-600"
+                        className="text-gray-500 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <MoreVertical className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {/* View Invoice */}
+                    <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:text-gray-200">
                       <DropdownMenuItem asChild>
                         <Link
                           href={`/mfm/invoices/${inv.id}`}
-                          className="flex items-center text-indigo-600 hover:bg-indigo-100 cursor-pointer"
+                          className="flex items-center text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900 cursor-pointer"
                         >
                           <Eye className="mr-2 h-4 w-4" /> View
                         </Link>
                       </DropdownMenuItem>
-                      {/* Delete Invoice */}
                       <DropdownMenuItem
-                        className="text-red-600 hover:bg-red-100 cursor-pointer"
+                        className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 cursor-pointer"
                         onClick={() => {
                           setSelectedInvoice(inv);
                           setDeleteDialogOpen(true);
@@ -235,21 +211,19 @@ export default function InvoiceTable({ invoices }: Props) {
                       >
                         <Trash2 className="mr-2 h-4 w-4" /> Delete
                       </DropdownMenuItem>
-                      {/* Edit Invoice */}
                       <DropdownMenuItem
                         onClick={() => {
                           setSelectedInvoice(inv);
                           setEditModalOpen(true);
                         }}
-                        className="text-indigo-600 hover:bg-indigo-100 cursor-pointer"
+                        className="text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900 cursor-pointer"
                       >
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
-                      {/* Payment Invoice */}
                       <DropdownMenuItem asChild>
                         <Link
                           href={`/mfm/payment_invoice?id=${inv.id}`}
-                          className="flex items-center text-sky-600 hover:bg-indigo-100 cursor-pointer"
+                          className="flex items-center text-sky-600 dark:text-sky-400 hover:bg-indigo-100 dark:hover:bg-indigo-900 cursor-pointer"
                         >
                           <DollarSign className="mr-2 h-4 w-4" /> Payment Invoice
                         </Link>
@@ -262,24 +236,10 @@ export default function InvoiceTable({ invoices }: Props) {
           </TableBody>
         </Table>
 
-        {/* Pagination */}
-        <Pagination className="mt-4 justify-center flex cursor-pointer">
-          <PaginationPrevious onClick={() => goToPage(currentPage - 1)} />
-          <PaginationContent>
-            {Array.from({ length: totalPages }).map((_, i) => {
-              const page = i + 1;
-              return (
-                <PaginationItem key={page} onClick={() => goToPage(page)}>
-                  <PaginationLink isActive={page === currentPage}>
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              );
-            })}
-          </PaginationContent>
-          <PaginationNext onClick={() => goToPage(currentPage + 1)} />
-        </Pagination>
+        {/* Smart Pagination */}
+        <SmartPagination paginationData={paginationData} className="mt-4" />
       </CardContent>
+
       {/* Delete Confirmation Dialog */}
       {selectedInvoice && (
         <InvoiceDeleteDialog
@@ -288,6 +248,7 @@ export default function InvoiceTable({ invoices }: Props) {
           invoiceId={selectedInvoice.id}
         />
       )}
+
       {/* Edit Invoice Modal */}
       {selectedInvoice && (
         <InvoiceEditModal
@@ -296,7 +257,6 @@ export default function InvoiceTable({ invoices }: Props) {
           invoice={selectedInvoice}
         />
       )}
-      {/* Payment Invoice Modal */}
     </div>
   );
 }

@@ -22,7 +22,7 @@ import { SearchFilterSection } from "@/components/products/SearchFilterSection";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SmartPagination } from "@/components/utils/SmartPagination"; // ✅ import smart pagination
+import { SmartPagination } from "@/components/utils/SmartPagination"; 
 
 interface Media {
   id: number;
@@ -262,7 +262,7 @@ export default function ProductTable({ products }: Props) {
             </Table>
           </div>
 
-          {/* ✅ SmartPagination instead of manual pagination */}
+          {/*  SmartPagination instead of manual pagination */}
           <SmartPagination paginationData={paginationData} className="mt-6" />
         </CardContent>
       </div>

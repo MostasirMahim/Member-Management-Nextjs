@@ -20,17 +20,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MoreVertical, Eye, Trash2 } from "lucide-react";
 import Link from "next/link";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { TransactionSearchFilterSection } from "./TransectionSearchFilterSection";
+import { SmartPagination } from "@/components/utils/SmartPagination";
 
 interface Transaction {
   id: number;
@@ -62,7 +55,7 @@ export default function TransactionTable({ transactions }: Props) {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // Pagination
+  // Pagination & items per page
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
   const itemsPerPage = 10;
 
@@ -86,6 +79,16 @@ export default function TransactionTable({ transactions }: Props) {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // Pagination data for SmartPagination
+  const paginationData = {
+    count: filteredTransactions.length,
+    total_pages: totalPages,
+    current_page: currentPage,
+    next: currentPage < totalPages ? "next" : null,
+    previous: currentPage > 1 ? "prev" : null,
+    page_size: itemsPerPage,
+  };
 
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -113,8 +116,8 @@ export default function TransactionTable({ transactions }: Props) {
       </CardHeader>
 
       <CardContent>
-        <Table className="w-full text-sm text-gray-700">
-          <TableHeader className="bg-gray-100">
+        <Table className="w-full text-sm text-gray-700 dark:text-gray-400">
+          <TableHeader className="bg-gray-100 dark:bg-gray-700">
             <TableRow className="bg-gray-150 font-bold text-sm">
               <TableHead>ID</TableHead>
               <TableHead>Invoice</TableHead>
@@ -141,28 +144,28 @@ export default function TransactionTable({ transactions }: Props) {
                 <TableCell className="font-medium">{t.amount}</TableCell>
                 <TableCell>{t.transaction_date}</TableCell>
                 <TableCell>
-                  <Badge
-                    className={
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       t.status === "paid"
-                        ? "bg-green-600 text-white"
+                        ? "bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
                         : t.status === "unpaid"
-                        ? "bg-red-500 text-white"
-                        : "bg-yellow-500 text-white"
-                    }
+                        ? "bg-red-100 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700 hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                        : "bg-yellow-100 text-yellow-800 border border-yellow-200 dark:bg-yellow-900 dark:text-yellow-300 dark:border-yellow-700 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors"
+                    }`}
                   >
-                    {t.status || "N/A"}
-                  </Badge>
+                    {t.status.charAt(0).toUpperCase() + t.status.slice(1)}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <Badge
-                    className={
-                      t.is_active
-                        ? "bg-green-500 text-white"
-                        : "bg-red-500 text-white"
-                    }
-                  >
-                    {t.is_active ? "active" : "inactive"}
-                  </Badge>
+                        className={
+                          t.is_active
+                            ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200 transition-colors"
+                            : "bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition-colors"
+                        }
+                      >
+                        {t.is_active ? "Active" : "Inactive"}
+                      </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -201,22 +204,8 @@ export default function TransactionTable({ transactions }: Props) {
           </TableBody>
         </Table>
 
-        <Pagination className="mt-4 justify-center flex cursor-pointer">
-          <PaginationPrevious onClick={() => goToPage(currentPage - 1)} />
-          <PaginationContent>
-            {Array.from({ length: totalPages }).map((_, i) => {
-              const page = i + 1;
-              return (
-                <PaginationItem key={page} onClick={() => goToPage(page)}>
-                  <PaginationLink isActive={page === currentPage}>
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              );
-            })}
-          </PaginationContent>
-          <PaginationNext onClick={() => goToPage(currentPage + 1)} />
-        </Pagination>
+        {/* Smart Pagination */}
+        <SmartPagination paginationData={paginationData} className="mt-4" />
       </CardContent>
     </div>
   );
