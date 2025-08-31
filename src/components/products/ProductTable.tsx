@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -22,15 +21,8 @@ import { MoreVertical, Pencil, Trash2, Eye, Package } from "lucide-react";
 import { SearchFilterSection } from "@/components/products/SearchFilterSection";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
+import { SmartPagination } from "@/components/utils/SmartPagination"; // ✅ import smart pagination
 
 interface Media {
   id: number;
@@ -91,8 +83,6 @@ export default function ProductTable({ products }: Props) {
 
   // Pagination calc
   const totalPages = Math.ceil(filteredProducts?.length / itemsPerPage);
-
-  // currentPage validate
   const currentPage = pageParam > totalPages ? 1 : pageParam;
 
   // Slice data for current page
@@ -101,13 +91,14 @@ export default function ProductTable({ products }: Props) {
     currentPage * itemsPerPage
   );
 
-  const goToPage = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-
-    const params = new URLSearchParams(Array.from(searchParams.entries()));
-    params.set("page", page.toString());
-
-    router.push(`?${params.toString()}`);
+  // Prepare paginationData for SmartPagination
+  const paginationData = {
+    count: filteredProducts?.length || 0,
+    total_pages: totalPages,
+    current_page: currentPage,
+    next: currentPage < totalPages ? `?page=${currentPage + 1}` : null,
+    previous: currentPage > 1 ? `?page=${currentPage - 1}` : null,
+    page_size: itemsPerPage,
   };
 
   return (
@@ -133,7 +124,7 @@ export default function ProductTable({ products }: Props) {
         <CardContent>
           <div className="overflow-x-auto">
             <Table className="min-w-[1100px] text-sm">
-              <TableHeader className="">
+              <TableHeader>
                 <TableRow className="bg-gradient-to-r from-indigo-100 via-blue-200 to-indigo-200">
                   <TableHead className="text-gray-700 font-bold text-base py-4">
                     Image
@@ -187,7 +178,9 @@ export default function ProductTable({ products }: Props) {
                       />
                     </TableCell>
                     <TableCell className="font-semibold text-yellow-800">
-                      <span className="text-base font-semibold">{prod.name}</span>
+                      <span className="text-base font-semibold">
+                        {prod.name}
+                      </span>
                     </TableCell>
                     <TableCell className="font-medium text-green-800">
                       <span className="text-base">${prod.price}</span>
@@ -269,43 +262,10 @@ export default function ProductTable({ products }: Props) {
             </Table>
           </div>
 
-          {/* Pagination */}
-          <div className="mt-6 flex justify-center items-center gap-2">
-            <button
-              className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 font-semibold hover:bg-indigo-100 transition"
-              disabled={currentPage === 1}
-              onClick={() => goToPage(currentPage - 1)}
-            >
-              Previous
-            </button>
-            {Array.from({ length: totalPages }).map((_, i) => {
-              const page = i + 1;
-              return (
-                <button
-                  key={page}
-                  className={`px-3 py-1 rounded-md font-semibold border transition
-          ${page === currentPage
-                      ? "bg-indigo-600 text-white border-indigo-600"
-                      : "bg-white text-indigo-700 border-gray-200 hover:bg-indigo-50"
-                    }`}
-                  onClick={() => goToPage(page)}
-                >
-                  {page}
-                </button>
-              );
-            })}
-            <button
-              className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 font-semibold hover:bg-indigo-100 transition"
-              disabled={currentPage === totalPages}
-              onClick={() => goToPage(currentPage + 1)}
-            >
-              Next
-            </button>
-          </div>
+          {/* ✅ SmartPagination instead of manual pagination */}
+          <SmartPagination paginationData={paginationData} className="mt-6" />
         </CardContent>
       </div>
     </div>
   );
 }
-
-
