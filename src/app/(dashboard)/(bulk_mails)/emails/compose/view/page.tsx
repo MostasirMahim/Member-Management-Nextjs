@@ -13,7 +13,7 @@ async function ViewAllComposes({ searchParams }: Props) {
   let responseData = {};
   try {
     const { data } = await axiosInstance.get(
-      `/api/mails/v1/email/composes/?page=${page}`,
+      `/api/mails/v1/email/composes/?page=${page}&page_size=20`,
       {
         headers: {
           Cookie: `access_token=${authToken}`,
