@@ -474,6 +474,11 @@ const navigation_sidebar_links = [
         label: "Create facility",
         href: "/facilities/create",
       },
+      {
+        icon: <Eye className="h-4 w-4" />,
+        label: "View facilities",
+        href: "/facilities",
+      },
     ],
   },
 ];
