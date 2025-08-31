@@ -171,6 +171,12 @@ export default function GeneratedForm() {
               name="usages_fee"
               rules={{
                 required: "Facility usages_fee is required",
+                validate: (value) => {
+                  if (value <= 0) {
+                    return "Usage fee must be greater than 0";
+                  }
+                  return true;
+                },
               }}
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
