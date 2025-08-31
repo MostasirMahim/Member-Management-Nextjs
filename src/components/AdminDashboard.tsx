@@ -52,6 +52,7 @@ import {
   FileChartColumn,
   CircleUser,
   History,
+  Dumbbell,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -460,6 +461,18 @@ const navigation_sidebar_links = [
         icon: <FileChartColumn className="h-4 w-4" />,
         label: "Upload others sales",
         href: "/upload/sales/others",
+      },
+    ],
+  },
+  {
+    icon: <Dumbbell className="h-5 w-5" />,
+    label: "Facility management",
+    href: "#",
+    subItems: [
+      {
+        icon: <CirclePlus className="h-4 w-4" />,
+        label: "Create facility",
+        href: "/facilities/create",
       },
     ],
   },

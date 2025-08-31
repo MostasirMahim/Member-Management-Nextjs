@@ -439,6 +439,7 @@ export const navigationPermissions: Record<string, string | null> = {
   "Promo code management": "promo_code_management",
   "Member financial management": "member_financial_management",
   "Upload sales": "member_financial_management",
+  "Facility management": "facility_management",
 };
 
 // lib/navigation-permissions.ts
