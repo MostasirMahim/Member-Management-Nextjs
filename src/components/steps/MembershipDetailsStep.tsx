@@ -199,14 +199,11 @@ export default function MembershipDetailsStep() {
       );
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data?.status === "success") {
-        const routes = 2;
-        const page = 1;
-        Promise.all([
-          querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] }),
-          querClient.invalidateQueries({ queryKey: ["getAllMembers", page, routes] }),
-        ])
+        const routes = 3;
+        const page = 2;
+        await querClient.invalidateQueries({ queryKey: ["getAllMembers", page, routes] });
         toast.success(data.message || "Membership Updated Successfully.");
       }
     },
@@ -336,10 +333,7 @@ export default function MembershipDetailsStep() {
   }
   return (
     <div className="">
-      <form
-        onSubmit={formik.handleSubmit}
-        className="space-y-6"
-      >
+      <form onSubmit={formik.handleSubmit} className="space-y-6">
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Left Column */}
           <div className="space-y-4">

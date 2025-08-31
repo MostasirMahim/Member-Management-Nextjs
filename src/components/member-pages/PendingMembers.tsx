@@ -11,6 +11,7 @@ import {
   Calendar,
   Users,
   UserRoundSearch,
+  RefreshCcwIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -628,8 +629,8 @@ function AllMembers() {
                         variant="outline"
                         className="gap-2 bg-transparent text-green-600"
                       >
-                        <Search className="h-4 w-4" />
-                        {isFetching ? "Retrying Search.." : "Reset Filters"}
+                        <RefreshCcwIcon className={`h-4 w-4 ${isFetching && "animate-spin"}`} />
+                        {isFetching ? "Refreshing.." : "Refresh"}
                       </Button>
                     </div>
                   </Card>
