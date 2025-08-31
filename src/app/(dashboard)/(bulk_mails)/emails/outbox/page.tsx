@@ -14,7 +14,7 @@ async function OutboxViewPage({ searchParams }: Props) {
   let responseData = {};
   try {
     const { data } = await axiosInstance.get(
-      `/api/mails/v1/email/outboxes/?page=${page}`,
+      `/api/mails/v1/email/outboxes/?page=${page}&page_size=20`,
       {
         headers: {
           Cookie: `access_token=${authToken}`,
