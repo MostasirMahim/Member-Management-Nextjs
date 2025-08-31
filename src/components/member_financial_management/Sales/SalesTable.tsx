@@ -20,19 +20,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MoreVertical, Eye, Trash2 } from "lucide-react";
 import Link from "next/link";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { SalesSearchFilterSection } from "./SalesSearchFilterSection";
 import SalesDeleteDialog from "./SalesDeleteDialog";
-
+import { SmartPagination } from "@/components/utils/SmartPagination"; 
 
 interface Sale {
   id: number;
@@ -96,6 +88,16 @@ export default function SalesTable({ sales }: Props) {
     currentPage * itemsPerPage
   );
 
+  // Build pagination data for SmartPagination
+  const paginationData = {
+    count: filteredSales.length,
+    total_pages: totalPages,
+    current_page: currentPage,
+    next: currentPage < totalPages ? (currentPage + 1).toString() : null,
+    previous: currentPage > 1 ? (currentPage - 1).toString() : null,
+    page_size: itemsPerPage,
+  };
+
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
     const params = new URLSearchParams(Array.from(searchParams.entries()));
@@ -126,7 +128,7 @@ export default function SalesTable({ sales }: Props) {
 
       {/* Table */}
       <CardContent>
-        <Table className="w-full text-sm text-gray-700">
+        <Table className="w-full text-sm text-gray-700 dark:text-gray-500 ">
           <TableHeader className="bg-gray-100">
             <TableRow className="bg-gray-150 font-bold text-sm">
               <TableHead>ID</TableHead>
@@ -137,9 +139,7 @@ export default function SalesTable({ sales }: Props) {
               <TableHead>Sales Date</TableHead>
               <TableHead>Due Date</TableHead>
               <TableHead>Total</TableHead>
-              <TableHead>
-                Sub Total
-              </TableHead>
+              <TableHead>Sub Total</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Is Active</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -162,28 +162,28 @@ export default function SalesTable({ sales }: Props) {
                 <TableCell className="font-medium">{s.total_amount}</TableCell>
                 <TableCell className="font-medium">{s.sub_total}</TableCell>
                 <TableCell>
-                  <Badge
-                    className={
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       s.payment_status === "paid"
-                        ? "bg-green-600 text-white"
+                        ? "bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
                         : s.payment_status === "unpaid"
-                        ? "bg-red-500 text-white"
-                        : "bg-yellow-500 text-white"
-                    }
+                        ? "bg-red-100 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700 hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                        : "bg-yellow-100 text-yellow-800 border border-yellow-200 dark:bg-yellow-900 dark:text-yellow-300 dark:border-yellow-700 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors"
+                    }`}
                   >
-                    {s.payment_status}
-                  </Badge>
+                    {s.payment_status.charAt(0).toUpperCase() + s.payment_status.slice(1)}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <Badge
-                    className={
-                      s.is_active
-                        ? "bg-green-500 text-white"
-                        : "bg-red-500 text-white"
-                    }
-                  >
-                    {s.is_active ? "active" : "inactive"}
-                  </Badge>
+                        className={
+                          s.is_active
+                            ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200 transition-colors"
+                            : "bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition-colors"
+                        }
+                      >
+                        {s.is_active ? "Active" : "Inactive"}
+                      </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -224,23 +224,8 @@ export default function SalesTable({ sales }: Props) {
           </TableBody>
         </Table>
 
-        {/* Pagination */}
-        <Pagination className="mt-4 justify-center flex cursor-pointer">
-          <PaginationPrevious onClick={() => goToPage(currentPage - 1)} />
-          <PaginationContent>
-            {Array.from({ length: totalPages }).map((_, i) => {
-              const page = i + 1;
-              return (
-                <PaginationItem key={page} onClick={() => goToPage(page)}>
-                  <PaginationLink isActive={page === currentPage}>
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              );
-            })}
-          </PaginationContent>
-          <PaginationNext onClick={() => goToPage(currentPage + 1)} />
-        </Pagination>
+        {/* Smart Pagination */}
+        <SmartPagination paginationData={paginationData} />
       </CardContent>
 
       {/* Delete Confirmation Dialog */}

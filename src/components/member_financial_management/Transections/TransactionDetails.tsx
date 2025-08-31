@@ -10,21 +10,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { toast } from "react-toastify";
 
-interface TransactionData {
-  id: number;
-  invoice: string;
-  payment_method: string;
-  member: string;
-  created_at: string;
-  updated_at: string;
-  is_active: boolean;
-  amount: string;
-  transaction_type: string;
-  transaction_date: string;
-  status: string;
-  notes: string;
-  adjustment_reason: string;
-}
+
 
 interface TransactionReceiptProps {
   data: any;

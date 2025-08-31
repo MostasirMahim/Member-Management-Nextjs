@@ -84,57 +84,63 @@ export default function AddBrand() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-  addBrand(values); 
-};
-
+    addBrand(values);
+  };
 
   return (
-    <>
-      <div className="flex justify-center items-center bg-gray-100 px-4 py-16 bg-opacity-0">
-        <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg">
-          <h2 className="text-center md:text-2xl font-bold mb-6 text-gray-800">
-            Add Product Brand
-          </h2>
+    <div className="flex justify-center items-center min-h-screen px-4 py-16 bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+      <div className="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 w-full max-w-lg transition-colors duration-300">
+        <h2 className="text-center md:text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 transition-colors duration-300">
+          Add Product Brand
+        </h2>
 
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              onReset={() => form.reset()}
-              className="space-y-6"
-            >
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-base text-gray-700">
-                      Brand Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter category name"
-                        type="text"
-                        id="name"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            onReset={() => form.reset()}
+            className="space-y-6"
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-base text-gray-700 dark:text-gray-200">
+                    Brand Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter brand name"
+                      type="text"
+                      id="name"
+                      {...field}
+                      className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 placeholder-gray-400 dark:placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors duration-300"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-red-500 dark:text-red-400" />
+                </FormItem>
+              )}
+            />
 
-              <div className="flex justify-end gap-3 pt-4">
-                <Button variant="outline" type="reset">
-                  Reset
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  {isPending ? "Submitting..." : "Submit"}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </div>
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                variant="outline"
+                type="reset"
+                className="border-gray-400 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300"
+              >
+                Reset
+              </Button>
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white transition-colors duration-300"
+              >
+                {isPending ? "Submitting..." : "Submit"}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </div>
-    </>
+    </div>
   );
 }

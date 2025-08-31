@@ -36,6 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { SmartPagination } from "../utils/SmartPagination";
 interface Props {
   data: any;
 }
@@ -47,34 +48,6 @@ const EmailComposeTable = ({ data }: Props) => {
   const [deleteComposeId, setDeleteComposeId] = useState(null);
 
   const router = useRouter();
-  const currentPage = paginationData?.current_page || 1;
-  const totalPages = paginationData?.total_pages || 1;
-
-  const goToPage = (page: number) => {
-    if (page !== currentPage) {
-      router.push(`?page=${page}`);
-      router.refresh();
-    }
-  };
-
-  const renderPageLinks = () => {
-    const pagesToShow = [];
-
-    for (let i = 1; i <= totalPages; i++) {
-      pagesToShow.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={() => goToPage(i)}
-            isActive={i === currentPage}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return pagesToShow;
-  };
 
   const handleDelete = async () => {
     try {
@@ -169,41 +142,7 @@ const EmailComposeTable = ({ data }: Props) => {
           ))}
         </TableBody>
       </Table>
-      <div className="my-5 pb-11">
-        {/* -- PAGINATION -- */}
-        <div className=" flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              {/* Previous Button */}
-              {paginationData?.previous && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={(e) => {
-                      e.preventDefault();
-                      goToPage(currentPage - 1);
-                    }}
-                  />
-                </PaginationItem>
-              )}
-
-              {/* Page Numbers */}
-              {renderPageLinks()}
-
-              {/* Next Button */}
-              {paginationData?.next && (
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={(e) => {
-                      e.preventDefault();
-                      goToPage(currentPage + 1);
-                    }}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
-        </div>
-      </div>
+      <SmartPagination paginationData={paginationData} />
     </div>
   );
 };

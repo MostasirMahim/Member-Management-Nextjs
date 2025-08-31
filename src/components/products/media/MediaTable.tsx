@@ -51,11 +51,9 @@ interface Props {
 }
 
 export default function MediaTable({ media }: Props) {
-  console.log("media", media);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  const [selectedMedia, setSelectedMedia] = useState(null);
+  const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
   const pathname = usePathname();
 
   const formatBDTime = (isoString: string) => {
@@ -73,68 +71,84 @@ export default function MediaTable({ media }: Props) {
   return (
     <div>
       <CardHeader className="flex flex-row items-center gap-2">
-        <Layers className=" h-6 w-6 opacity-75" />
-        <CardTitle className="text-xl font-bold opacity-75">
+        <Layers className="h-6 w-6 text-gray-500 dark:text-gray-300" />
+        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100">
           All Products Media
         </CardTitle>
       </CardHeader>
+
       <CardContent>
-        <Table className="w-full text-sm text-gray-700">
-          <TableHeader className="bg-gray-100">
-            <TableRow className="bg-gray-100 font-extrabold text-sm">
-              <TableHead className="w-10 text-gray-600">ID</TableHead>
-              <TableHead className="w-10 text-gray-600">Image</TableHead>
-              <TableHead className="text-gray-600 ">Product Name</TableHead>
-              <TableHead className="text-gray-600">Product SKU</TableHead>
-              <TableHead className="text-gray-600">Is Active</TableHead>
-              <TableHead className="text-gray-600">Created At</TableHead>
-              <TableHead className="text-gray-600">Updated At</TableHead>
-              <TableHead className="text-right text-gray-500">
+        <Table className="w-full text-sm text-gray-700 dark:text-gray-200">
+          <TableHeader className="bg-gray-100 dark:bg-gray-800">
+            <TableRow className="font-extrabold text-sm">
+              <TableHead className="w-10 text-gray-600 dark:text-gray-300">
+                ID
+              </TableHead>
+              <TableHead className="w-10 text-gray-600 dark:text-gray-300">
+                Image
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-300">
+                Product Name
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-300">
+                Product SKU
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-300">
+                Is Active
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-300">
+                Created At
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-300">
+                Updated At
+              </TableHead>
+              <TableHead className="text-right text-gray-500 dark:text-gray-400">
                 Actions
               </TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
-            {media.data?.map((med: any, index: number) => (
+            {media.data?.map((med: Media) => (
               <TableRow
                 key={med.id}
-                className="hover:bg-indigo-50 transition-all duration-200"
+                className="hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200"
               >
-                <TableCell className="font-medium text-gray-700">
+                <TableCell className="font-medium text-gray-700 dark:text-gray-200">
                   {med.id}
                 </TableCell>
-                <TableCell className="font-medium text-gray-900">
+                <TableCell>
                   <Image
                     src={
-                      `http://127.0.0.1:8000/${med.image}` || "/placeholder.png"
+                      med.image
+                        ? `http://127.0.0.1:8000/${med.image}`
+                        : "/placeholder.png"
                     }
                     alt={med.product.name}
-                    width={250}
-                    height={250}
-                    className=" rounded-md object-cover border"
+                    width={80}
+                    height={80}
+                    className="rounded-md object-cover border border-gray-300 dark:border-gray-600"
                   />
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 ms-9">
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
                   {med.product.name}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900">
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
                   {med.product.sku}
                 </TableCell>
                 <TableCell>
                   <Badge
-                    className={
-                      med.is_active
-                        ? "bg-green-500 text-white"
-                        : "bg-red-500 text-white"
-                    }
+                    className={`${
+                      med.is_active ? "bg-green-500" : "bg-red-500"
+                    } text-white`}
                   >
                     {med.is_active ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900">
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
                   {formatBDTime(med.created_at)}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900">
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
                   {formatBDTime(med.updated_at)}
                 </TableCell>
                 <TableCell className="text-right">
@@ -143,24 +157,26 @@ export default function MediaTable({ media }: Props) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-gray-500 hover:text-indigo-600"
+                        className="text-gray-500 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <MoreVertical className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent
+                      align="end"
+                      className="dark:bg-gray-800"
+                    >
                       <DropdownMenuItem
                         onClick={() => {
                           setSelectedMedia(med);
                           setEditModalOpen(true);
                         }}
-                        className="text-indigo-600 hover:bg-indigo-100 cursor-pointer"
+                        className="text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-700 cursor-pointer"
                       >
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
-
                       <DropdownMenuItem
-                        className="text-red-600 hover:bg-red-100 cursor-pointer"
+                        className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-700 cursor-pointer"
                         onClick={() => {
                           setSelectedMedia(med);
                           setDeleteDialogOpen(true);
@@ -182,15 +198,20 @@ export default function MediaTable({ media }: Props) {
         <EditCategoryModal
           open={editModalOpen}
           onClose={() => setEditModalOpen(false)}
-          category={selectedMedia}
+          category={{
+            id: selectedMedia.id,
+            name: selectedMedia.product.name,
+            is_active: selectedMedia.is_active,
+          }}
         />
       )}
-      {/* {Delete Dialog} */}
+
+      {/* Delete Dialog */}
       {selectedMedia && (
         <DeleteCategoryDialog
           open={deleteDialogOpen}
           onClose={() => setDeleteDialogOpen(false)}
-          categoryId={(selectedMedia as any).id}
+          categoryId={selectedMedia.id}
         />
       )}
     </div>

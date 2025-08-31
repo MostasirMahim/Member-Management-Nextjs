@@ -1,20 +1,21 @@
-import ViewAllRestaurant from "@/components/restaurant/ViewAllRestaurant";
+import { FacilitiesTable } from "@/components/Facility/FacilityTable";
 import axiosInstance from "@/lib/axiosInstance";
 import { cookies } from "next/headers";
+import React from "react";
 
 interface Props {
   searchParams: Promise<{ page?: string }>;
 }
 
-async function RestaurantViewPage({ searchParams }: Props) {
+async function ViewAllFacilitesPage({ searchParams }: Props) {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
   let { page } = await searchParams;
   page = page || "1";
-  let data = {};
+  let data: any = {};
   try {
     const response = await axiosInstance.get(
-      `/api/restaurants/v1/restaurants/?page=${page}&page_size=5`,
+      `/api/facility/v1/facilities/?page=${page}&page_size=10`,
       {
         headers: {
           Cookie: `access_token=${authToken}`,
@@ -29,12 +30,11 @@ async function RestaurantViewPage({ searchParams }: Props) {
     const errorMsg = error?.response?.data?.message || "Something went wrong";
     throw new Error(errorMsg);
   }
-
   return (
     <div>
-      <ViewAllRestaurant data={data} />
+      <FacilitiesTable data={data?.data} pagination={data?.pagination} />
     </div>
   );
 }
 
-export default RestaurantViewPage;
+export default ViewAllFacilitesPage;
