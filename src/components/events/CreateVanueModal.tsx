@@ -175,11 +175,15 @@ export function CreateVenueModal() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false), formik.resetForm();
+              }}
             >
               Cancel
             </Button>
-            <Button disabled={isPending} type="submit">{isPending ? "Creating..." : "Create"}</Button>
+            <Button disabled={isPending} type="submit">
+              {isPending ? "Creating..." : "Create"}
+            </Button>
           </div>
         </form>
       </DialogContent>
