@@ -47,11 +47,10 @@ export default function page() {
     },
     onSuccess: async (data) => {
       if (data.code === 200 && data.status === "success") {
-        router.replace("/");
-        router.refresh();
         toast.success("Login successful.");
         await queryClient.invalidateQueries({ queryKey: ["authUser"] });
-        window.location.reload();
+        router.replace("/");
+        router.refresh();
       }
     },
     onError: (error: any) => {
