@@ -609,11 +609,13 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
       const res = await axiosInstance.delete("/api/account/v1/logout/");
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async(data) => {
       if (data.status === "success") {
         router.replace("/login");
         toast.success(data.message || "You have been logged out successfully.");
-        queryClient.invalidateQueries({ queryKey: ["authUser"] });
+        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
+        router.refresh();
+        window.location.reload();
       }
     },
     onError: (error: any) => {

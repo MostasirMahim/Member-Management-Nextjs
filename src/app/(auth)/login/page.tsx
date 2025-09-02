@@ -45,12 +45,13 @@ export default function page() {
       const res = await axiosInstance.post("/api/account/v1/login/", formData);
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.code === 200 && data.status === "success") {
         router.replace("/");
         router.refresh();
-        toast.success(data.message || "You have been logged in successfully.");
-        queryClient.invalidateQueries({ queryKey: ["authUser"] });
+        toast.success("Login successful.");
+        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
+        window.location.reload();
       }
     },
     onError: (error: any) => {
