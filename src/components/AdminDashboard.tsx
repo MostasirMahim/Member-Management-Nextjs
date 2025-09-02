@@ -481,6 +481,23 @@ const navigation_sidebar_links = [
       },
     ],
   },
+  {
+    icon: <Dumbbell className="h-5 w-5" />,
+    label: "Event Management",
+    href: "#",
+    subItems: [
+      {
+        icon: <CirclePlus className="h-4 w-4" />,
+        label: "Events",
+        href: "/events",
+      },
+      {
+        icon: <Eye className="h-4 w-4" />,
+        label: "Venues",
+        href: "/venues",
+      },
+    ],
+  },
 ];
 
 interface SubItem {
