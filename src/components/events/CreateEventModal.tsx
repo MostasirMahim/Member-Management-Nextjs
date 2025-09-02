@@ -229,7 +229,13 @@ export function CreateEventModal() {
               onValueChange={(value) => formik.setFieldValue("venue", Number.parseInt(value))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select venue" />
+                <SelectValue>
+                  {formik.values.venue
+                    ? AllVenues?.data?.find((venue:any) => venue.id === formik.values.venue)?.street_address +
+                      ", " +
+                      AllVenues?.data?.find((venue:any) => venue.id === formik.values.venue)?.city
+                    : "Select Venue"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {AllVenues?.data?.map((venue:any) => (
@@ -260,7 +266,7 @@ export function CreateEventModal() {
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => {setOpen(false), formik.resetForm()}}>
               Cancel
             </Button>
             <Button type="submit">Create Event</Button>
