@@ -15,8 +15,9 @@ export async function middleware(req: NextRequest) {
   let user_permissions: string[] = [];
 
   try {
+    const baseURL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8000";
     const apiRes = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/account/v1/authorization/get_user_all_permissions/`,
+      `${baseURL}/api/account/v1/authorization/get_user_all_permissions/`,
       {
         headers: {
           cookie: `access_token=${token};`,
@@ -35,6 +36,7 @@ export async function middleware(req: NextRequest) {
     const data = json.data[0];
     user_permissions = data.permissions.map((p: any) => p.permission_name);
   } catch (err) {
+    console.log(err); 
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
