@@ -50,7 +50,12 @@ export function CreateVenueModal() {
       console.log("error", error?.response);
       const { message, errors, detail } = error?.response.data;
       if (errors) {
-        const allErrors = Object.values(errors).flat().join("\n");
+         Object.entries(errors).forEach(([field, messages]) => {
+          formik.setFieldError(
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          );
+        });
         toast.error(detail || "An error occurred during Added");
       } else {
         toast.error(message || "An error occurred during Added");

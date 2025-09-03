@@ -1,20 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useFormik } from "formik"
-import * as Yup from "yup"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus } from "lucide-react"
-import { dummyVenues } from "@/lib/dummy"
-import useGetAllVenues from "@/hooks/data/useGetAllVenues"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import axiosInstance from "@/lib/axiosInstance"
-import { toast } from "react-toastify"
+import { useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus } from "lucide-react";
+import useGetAllVenues from "@/hooks/data/useGetAllVenues";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "react-toastify";
 
 const eventSchema = Yup.object({
   title: Yup.string().required("Title is required"),
@@ -22,24 +33,23 @@ const eventSchema = Yup.object({
   start_date: Yup.string().required("Start date is required"),
   end_date: Yup.string().required("End date is required"),
   status: Yup.string().required("Status is required"),
-  registration_deadline: Yup.string().required("Registration deadline is required"),
+  registration_deadline: Yup.string().required(
+    "Registration deadline is required"
+  ),
   event_type: Yup.string().required("Event type is required"),
   reminder_time: Yup.string().required("Reminder time is required"),
   venue: Yup.number().required("Venue is required"),
   organizer: Yup.string().required("Organizer is required"),
-})
+});
 
 export function CreateEventModal() {
-  const {data:AllVenues, isLoading:VenuesLoading} = useGetAllVenues();
-  const [open, setOpen] = useState(false)
+  const { data: AllVenues, isLoading: VenuesLoading } = useGetAllVenues();
+  const [open, setOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const { mutate: createEvents, isPending } = useMutation({
     mutationFn: async (Data: any) => {
-      const res = await axiosInstance.post(
-        "/api/event/v1/events/",
-        Data
-      );
+      const res = await axiosInstance.post("/api/event/v1/events/", Data);
       return res.data;
     },
     onSuccess: async (data) => {
@@ -54,7 +64,12 @@ export function CreateEventModal() {
       console.log("error", error?.response);
       const { message, errors, detail } = error?.response.data;
       if (errors) {
-        const allErrors = Object.values(errors).flat().join("\n");
+        Object.entries(errors).forEach(([field, messages]) => {
+          formik.setFieldError(
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          );
+        });
         toast.error(detail || "An error occurred during Added");
       } else {
         toast.error(message || "An error occurred during Added");
@@ -79,13 +94,13 @@ export function CreateEventModal() {
     onSubmit: (values) => {
       createEvents(values);
     },
-  })
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4" />
           Create Event
         </Button>
       </DialogTrigger>
@@ -121,7 +136,9 @@ export function CreateEventModal() {
               rows={3}
             />
             {formik.touched.description && formik.errors.description && (
-              <p className="text-sm text-destructive">{formik.errors.description}</p>
+              <p className="text-sm text-destructive">
+                {formik.errors.description}
+              </p>
             )}
           </div>
 
@@ -137,7 +154,9 @@ export function CreateEventModal() {
                 onBlur={formik.handleBlur}
               />
               {formik.touched.start_date && formik.errors.start_date && (
-                <p className="text-sm text-destructive">{formik.errors.start_date}</p>
+                <p className="text-sm text-destructive">
+                  {formik.errors.start_date}
+                </p>
               )}
             </div>
 
@@ -152,7 +171,9 @@ export function CreateEventModal() {
                 onBlur={formik.handleBlur}
               />
               {formik.touched.end_date && formik.errors.end_date && (
-                <p className="text-sm text-destructive">{formik.errors.end_date}</p>
+                <p className="text-sm text-destructive">
+                  {formik.errors.end_date}
+                </p>
               )}
             </div>
           </div>
@@ -160,7 +181,10 @@ export function CreateEventModal() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select value={formik.values.status} onValueChange={(value) => formik.setFieldValue("status", value)}>
+              <Select
+                value={formik.values.status}
+                onValueChange={(value) => formik.setFieldValue("status", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -172,7 +196,9 @@ export function CreateEventModal() {
                 </SelectContent>
               </Select>
               {formik.touched.status && formik.errors.status && (
-                <p className="text-sm text-destructive">{formik.errors.status}</p>
+                <p className="text-sm text-destructive">
+                  {formik.errors.status}
+                </p>
               )}
             </div>
 
@@ -187,7 +213,9 @@ export function CreateEventModal() {
                 placeholder="Conference"
               />
               {formik.touched.event_type && formik.errors.event_type && (
-                <p className="text-sm text-destructive">{formik.errors.event_type}</p>
+                <p className="text-sm text-destructive">
+                  {formik.errors.event_type}
+                </p>
               )}
             </div>
           </div>
@@ -202,9 +230,12 @@ export function CreateEventModal() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
-            {formik.touched.registration_deadline && formik.errors.registration_deadline && (
-              <p className="text-sm text-destructive">{formik.errors.registration_deadline}</p>
-            )}
+            {formik.touched.registration_deadline &&
+              formik.errors.registration_deadline && (
+                <p className="text-sm text-destructive">
+                  {formik.errors.registration_deadline}
+                </p>
+              )}
           </div>
 
           <div className="space-y-2">
@@ -218,28 +249,26 @@ export function CreateEventModal() {
               onBlur={formik.handleBlur}
             />
             {formik.touched.reminder_time && formik.errors.reminder_time && (
-              <p className="text-sm text-destructive">{formik.errors.reminder_time}</p>
+              <p className="text-sm text-destructive">
+                {formik.errors.reminder_time}
+              </p>
             )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="venue">Venue</Label>
             <Select
-              value={formik.values.venue}
-              onValueChange={(value) => formik.setFieldValue("venue", Number.parseInt(value))}
+              value={formik.values.venue ? String(formik.values.venue) : ""}
+              onValueChange={(value) =>
+                formik.setFieldValue("venue", Number(value))
+              }
             >
               <SelectTrigger>
-                <SelectValue>
-                  {formik.values.venue
-                    ? AllVenues?.data?.find((venue:any) => venue.id === formik.values.venue)?.street_address +
-                      ", " +
-                      AllVenues?.data?.find((venue:any) => venue.id === formik.values.venue)?.city
-                    : "Select Venue"}
-                </SelectValue>
+                <SelectValue placeholder="Select venue" />
               </SelectTrigger>
               <SelectContent>
-                {AllVenues?.data?.map((venue:any) => (
-                  <SelectItem key={venue.id} value={venue.id.toString()}>
+                {AllVenues?.data?.map((venue: any) => (
+                  <SelectItem key={venue.id} value={String(venue.id)}>
                     {venue.street_address}, {venue.city}
                   </SelectItem>
                 ))}
@@ -261,18 +290,28 @@ export function CreateEventModal() {
               placeholder="GM0001-PU"
             />
             {formik.touched.organizer && formik.errors.organizer && (
-              <p className="text-sm text-destructive">{formik.errors.organizer}</p>
+              <p className="text-sm text-destructive">
+                {formik.errors.organizer}
+              </p>
             )}
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => {setOpen(false), formik.resetForm()}}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setOpen(false), formik.resetForm();
+              }}
+            >
               Cancel
             </Button>
-            <Button type="submit">Create Event</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Creating..." : "Create"}
+            </Button>
           </div>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

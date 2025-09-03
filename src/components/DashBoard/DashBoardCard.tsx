@@ -36,7 +36,7 @@ async function DashBoardCard({ searchParams }: Props) {
     responseData = data;
   } catch (error: any) {
     console.log("Error occurred");
-    console.log(error.response.data);
+    console.log(error?.response?.data);
     const errorMsg = error?.response?.data?.message || "Something went wrong";
     throw new Error(errorMsg);
   }
