@@ -8,8 +8,6 @@ import {
   LayoutDashboard,
   Users,
   FileText,
-  FolderOpen,
-  Clock,
   LogOut,
   Menu,
   Bell,
@@ -82,7 +80,6 @@ import {
 } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { currentUser } from "@/lib/dummy";
 import ModeToggle from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 import { LoadingDots } from "./ui/loading";
@@ -496,6 +493,16 @@ const navigation_sidebar_links = [
         label: "Venues",
         href: "/venues",
       },
+      {
+        icon: <Eye className="h-4 w-4" />,
+        label: "Tickets",
+        href: "/tickets",
+      },
+      {
+        icon: <Eye className="h-4 w-4" />,
+        label: "Fees",
+        href: "/fees",
+      },
     ],
   },
 ];
@@ -647,8 +654,6 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
       }
     },
   });
-
-  const USER = currentUser;
 
   useEffect(() => {
     setIsMobileOpen(false);
