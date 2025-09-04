@@ -511,7 +511,7 @@ const navigation_sidebar_links = [
       {
         icon: <ImageIcon className="h-4 w-4" />,
         label: "Media",
-        href: "/media",
+        href: "/events/media",
       },
     ],
   },
