@@ -16,4 +16,5 @@ export const protected_routes: {
   { path: "/promo_codes", permission_name: "promo_code_management" },
   { path: "/mfm", permission_name: "member_financial_management" },
   { path: "/upload/sales", permission_name: "member_financial_management" },
+  { path: "/events", permission_name: null },
 ];
