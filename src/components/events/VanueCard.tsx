@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
-import type { Venue } from "@/lib/dummy";
+import { Venue } from "@/types";
 
 interface VenueCardProps {
   venue: Venue;

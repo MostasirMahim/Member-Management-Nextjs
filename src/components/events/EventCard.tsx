@@ -2,8 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, User, Clock } from "lucide-react";
-import type { Event } from "@/lib/dummy";
+
 import Link from "next/link";
+import { Event } from "@/types";
 
 interface EventCardProps {
   event: Event;
@@ -79,7 +80,7 @@ export function EventCard({ event }: EventCardProps) {
         <div className="flex items-center justify-between pt-2">
           <Badge variant="outline">{event.event_type}</Badge>
           <Link href={`/events/${event.id}`}>
-            <Button variant="outline" size="sm">
+            <Button variant="default" size="sm">
               View Details
             </Button>
           </Link>
