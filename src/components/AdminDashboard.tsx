@@ -55,6 +55,7 @@ import {
   TableOfContents,
   Ticket,
   MapPinHouse,
+  ImageIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -506,6 +507,11 @@ const navigation_sidebar_links = [
         icon: <HandCoins className="h-4 w-4" />,
         label: "Fees",
         href: "/events/fees",
+      },
+      {
+        icon: <ImageIcon className="h-4 w-4" />,
+        label: "Media",
+        href: "/media",
       },
     ],
   },
