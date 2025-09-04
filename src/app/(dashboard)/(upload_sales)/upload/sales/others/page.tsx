@@ -2,6 +2,7 @@ import OthersUploadForm from "@/components/upload/OthersUploadForm";
 import axiosInstance from "@/lib/axiosInstance";
 import { cookies } from "next/headers";
 import React from "react";
+import { redirect } from "next/navigation";
 
 interface Props {
   searchParams: Promise<{ page?: string }>;
@@ -34,6 +35,10 @@ async function LoungeSalesUploadPage({ searchParams }: Props) {
   } catch (error: any) {
     console.log("Error occurred");
     console.log(error.response?.data);
+    console.log(error.response.status);
+    if (error?.response?.status == 403) {
+      redirect("/unauthorized");
+    }
     const errorMsg = error?.response?.data?.message || "Something went wrong";
     throw new Error(errorMsg);
   }
