@@ -149,7 +149,7 @@ const navigation_sidebar_links = [
   {
     icon: <Logs className="h-5 w-5" />,
     label: "My activity logs",
-    href: "/activity_logs/my",
+    href: "/my-activity-logs",
   },
   ,
   {

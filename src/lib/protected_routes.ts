@@ -10,7 +10,6 @@ export const protected_routes: {
   { path: "/choices", permission_name: null },
   { path: "/registration/email", permission_name: "employee_onboarding" },
   { path: "/activity_logs", permission_name: "activity_log_management" },
-  { path: "/activity_logs/my", permission_name: null },
   { path: "/emails", permission_name: "bulk_emails_management" },
   { path: "/restaurants", permission_name: "restaurant_management" },
   { path: "/products", permission_name: "product_management" },
