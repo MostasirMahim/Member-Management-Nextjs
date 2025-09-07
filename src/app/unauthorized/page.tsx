@@ -87,7 +87,7 @@ export default function UnauthorizedPage() {
             >
               <Link href="/">
                 <Home className="w-5 h-5 mr-2" />
-                Go to Homepage
+                Go to Dashboard
               </Link>
             </Button>
           </motion.div>

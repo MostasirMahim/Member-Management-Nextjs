@@ -21,7 +21,6 @@ import {
   Droplets,
   Building,
 } from "lucide-react";
-import Image from "next/image";
 import { cookies } from "next/headers";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "react-toastify";
@@ -112,7 +111,12 @@ async function MemberDetails({ id }: { id: string }) {
                 <div className="relative">
                   <Avatar className="h-32 w-32 md:h-40 md:w-40 border-4 border-white/20 shadow-2xl transition-transform duration-300 group-hover:scale-105">
                     <AvatarImage
-                      src={"/assets/logo.png"}
+                      src={
+                        `${
+                          process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+                          "http://localhost:8000"
+                        }${member_info?.profile_photo}` || "/assets/logo.png"
+                      }
                       alt={`${member_info?.first_name} ${member_info?.last_name}`}
                       className="object-cover"
                     />
