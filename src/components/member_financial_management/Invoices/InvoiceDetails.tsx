@@ -10,6 +10,7 @@ import { DollarSignIcon, FileText, Printer } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 interface InvoiceItem {
   products?: { name: string; sku: string }[];
@@ -433,10 +434,15 @@ export default function InvoiceComponent({ data }: Props2) {
               <Printer className="h-4 w-4" />
               Print
             </Button>
-            <Button variant="outline" size="sm" className="gap-1">
-              <DollarSignIcon className="h-4 w-4" />
-              Pay invoice
-            </Button>
+
+              <Link
+                href={`/mfm/payment_invoice?id=${data.id}`}
+              >
+                <Button  size="sm" className="gap-1">
+                  <DollarSignIcon />
+                  Pay Invoice
+                </Button>
+              </Link>
           </div>
         </CardContent>
       </Card>
