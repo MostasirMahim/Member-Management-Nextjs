@@ -2,6 +2,7 @@ import FacilityCart from "@/components/Facility/FacilityCart";
 import ViewProductCart from "@/components/products/buy/ViewProductCart";
 import axiosInstance from "@/lib/axiosInstance";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function MemberIDs() {
   const cookieStore = cookies();
@@ -19,7 +20,11 @@ export default async function MemberIDs() {
       }
     );
     member_ids = data.data;
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error?.response?.status);
+    if (error?.response?.status == 403) {
+      redirect("/unauthorized");
+    }
     console.error("Failed to fetch products", error);
   }
 

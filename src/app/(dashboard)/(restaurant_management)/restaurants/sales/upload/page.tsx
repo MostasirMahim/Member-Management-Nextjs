@@ -2,6 +2,7 @@ import RestaurantSalesUploadForm from "@/components/restaurant/RestaurantSalesUp
 import axiosInstance from "@/lib/axiosInstance";
 import { cookies } from "next/headers";
 import React from "react";
+import { redirect } from "next/navigation";
 
 interface Props {
   searchParams: Promise<{ page?: string }>;
@@ -40,7 +41,12 @@ async function RestaurantSalesUploadPage({ searchParams }: Props) {
     restaurantData = restaurantRes.data;
   } catch (error: any) {
     console.log("Error occurred");
-    console.log(error.response?.data);
+    console.log(error?.response?.data);
+    console.log(error?.response?.status);
+    if (error?.response?.status == 403) {
+      redirect("/unauthorized");
+    }
+
     const errorMsg = error?.response?.data?.message || "Something went wrong";
     throw new Error(errorMsg);
   }

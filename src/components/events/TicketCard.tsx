@@ -65,7 +65,7 @@ export function TicketCard({ ticket }: TicketCardProps) {
       </CardContent>
 
       <CardFooter className="pt-4">
-        <Link href={`/tickets/${ticket.id}`} className="w-full">
+        <Link href={`/events/tickets/${ticket.id}`} className="w-full">
           <Button variant="default" className="w-full">
             <Eye className="h-4 w-4 mr-2" />
             View Details

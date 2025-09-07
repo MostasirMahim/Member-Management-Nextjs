@@ -51,6 +51,11 @@ import {
   CircleUser,
   History,
   Dumbbell,
+  Component,
+  TableOfContents,
+  Ticket,
+  MapPinHouse,
+  ImageIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -149,7 +154,7 @@ const navigation_sidebar_links = [
   {
     icon: <Logs className="h-5 w-5" />,
     label: "My activity logs",
-    href: "/activity_logs/my",
+    href: "/my-activity-logs",
   },
   ,
   {
@@ -479,29 +484,34 @@ const navigation_sidebar_links = [
     ],
   },
   {
-    icon: <Dumbbell className="h-5 w-5" />,
+    icon: <Component className="h-5 w-5" />,
     label: "Event Management",
     href: "#",
     subItems: [
       {
-        icon: <CirclePlus className="h-4 w-4" />,
+        icon: <TableOfContents className="h-4 w-4" />,
         label: "Events",
         href: "/events",
       },
       {
-        icon: <Eye className="h-4 w-4" />,
+        icon: <MapPinHouse className="h-4 w-4" />,
         label: "Venues",
-        href: "/venues",
+        href: "/events/venues",
       },
       {
-        icon: <Eye className="h-4 w-4" />,
+        icon: <Ticket className="h-4 w-4" />,
         label: "Tickets",
-        href: "/tickets",
+        href: "/events/tickets",
       },
       {
-        icon: <Eye className="h-4 w-4" />,
+        icon: <HandCoins className="h-4 w-4" />,
         label: "Fees",
-        href: "/fees",
+        href: "/events/fees",
+      },
+      {
+        icon: <ImageIcon className="h-4 w-4" />,
+        label: "Media",
+        href: "/events/media",
       },
     ],
   },
@@ -546,7 +556,7 @@ const NavItem = ({
   const [isOpen, setIsOpen] = useState(isParentActive);
 
   const paddingLeft = level * 16 + 12;
-  const buttonWidth = level > 0 ? "w-full" : "w-[98%]";
+  const buttonWidth = level > 0 ? "w-full" : "w-[90%]";
 
   if (subItems && subItems?.length > 0) {
     return (
@@ -557,7 +567,7 @@ const NavItem = ({
             className={cn(
               `${buttonWidth} hover:translate-y-1 transition-transform duration-300 ease-in-out justify-between gap-1 h-10 px-3`,
               isParentActive &&
-                "bg-primary hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-white"
+                "bg-primary hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-white my-2"
             )}
             style={{ paddingLeft: `${paddingLeft}px` }}
           >
@@ -599,13 +609,13 @@ const NavItem = ({
   }
 
   return (
-    <Link href={href}>
+    <Link href={href} scroll={false}>
       <Button
         variant="ghost"
         className={cn(
-          `${buttonWidth} hover:translate-y-1 transition-transform duration-300 ease-in-out justify-start gap-3 h-10 px-3`,
+          `${buttonWidth} hover:translate-y-1 transition-transform duration-300 ease-in-out justify-start gap-3 h-10 px-3 w-[90%]`,
           active &&
-            "bg-primary hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-white"
+            "bg-blue-50 hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-primary my-1"
         )}
         style={{ paddingLeft: `${paddingLeft}px` }}
       >
@@ -628,6 +638,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   const [navigation, setNavigation] = useState<any>([]);
   const router = useRouter();
   const queryClient = useQueryClient();
+
   const { mutate: logOutFunc, isPending } = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.delete("/api/account/v1/logout/");
@@ -725,7 +736,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <ScrollArea className="flex-1  overflow-y-auto no-scrollbar">
+      <ScrollArea className="flex-1  overflow-y-auto no-scrollbar border-b-2 mb-5">
         <nav className="space-y-1 px-2">
           {navigation.map((item: any, index: number) => (
             <NavItem

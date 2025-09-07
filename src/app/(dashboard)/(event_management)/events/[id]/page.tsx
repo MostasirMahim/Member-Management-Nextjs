@@ -1,9 +1,18 @@
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, User, Clock, AlertCircle, Tag } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  User,
+  Clock,
+  AlertCircle,
+  Tag,
+  Image,
+} from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { cookies } from "next/headers";
+import MasonryGrid from "@/components/events/MasonryGrid";
 
 interface EventDetailsPageProps {
   params: {
@@ -43,7 +52,6 @@ export default async function EventDetailsPage({
       throw new Error(error.message || "Failed to fetch invoice");
     }
   }
-
   if (!event) {
     notFound();
   }
@@ -229,6 +237,19 @@ export default async function EventDetailsPage({
               </CardContent>
             </Card>
           </div>
+        </div>
+        <div className="space-y-6 py-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Image className="h-5 w-5" />
+                Event Media
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MasonryGrid items={event?.media} />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
