@@ -41,19 +41,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { LoadingDots, LoadingPage } from "@/components/ui/loading";
+import { LoadingDots } from "@/components/ui/loading";
 import useGetAllMembers, {
   exportMembersExcel,
 } from "@/hooks/data/useGetAllMembers";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "../ui/pagination";
 import { useAddMemberStore } from "@/store/store";
 
 import {
@@ -70,6 +62,7 @@ import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "react-toastify";
 import CustomAlertDialog from "../ui/custom-alert";
+import { SmartPagination } from "../utils/SmartPagination";
 
 interface FilterState {
   date_of_birth?: Date;
@@ -102,7 +95,7 @@ const initialFilters: FilterState = {
   member_ID: "",
   name: "",
 };
-function AllMembers() {
+function PendingMembers() {
   const [searchQuery, setSearchQuery] = useState("");
   const { setMemberID, setIsUpdateMode } = useAddMemberStore();
   const searchParams = useSearchParams();
@@ -123,7 +116,6 @@ function AllMembers() {
   } = useGetAllMembers(page, filters, routes);
   const allMembers = allMembersReq?.data;
   const paginationData = allMembersReq?.pagination;
-  const { current_page, total_pages } = paginationData || {};
   const { data: choiceSections } = useGetAllChoice();
 
   const {
@@ -214,30 +206,7 @@ function AllMembers() {
   const handleIdTransfer = (member_ID: string) => {
     router.push(`/member/transferID/${member_ID}`);
   };
-  const goToPage = (page: number) => {
-    if (page !== current_page) {
-      router.push(`?page=${page}`);
-      router.refresh();
-    }
-  };
-  const renderPageLinks = () => {
-    const pagesToShow = [];
 
-    for (let i = 1; i <= total_pages; i++) {
-      pagesToShow.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={() => goToPage(i)}
-            isActive={i === current_page}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return pagesToShow;
-  };
   if (user_isLoading) return <LoadingDots />;
   return (
     <div className="space-y-6 ">
@@ -629,7 +598,9 @@ function AllMembers() {
                         variant="outline"
                         className="gap-2 bg-transparent text-green-600"
                       >
-                        <RefreshCcwIcon className={`h-4 w-4 ${isFetching && "animate-spin"}`} />
+                        <RefreshCcwIcon
+                          className={`h-4 w-4 ${isFetching && "animate-spin"}`}
+                        />
                         {isFetching ? "Refreshing.." : "Refresh"}
                       </Button>
                     </div>
@@ -737,37 +708,8 @@ function AllMembers() {
       </div>
 
       {/* -- PAGINATION -- */}
-      <div className=" flex justify-center">
-        <Pagination>
-          <PaginationContent>
-            {/* Previous Button */}
-            {paginationData?.previous && (
-              <PaginationItem className="cursor-pointer">
-                <PaginationPrevious
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToPage(current_page - 1);
-                  }}
-                />
-              </PaginationItem>
-            )}
-
-            {/* Page Numbers */}
-            {renderPageLinks()}
-
-            {/* Next Button */}
-            {paginationData?.next && (
-              <PaginationItem>
-                <PaginationNext
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToPage(current_page + 1);
-                  }}
-                />
-              </PaginationItem>
-            )}
-          </PaginationContent>
-        </Pagination>
+      <div className="flex justify-center">
+        <SmartPagination paginationData={paginationData} />
       </div>
       <CustomAlertDialog
         open={deleteDialogOpen}
@@ -784,4 +726,4 @@ function AllMembers() {
   );
 }
 
-export default AllMembers;
+export default PendingMembers;

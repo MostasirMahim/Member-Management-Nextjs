@@ -46,14 +46,6 @@ import useGetAllMembers, {
   exportMembersExcel,
 } from "@/hooks/data/useGetAllMembers";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "../ui/pagination";
 import { useAddMemberStore } from "@/store/store";
 
 import {
@@ -70,6 +62,7 @@ import CustomAlertDialog from "../ui/custom-alert";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "react-toastify";
+import { SmartPagination } from "../utils/SmartPagination";
 
 interface FilterState {
   date_of_birth?: Date;
@@ -124,7 +117,6 @@ function AllMembers() {
   } = useGetAllMembers(page, filters, routes);
   const allMembers = allMembersReq?.data;
   const paginationData = allMembersReq?.pagination;
-  const { current_page, total_pages } = paginationData || {};
   const { data: choiceSections } = useGetAllChoice();
 
   const {
@@ -198,35 +190,11 @@ function AllMembers() {
     router.push(`/member/view/${member_ID}`);
   };
 
-  const goToPage = (page: number) => {
-    if (page !== current_page) {
-      router.push(`?page=${page}`);
-      router.refresh();
-    }
-  };
   const handleExport = () => {
     exportMembersExcel(page, filters);
     refetch();
   };
 
-  const renderPageLinks = () => {
-    const pagesToShow = [];
-
-    for (let i = 1; i <= total_pages; i++) {
-      pagesToShow.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={() => goToPage(i)}
-            isActive={i === current_page}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return pagesToShow;
-  };
   const handleUpdate = (member_ID: string) => {
     setMemberID(member_ID);
     setIsUpdateMode(true);
@@ -622,7 +590,9 @@ function AllMembers() {
                     <div className="flex flex-col items-center gap-4">
                       <Users className="h-12 w-12 text-muted-foreground" />
                       <div className="space-y-2">
-                        <h3 className="text-lg font-medium">No Members Found</h3>
+                        <h3 className="text-lg font-medium">
+                          No Members Found
+                        </h3>
                         <p className="text-sm text-muted-foreground">
                           No members match your current filter criteria. Try
                           adjusting your filters or reset to see all members.
@@ -742,36 +712,7 @@ function AllMembers() {
 
       {/* -- PAGINATION -- */}
       <div className=" flex justify-center">
-        <Pagination>
-          <PaginationContent>
-            {/* Previous Button */}
-            {paginationData?.previous && (
-              <PaginationItem className="cursor-pointer">
-                <PaginationPrevious
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToPage(current_page - 1);
-                  }}
-                />
-              </PaginationItem>
-            )}
-
-            {/* Page Numbers */}
-            {renderPageLinks()}
-
-            {/* Next Button */}
-            {paginationData?.next && (
-              <PaginationItem>
-                <PaginationNext
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToPage(current_page + 1);
-                  }}
-                />
-              </PaginationItem>
-            )}
-          </PaginationContent>
-        </Pagination>
+        <SmartPagination paginationData={paginationData} />
       </div>
 
       <CustomAlertDialog

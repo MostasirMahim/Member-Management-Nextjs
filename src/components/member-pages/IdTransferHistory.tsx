@@ -5,7 +5,6 @@ import {
   Filter,
   Calendar,
   HistoryIcon,
-  Train,
   TrainTrackIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,16 +26,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { LoadingDots, LoadingPage } from "@/components/ui/loading";
-import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "../ui/pagination";
+import { LoadingDots } from "@/components/ui/loading";
+import { useSearchParams } from "next/navigation";
 import {
   Popover,
   PopoverContent,
@@ -48,6 +39,7 @@ import { Card } from "../ui/card";
 import { getNames } from "country-list";
 import useGetTransferHistory from "@/hooks/data/useGetTransferHistory";
 import { formatPostDate } from "@/lib/date_modify";
+import { SmartPagination } from "../utils/SmartPagination";
 
 interface FilterState {
   start_date?: Date;
@@ -74,7 +66,6 @@ function IdTransferHistory() {
   } = useGetTransferHistory(page, filters);
   const allMembers = allMembersReq?.data;
   const paginationData = allMembersReq?.pagination;
-  const { current_page, total_pages } = paginationData || {};
 
   const updateFilter = (
     key: keyof FilterState,
@@ -103,32 +94,7 @@ function IdTransferHistory() {
         user.stored_member_id.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesSearch;
     }) || [];
-  const router = useRouter();
 
-  const goToPage = (page: number) => {
-    if (page !== current_page) {
-      router.push(`?page=${page}`);
-      router.refresh();
-    }
-  };
-  const renderPageLinks = () => {
-    const pagesToShow = [];
-
-    for (let i = 1; i <= total_pages; i++) {
-      pagesToShow.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={() => goToPage(i)}
-            isActive={i === current_page}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return pagesToShow;
-  };
   if (user_isLoading) return <LoadingDots />;
   return (
     <div className="space-y-6 ">
@@ -392,36 +358,7 @@ function IdTransferHistory() {
 
       {/* -- PAGINATION -- */}
       <div className=" flex justify-center">
-        <Pagination>
-          <PaginationContent>
-            {/* Previous Button */}
-            {paginationData?.previous && (
-              <PaginationItem className="cursor-pointer">
-                <PaginationPrevious
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToPage(current_page - 1);
-                  }}
-                />
-              </PaginationItem>
-            )}
-
-            {/* Page Numbers */}
-            {renderPageLinks()}
-
-            {/* Next Button */}
-            {paginationData?.next && (
-              <PaginationItem>
-                <PaginationNext
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToPage(current_page + 1);
-                  }}
-                />
-              </PaginationItem>
-            )}
-          </PaginationContent>
-        </Pagination>
+        <SmartPagination paginationData={paginationData} />
       </div>
     </div>
   );

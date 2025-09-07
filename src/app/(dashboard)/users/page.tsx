@@ -13,25 +13,16 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { LoadingDots } from "@/components/ui/loading";
-import { useRouter } from "next/navigation";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Card } from "@/components/ui/card";
 import useGetAllUsers from "@/hooks/data/useGetAllUsers";
 import { formatPostDate } from "@/lib/date_modify";
+import { SmartPagination } from "@/components/utils/SmartPagination";
 
 function page() {
   const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter();
   const { data, isLoading: isLoadinAllUsers } = useGetAllUsers();
   const paginationData = data?.pagination;
-  const { current_page, total_pages } = paginationData || {};
+
 
   const filteredUsers =
     data?.data?.filter((user: any) => {
@@ -46,31 +37,9 @@ function page() {
     console.log("Member ID clicked:", member_ID);
   };
 
-  const goToPage = (page: number) => {
-    if (page !== current_page) {
-      router.push(`?page=${page}`);
-      router.refresh();
-    }
-  };
 
-  const renderPageLinks = () => {
-    const pagesToShow = [];
 
-    for (let i = 1; i <= total_pages; i++) {
-      pagesToShow.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={() => goToPage(i)}
-            isActive={i === current_page}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
 
-    return pagesToShow;
-  };
 
   if (isLoadinAllUsers) return <LoadingDots />;
   return (
@@ -229,36 +198,7 @@ function page() {
 
       {/* -- PAGINATION -- */}
       <div className=" flex justify-center">
-        <Pagination>
-          <PaginationContent>
-            {/* Previous Button */}
-            {paginationData?.previous && (
-              <PaginationItem className="cursor-pointer">
-                <PaginationPrevious
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToPage(current_page - 1);
-                  }}
-                />
-              </PaginationItem>
-            )}
-
-            {/* Page Numbers */}
-            {renderPageLinks()}
-
-            {/* Next Button */}
-            {paginationData?.next && (
-              <PaginationItem>
-                <PaginationNext
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToPage(current_page + 1);
-                  }}
-                />
-              </PaginationItem>
-            )}
-          </PaginationContent>
-        </Pagination>
+         <SmartPagination paginationData={paginationData} />
       </div>
     </div>
   );

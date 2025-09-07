@@ -117,7 +117,7 @@ export function SmartPagination({
   };
 
   return (
-    <div className={`my-5 pb-11 ${className || ""}`}>
+    <div className={`my-2 ${className || ""}`}>
       <div className="flex justify-center">
         <Pagination>
           <PaginationContent>
