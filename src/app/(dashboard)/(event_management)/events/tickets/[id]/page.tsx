@@ -191,7 +191,7 @@ export default function TicketDetailsPage({
                 </div>
 
                 <Link
-                  href={`/tickets/${ticket?.id}/purchase`}
+                  href={`/events/tickets/${ticket?.id}/purchase`}
                   className="w-full block"
                 >
                   <Button

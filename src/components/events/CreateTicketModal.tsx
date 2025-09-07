@@ -256,19 +256,13 @@ export function CreateTicketModal() {
           <div className="space-y-2">
             <Label htmlFor="event">Event</Label>
             <Select
-              value={formik.values.event}
+              value={formik.values.event ? String(formik.values.event) : ""}
               onValueChange={(value) =>
                 formik.setFieldValue("event", Number(value))
               }
             >
               <SelectTrigger>
-                <SelectValue>
-                  {formik.values.event
-                    ? AllEvents?.data?.find(
-                        (event: any) => event.id === formik.values.event
-                      )?.title
-                    : "Select an event"}
-                </SelectValue>
+                <SelectValue placeholder="Select an event" />
               </SelectTrigger>
               <SelectContent>
                 {AllEvents?.data?.map((event: any) => (
