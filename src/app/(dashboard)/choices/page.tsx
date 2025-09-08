@@ -18,9 +18,10 @@ import {
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
+
 import useGetChoices from "@/hooks/data/useGetChoices";
 import { LoadingDots } from "@/components/ui/loading";
+import { toast } from "react-toastify";
 
 interface ChoiceItem {
   id: string;
@@ -77,24 +78,16 @@ export default function ManageChoicesPage() {
     mutationFn: async ({ slug, formData }: { slug: Slug; formData: any }) => {
       const endpoint = getApiEndpoint(slug);
       if (!endpoint) {
-        toast({
-          title: "Endpoint Not Found",
-          description: "Technical Mistake",
-          variant: "destructive",
-        });
+        toast.error("Endpoint not found");
         return;
       }
       const res = await axiosInstance.post(`${endpoint}`, formData);
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async(data) => {
       if (data?.status === "success") {
-        queryClient.invalidateQueries({ queryKey: ["getChoices"] });
-        toast({
-          title: data?.details || "Choice Added successfully",
-          description: data?.message || "Choice has been successfully added.",
-          variant: "default",
-        });
+        await queryClient.invalidateQueries({ queryKey: ["getChoices"] });
+        toast.success("Choice Added Successfully");
       }
     },
     onError: (error: any) => {
@@ -102,22 +95,14 @@ export default function ManageChoicesPage() {
       const { message, errors, detail } = error?.response.data;
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Choice Added Failed",
-          description: allErrors,
-          variant: "destructive",
-        });
+        toast.error(allErrors || "An error occurred during Choice Added");
       } else {
-        toast({
-          title: detail || "Choice Added Failed",
-          description: message || "An error occurred during Choice Added",
-          variant: "destructive",
-        });
+        toast.error(message || "An error occurred during Choice Added");
       }
     },
   });
 
-  //To Identify Institutions Extra Code Field
+
   const FORMIK_COUNT: hasCode[] = [
     { hasCode: false },
     { hasCode: false },

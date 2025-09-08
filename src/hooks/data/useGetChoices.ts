@@ -1,7 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "../use-toast";
 import dataToChoiceSections from "@/lib/choice_transformer";
+import { toast } from "react-toastify";
 
 function useGetChoices() {
   return useQuery({
@@ -12,7 +12,7 @@ function useGetChoices() {
           "/api/core/v1/all_choices/?cache=false"
         );
         if (res?.data?.status == "success") {
-            const result = dataToChoiceSections(res.data.data)
+          const result = dataToChoiceSections(res.data.data);
           return result;
         } else {
           console.error("Failed to fetch Choices:", res.data.message);
@@ -20,12 +20,7 @@ function useGetChoices() {
         }
       } catch (error: any) {
         console.error("Error fetching Choices stats:", error);
-        toast({
-          title: "Error",
-          description:
-            error?.response?.data?.message || "Failed to fetch Choices",
-          variant: "destructive",
-        });
+        toast.error(error?.response?.data?.message || "Error fetching Choices");
         return [];
       }
     },
