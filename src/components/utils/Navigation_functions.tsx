@@ -427,7 +427,7 @@ export const navigationPermissions: Record<string, string | null> = {
 
   // MemberSphere - We can permission the entire section or individual sub-items.
   MemberSphere: "member_management", // Example: A general permission for the
-  "Add Choices": null, // Define permission if needed
+  "Add Choices": "member_management", // Define permission if needed
   "All Users": "view_all_users",
   "All Groups": "group_permission_management",
   Onboarding: "employee_onboarding",
