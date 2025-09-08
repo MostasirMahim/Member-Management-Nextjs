@@ -132,6 +132,8 @@ export default function EmailDetailsStep() {
       if (data?.status === "success") {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Email successfully updated.");
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
     onError: (error: any) => {
@@ -237,7 +239,7 @@ export default function EmailDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-        formik.resetForm();
+    formik.resetForm();
   };
 
   if (isLoading || isLoadingMember) {

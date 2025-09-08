@@ -89,8 +89,6 @@ export default function MembershipDetailsStep() {
   });
 
   const { member_info: memberData } = data ?? {};
-
-  console.log("memberData", memberData);
   const {
     membership_type,
     institute_name,
@@ -203,8 +201,12 @@ export default function MembershipDetailsStep() {
       if (data?.status === "success") {
         const routes = 3;
         const page = 2;
-        await querClient.invalidateQueries({ queryKey: ["getAllMembers", page, routes] });
+        await querClient.invalidateQueries({
+          queryKey: ["getAllMembers", page, routes],
+        });
         toast.success(data.message || "Membership Updated Successfully.");
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
     onError: (error: any) => {

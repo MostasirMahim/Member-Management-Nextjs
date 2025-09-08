@@ -95,6 +95,8 @@ export default function AddressDetailsStep() {
       if (data?.status === "success") {
         toast.success(data.message || "Address has been successfully updated.");
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
     onError: handleError,
@@ -199,7 +201,7 @@ export default function AddressDetailsStep() {
 
   const handleSkip = () => nextStep();
   const handleSaveAndExit = () => {
-        formik.resetForm();
+    formik.resetForm();
   };
 
   return (

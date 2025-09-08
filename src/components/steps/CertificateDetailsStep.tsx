@@ -36,15 +36,8 @@ export default function CertificateDetailsStep() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const {
-    currentStep,
-    setCurrentStep,
-    nextStep,
-    markStepCompleted,
-    memberID,
-    setMemberID,
-    isUpdateMode,
-  } = useAddMemberStore();
+  const { currentStep, nextStep, markStepCompleted, memberID, isUpdateMode } =
+    useAddMemberStore();
 
   const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
     enabled: isUpdateMode && !!memberID,
@@ -206,6 +199,8 @@ export default function CertificateDetailsStep() {
       if (Array.isArray(dataArray) && dataArray.length > 0) {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success("All Certificate updated.");
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
 
@@ -359,7 +354,9 @@ export default function CertificateDetailsStep() {
                     </Label>
                     <p className="text-sm text-gray-500 pr-5">
                       {isUpdateMode
-                        ? memberData[index]?.certificate_document?.split("/").pop()
+                        ? memberData[index]?.certificate_document
+                            ?.split("/")
+                            .pop()
                         : null}
                     </p>
                   </div>

@@ -62,11 +62,9 @@ export default function SpouseDetailsStep() {
 
   const {
     currentStep,
-    setCurrentStep,
     nextStep,
     markStepCompleted,
     memberID,
-    setMemberID,
     isUpdateMode,
   } = useAddMemberStore();
 
@@ -143,6 +141,8 @@ export default function SpouseDetailsStep() {
       if (data?.status === "success") {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Spouse has been successfully updated.");
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
     onError: (error: any) => {
@@ -208,7 +208,6 @@ export default function SpouseDetailsStep() {
     formik.setFieldValue(field, value);
   };
 
-  //Button Functions
   const handleSkip = () => {
     nextStep();
   };
@@ -216,7 +215,7 @@ export default function SpouseDetailsStep() {
   const handleSaveAndExit = () => {
     formik.resetForm();
   };
-  if(isLoading || isLoadingMember) return <LoadingCard />
+  if (isLoading || isLoadingMember) return <LoadingCard />;
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <div className="flex flex-col md:flex-row gap-6">

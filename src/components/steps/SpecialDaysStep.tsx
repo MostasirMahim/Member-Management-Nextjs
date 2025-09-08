@@ -41,18 +41,10 @@ const initialValues = {
 };
 
 export default function SpecialDaysStep() {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
-  const {
-    currentStep,
-    setCurrentStep,
-    nextStep,
-    markStepCompleted,
-    memberID,
-    setMemberID,
-    isUpdateMode,
-  } = useAddMemberStore();
+  const { currentStep, nextStep, markStepCompleted, memberID, isUpdateMode } =
+    useAddMemberStore();
 
   const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
     enabled: isUpdateMode && !!memberID,
@@ -127,6 +119,8 @@ export default function SpecialDaysStep() {
       if (data?.status === "success") {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Special day successfully updated.");
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
     onError: (error: any) => {

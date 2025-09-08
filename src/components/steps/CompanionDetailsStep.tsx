@@ -44,15 +44,8 @@ export default function CompanionDetailsStep() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const {
-    currentStep,
-    setCurrentStep,
-    nextStep,
-    markStepCompleted,
-    memberID,
-    setMemberID,
-    isUpdateMode,
-  } = useAddMemberStore();
+  const { currentStep, nextStep, markStepCompleted, memberID, isUpdateMode } =
+    useAddMemberStore();
 
   const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
     enabled: isUpdateMode && !!memberID,
@@ -127,6 +120,8 @@ export default function CompanionDetailsStep() {
       if (data?.status === "success") {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Companion updated.");
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
     onError: (error: any) => {
@@ -214,7 +209,7 @@ export default function CompanionDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-       formik.resetForm();
+    formik.resetForm();
   };
 
   return (

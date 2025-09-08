@@ -122,6 +122,8 @@ export default function ContactDetailsStep() {
         console.log(data);
         querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Contact successfully updated.");
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
     onError: (error: any) => {
@@ -231,7 +233,7 @@ export default function ContactDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-        formik.resetForm();
+    formik.resetForm();
   };
 
   return (

@@ -212,6 +212,8 @@ export default function DocumentDetailsStep() {
       if (Array.isArray(dataArray) && dataArray.length > 0) {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success("All document updated.");
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
 
@@ -296,7 +298,7 @@ export default function DocumentDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-        formik.resetForm();
+    formik.resetForm();
   };
 
   return (

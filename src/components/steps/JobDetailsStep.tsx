@@ -37,18 +37,9 @@ const initialValues = {
 };
 
 export default function JobDetailsStep() {
-  const router = useRouter();
   const queryClient = useQueryClient();
-
-  const {
-    currentStep,
-    setCurrentStep,
-    nextStep,
-    markStepCompleted,
-    memberID,
-    setMemberID,
-    isUpdateMode,
-  } = useAddMemberStore();
+  const { currentStep, nextStep, markStepCompleted, memberID, isUpdateMode } =
+    useAddMemberStore();
 
   const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
     enabled: isUpdateMode && !!memberID,
@@ -63,6 +54,7 @@ export default function JobDetailsStep() {
       );
       return res.data;
     },
+
     onSuccess: (data) => {
       if (data?.status === "success") {
         formik.resetForm();
@@ -123,6 +115,8 @@ export default function JobDetailsStep() {
         toast.success(
           data.message || "Job Detail has been successfully updated."
         );
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
     onError: (error: any) => {
@@ -166,7 +160,7 @@ export default function JobDetailsStep() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
-      isUpdateMode && memberData  && memberData?.length > 0
+      isUpdateMode && memberData && memberData?.length > 0
         ? {
             data: memberData?.map((j: any) => ({
               id: j?.id || 0,
@@ -225,7 +219,7 @@ export default function JobDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-        formik.resetForm();
+    formik.resetForm();
   };
 
   return (
@@ -345,7 +339,7 @@ export default function JobDetailsStep() {
             onClick={() => handleSaveAndExit()}
             className="flex-1 sm:flex-none bg-transparent"
           >
-          Reset
+            Reset
           </Button>
           <Button
             type="button"

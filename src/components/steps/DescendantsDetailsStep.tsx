@@ -258,6 +258,8 @@ export default function DescendantsDetailsStep() {
       if (Array.isArray(dataArray) && dataArray.length > 0) {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success("All descendants updated.");
+        markStepCompleted(currentStep);
+        nextStep();
       }
     },
 
@@ -358,7 +360,7 @@ export default function DescendantsDetailsStep() {
   };
 
   const handleSaveAndExit = () => {
-      formik.resetForm();
+    formik.resetForm();
   };
 
   return (

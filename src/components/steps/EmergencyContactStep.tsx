@@ -128,6 +128,8 @@ export default function EmergencyContactStep() {
           toast.success(
             data.message || "Emergency Contact has been successfully updated."
           );
+          markStepCompleted(currentStep);
+          nextStep();
         }
       },
       onError: (error: any) => {
@@ -232,7 +234,7 @@ export default function EmergencyContactStep() {
   };
 
   const handleSaveAndExit = () => {
-       formik.resetForm();
+    formik.resetForm();
   };
 
   return (
