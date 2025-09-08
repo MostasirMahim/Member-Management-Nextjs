@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "../use-toast";
+import { toast } from "react-toastify";
+
 
 
 function useGetGroups() {
@@ -17,11 +18,7 @@ function useGetGroups() {
           }
         } catch (error:any) {
           console.error("Error fetching:", error);
-          toast({
-            title: "Error",
-            description: error?.response?.data?.message || "Failed to fetch groups",
-            variant: "destructive",
-          });
+         toast.error(error?.response?.data?.message || "Failed to fetch groups");
           return [];
         }
       },

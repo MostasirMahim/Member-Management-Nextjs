@@ -31,9 +31,10 @@ import {
 import { CreateGroupForm } from "@/components/groups/CreateGroupForms";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
+
 import useGetGroups from "@/hooks/data/useGetGroups";
-import { LoadingDots, LoadingSkeleton } from "@/components/ui/loading";
+import { LoadingDots } from "@/components/ui/loading";
+import { toast } from "react-toastify";
 
 type GroupType = {
   id: number;
@@ -54,14 +55,10 @@ export default function GroupsPage() {
       );
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async(data) => {
       if (data?.status === "success") {
-        queryClient.invalidateQueries({ queryKey: ["getGroups"] });
-        toast({
-          title: data?.details || "Group Removed successfully",
-          description: data?.message || "Group has been successfully Removed.",
-          variant: "default",
-        });
+      await  queryClient.invalidateQueries({ queryKey: ["getGroups"] });
+        toast.success("Group Removed Successfully");
         setDeleteDialogOpen(false);
         setSelectedGroup(null);
       }
@@ -71,17 +68,9 @@ export default function GroupsPage() {
       const { message, errors, detail } = error?.response.data;
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Group Removed Failed",
-          description: allErrors,
-          variant: "destructive",
-        });
+        toast.error(allErrors || "Group Removed Failed");
       } else {
-        toast({
-          title: detail || "Group Removed Failed",
-          description: message || "An error occurred during Removed",
-          variant: "destructive",
-        });
+        toast.error(detail || message || "Group Removed Failed");
       }
     },
   });

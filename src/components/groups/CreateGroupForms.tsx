@@ -1,4 +1,5 @@
 "use client";
+
 import { useFormik } from "formik";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import useGetPermit from "@/hooks/data/useGetPermit";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
 import { LoadingDots } from "../ui/loading";
+import { toast } from "react-toastify";
 
 interface CreateGroupFormProps {
   onCancel: () => void;
@@ -28,15 +29,10 @@ export function CreateGroupForm({ onCancel }: CreateGroupFormProps) {
       );
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async(data) => {
       if (data?.status === "success") {
-        queryClient.invalidateQueries({ queryKey: ["getGroups"] });
-        toast({
-          title: data?.details || "New Group Created",
-          description:
-            data?.message || "New group has been created successfully.",
-          variant: "default",
-        });
+        await queryClient.invalidateQueries({ queryKey: ["getGroups"] });
+        toast.success("Group Added Successfully");
 
         formik.resetForm();
         onCancel();
@@ -47,17 +43,9 @@ export function CreateGroupForm({ onCancel }: CreateGroupFormProps) {
       const { message, errors, detail } = error?.response.data;
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Users Added Failed",
-          description: allErrors,
-          variant: "destructive",
-        });
+        toast.error(allErrors || "Users Added Failed");
       } else {
-        toast({
-          title: detail || "Users Added Failed",
-          description: message || "An error occurred during Added",
-          variant: "destructive",
-        });
+        toast.error(detail || message || "Users Added Failed");
       }
     },
   });

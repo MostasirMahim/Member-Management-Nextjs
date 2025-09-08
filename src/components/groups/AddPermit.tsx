@@ -7,8 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import useGetPermit from "@/hooks/data/useGetPermit";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
 import { LoadingDots } from "../ui/loading";
+import { toast } from "react-toastify";
 
 interface AddPermissionFormProps {
   existingPermissions: string[];
@@ -41,13 +41,7 @@ export function AddPermissionForm({
     onSuccess: (data) => {
       if (data?.status === "success") {
         queryClient.invalidateQueries({ queryKey: ["getGroup"] });
-        toast({
-          title: data?.details || "Permissions Added successfully",
-          description:
-            data?.message || "Permissions has been successfully added.",
-          variant: "default",
-        });
-
+        toast.success("Permissions Added Successfully");
         formik.resetForm();
         onCancel();
       }
@@ -57,17 +51,9 @@ export function AddPermissionForm({
       const { message, errors, detail } = error?.response.data;
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Permissions Added Failed",
-          description: allErrors,
-          variant: "destructive",
-        });
+       toast.error(allErrors || "Permissions Added Failed");
       } else {
-        toast({
-          title: detail || "Permissions Added Failed",
-          description: message || "An error occurred during Added",
-          variant: "destructive",
-        });
+        toast.error(detail || message || "Permissions Added Failed");
       }
     },
   });
@@ -80,11 +66,7 @@ export function AddPermissionForm({
       if (values.selectedPermissions) {
         addedPermit({ permission: values.selectedPermissions });
       } else {
-        toast({
-          title: "Permissions Not Selected",
-          description: "Please Select permissions",
-          variant: "destructive",
-        });
+        toast.error("Please select at least one permission");
       }
     },
   });

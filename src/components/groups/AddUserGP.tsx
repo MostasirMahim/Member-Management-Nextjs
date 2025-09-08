@@ -61,7 +61,7 @@ export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
       selectedUsers: [] as Array<{ id: number; username: string }>,
     },
     onSubmit: async (values) => {
-      const users = values.selectedUsers.map((user) => user.id);
+      const users = values.selectedUsers?.map((user) => user.id);
       if (users && groupId) {
         addedMember({ users, group: parseInt(groupId) });
       }
@@ -79,7 +79,7 @@ export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
     );
 
     if (isSelected) {
-      const updatedUsers = formik.values.selectedUsers.filter(
+      const updatedUsers = formik.values.selectedUsers?.filter(
         (selected) => selected.id !== user.id
       );
       formik.setFieldValue("selectedUsers", updatedUsers);
@@ -92,14 +92,14 @@ export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
   };
 
   const handleRemoveUser = (userId: number) => {
-    const updatedUsers = formik.values.selectedUsers.filter(
+    const updatedUsers = formik.values.selectedUsers?.filter(
       (user) => user.id !== userId
     );
     formik.setFieldValue("selectedUsers", updatedUsers);
   };
 
   const isUserSelected = (userId: number) => {
-    return formik.values.selectedUsers.some((user) => user.id === userId);
+    return formik.values.selectedUsers?.some((user) => user.id === userId);
   };
 
   if (isLoadinAllUsers) return <LoadingDots />;
@@ -112,11 +112,11 @@ export function AddMemberForm({ onCancel, groupId }: AddMemberFormProps) {
             <div className="flex items-center gap-2 mb-2">
               <User className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">
-                Selected Users ({formik.values.selectedUsers.length})
+                Selected Users ({formik.values.selectedUsers?.length})
               </span>
             </div>
             <div className="flex flex-wrap gap-1.5 max-h-[90px] overflow-y-auto ">
-              {formik.values.selectedUsers.map((user) => (
+              {formik.values.selectedUsers?.map((user) => (
                 <Badge
                   key={user.id}
                   variant="secondary"

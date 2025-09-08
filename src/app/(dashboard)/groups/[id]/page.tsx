@@ -8,7 +8,6 @@ import {
   Plus,
   UserPlus,
   KeyRound,
-  PencilIcon,
   SquarePen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -89,9 +88,9 @@ export default function GroupDetailPage() {
       );
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async(data) => {
       if (data?.status === "success") {
-        Promise.all([
+      await  Promise.all([
           queryClient.invalidateQueries({ queryKey: ["getGroup", id] }),
           queryClient.invalidateQueries({ queryKey: ["getGroups"] }),
         ]);
@@ -106,6 +105,12 @@ export default function GroupDetailPage() {
       console.log("error", error?.response);
       const { message, errors, detail } = error?.response.data;
       if (errors) {
+         Object.entries(errors).forEach(([field, messages]) => {
+          formik.setFieldError(
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          );
+        });
         const allErrors = Object.values(errors).flat().join("\n");
         toast.error(allErrors || "Group Update Failed");
       } else {
@@ -139,9 +144,9 @@ export default function GroupDetailPage() {
       );
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data?.status === "success") {
-        queryClient.invalidateQueries({ queryKey: ["getGroup"] });
+       await queryClient.invalidateQueries({ queryKey: ["getGroup"] });
         toast.success("Users Removed Successfully");
         setDeleteDialogOpen(false);
         setDeleteTarget(null);
@@ -167,9 +172,9 @@ export default function GroupDetailPage() {
       );
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async(data) => {
       if (data?.status === "success") {
-        queryClient.invalidateQueries({ queryKey: ["getGroup"] });
+        await queryClient.invalidateQueries({ queryKey: ["getGroup"] });
         toast.success("Permission Removed Successfully");
         setDeleteDialogOpen(false);
         setDeleteTarget(null);
