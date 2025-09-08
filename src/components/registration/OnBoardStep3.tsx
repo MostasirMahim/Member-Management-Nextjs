@@ -6,20 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useEffect, useState } from "react"; // To manage success state
+import { useEffect, useState } from "react";
 import {
   Eye,
   EyeOff,
-  IdCardIcon,
   PartyPopper,
   UserCog,
   UserPlus,
 } from "lucide-react";
-import { useFormStore, useRegUserStore } from "@/store/store";
+import { useRegUserStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
+
 interface userInfoType {
   email: string;
   username: string;
@@ -59,33 +59,24 @@ export default function OnboardingStep3() {
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-        toast({
-          title: data.details || "Employee Added",
-          description:
-            data.message || "New employee has been successfully added.",
-          variant: "default",
-        });
+        toast.success(data.message || "Registration successful.");
+        formik.resetForm();
         setIsSuccess(true);
         setRegisteredUsername(data.username);
       }
-      console.log("New Pass Chenge successfully:", data);
     },
     onError: (error: any) => {
       console.error("Error In Regestaration :", error);
-      const { message, errors, details } = error?.response.data;
+      const { message, errors } = error?.response.data;
       if (errors) {
-        const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: details || "Registration Failed",
-          description: allErrors,
-          variant: "destructive",
+        Object.entries(errors).forEach(([field, messages]) => {
+          formik.setFieldError(
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          );
         });
       } else {
-        toast({
-          title: details || "Registration Failed",
-          description: message || "An error occurred during registration",
-          variant: "destructive",
-        });
+        toast.error(message || "An error occurred during registration");
       }
     },
   });
@@ -150,7 +141,6 @@ export default function OnboardingStep3() {
       <Card className="w-full max-w-xl rounded-lg shadow-lg">
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col items-center space-y-4">
-            {/* Using a placeholder for the logo, similar to the login form */}
             <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-blue-100 border-2 border-blue-200">
               <UserCog className="w-12 h-12 text-blue-600" />
             </div>
@@ -211,14 +201,18 @@ export default function OnboardingStep3() {
             <div className="flex flex-col sm:flex-row gap-2 w-full">
               <div className="space-y-2 w-full">
                 <Label htmlFor="newPassword">
-                  A default password for this account
+                  New Password
+                  <span className="text-xs text-gray-500 font-primary font-thin">
+                    {" "}
+                    (At least 8 characters)
+                  </span>
                 </Label>
                 <div className="relative">
                   <Input
                     id="newPassword"
                     name="newPassword"
                     placeholder="Enter new password"
-                    type={showNewPassword ? "text" : "password"} // Dynamic type
+                    type={showNewPassword ? "text" : "password"} 
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.newPassword}
@@ -306,8 +300,9 @@ export default function OnboardingStep3() {
               <Button
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 type="submit"
+                disabled={isPending}
               >
-                Done
+                {isPending ? "Registering..." : "Register"}
               </Button>
             </div>
           </form>

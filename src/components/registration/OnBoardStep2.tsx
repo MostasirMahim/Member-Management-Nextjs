@@ -18,7 +18,8 @@ import { useRouter } from "next/navigation";
 import { useRegUserStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
+
 
 const validationSchema = Yup.object({
   otp: Yup.string()
@@ -36,6 +37,7 @@ export default function OnboardingStep2() {
       router.replace("/registration/email");
     }
   }, [email]);
+
   const { mutate: verifyRegOtp, isPending } = useMutation({
     mutationFn: async ({ email, otp }: { email: string; otp: number }) => {
       const res = await axiosInstance.post(
@@ -47,11 +49,7 @@ export default function OnboardingStep2() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         SET_OTP_Pass(true);
-        toast({
-          title: data.details || "OTP Verified",
-          description: data.message || "You can now proceed to the next step.",
-          variant: "default",
-        });
+        toast.success(data.message || "OTP verified successfully.");
         router.push("/registration/add");
       }
     },
@@ -59,18 +57,14 @@ export default function OnboardingStep2() {
       console.error("Error OTP Verification:", error);
       const { message, errors, details } = error?.response.data;
       if (errors) {
-        const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: details || "Verification Failed",
-          description: allErrors,
-          variant: "destructive",
+         Object.entries(errors).forEach(([field, messages]) => {
+          formik.setFieldError(
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          );
         });
       } else {
-        toast({
-          title: details || "Verification Failed",
-          description: message || "An error occurred during verification",
-          variant: "destructive",
-        });
+       toast.error(message || "An error occurred");
       }
     },
   });
@@ -113,8 +107,8 @@ export default function OnboardingStep2() {
   };
 
   return (
-    <div className="flex items-center justify-center   sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md min-h-[400px]  rounded-lg shadow-lg bg-white text-center">
+    <div className="flex items-center justify-center sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md min-h-[400px]  rounded-lg shadow-lg text-center">
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col items-center space-y-4">
             <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-blue-100 border-2 border-blue-200">
@@ -169,9 +163,9 @@ export default function OnboardingStep2() {
               <Button
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 type="submit"
-                disabled={false}
+                disabled={isPending}
               >
-                {false ? "Verifying..." : "Next"}
+                {isPending ? "Verifying..." : "Next"}
               </Button>
             </div>
           </form>
