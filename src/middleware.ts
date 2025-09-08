@@ -9,7 +9,25 @@ interface PermissionCache {
 }
 
 const permissionCache = new Map<string, PermissionCache>();
+const CACHE_TTL = 60 * 1000; // 1 minute in milliseconds
 
+// Cleanup function to remove expired entries
+function cleanupExpiredCache() {
+  const now = Date.now();
+  const entries = Array.from(permissionCache.entries());
+  console.log("Deleting cache entries older than 1 minute...");
+  
+  for (const [key, value] of entries) {
+    if (now - value.timestamp > CACHE_TTL) {
+      permissionCache.delete(key);
+    }
+  }
+}
+
+// Set up periodic cleanup (runs every 5 minutes)
+if (typeof setInterval !== 'undefined') {
+  setInterval(cleanupExpiredCache, 5 * 60 * 1000);
+}
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const pathname = req.nextUrl.pathname;
