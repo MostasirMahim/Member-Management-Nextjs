@@ -11,8 +11,8 @@ import { Eye, EyeOff, PartyPopper } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForgetPassStore } from "@/store/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/hooks/use-toast";
 import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "react-toastify";
 const validationSchema = Yup.object({
   newPassword: Yup.string()
     .min(8, "Password must be at least 8 characters")
@@ -51,41 +51,27 @@ export default function SetNewPasswordForm() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         setIsSuccess(true);
-        toast({
-          title: data.details || "Password Changed",
-          description:
-            data.message || "Your password has been successfully updated.",
-          variant: "default",
-        });
+        toast.success(data.message || "Password Reset Successfully.");
         queryClient.invalidateQueries({ queryKey: ["authUser"] });
       } else {
-        console.error("Error OTP Verification:", data.message);
-        const { message, errors, details } = data?.response.data;
-        if (errors) {
-          const allErrors = Object.values(errors).flat().join("\n");
-          toast({
-            title: details || "Verification Failed",
-            description: allErrors,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: details || "Verification Failed",
-            description:
-              message || "An error occurred while verifying the OTP.",
-            variant: "destructive",
-          });
-        }
+        toast.error(data.message);
       }
     },
     onError: (error: any) => {
       console.log("Error in Reset Password:", error);
-      toast({
-        title: "Reset Password Failed",
-        description:
-          error?.message || "An error occurred while resetting the password.",
-        variant: "destructive",
-      });
+      const { message, errors, detail } = error?.response.data;
+      if (errors) {
+         Object.entries(errors).forEach(([field, messages]) => {
+          formik.setFieldError(
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          );
+        });
+        const allErrors = Object.values(errors).flat().join("\n");
+        toast.error(allErrors || "Verification Failed");
+      } else {
+        toast.error(detail || message || "Verification Failed");
+      }
     },
   });
 
@@ -132,7 +118,7 @@ export default function SetNewPasswordForm() {
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => router.replace("/")}
             >
-              Go to Home
+              Go to Dashboard
             </Button>
           </CardContent>
         </Card>
@@ -145,7 +131,6 @@ export default function SetNewPasswordForm() {
       <Card className="w-full max-w-sm rounded-lg shadow-lg">
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col items-center space-y-4">
-            {/* Using a placeholder for the logo, similar to the login form */}
             <div className="h-16 w-16 flex items-center justify-center rounded-full bg-blue-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -175,13 +160,19 @@ export default function SetNewPasswordForm() {
           </div>
           <form onSubmit={formik.handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">
+                  New Password
+                  <span className="text-xs text-gray-500 font-primary font-thin">
+                    {" "}
+                    (At least 8 characters)
+                  </span>
+                </Label>
               <div className="relative">
                 <Input
                   id="newPassword"
                   name="newPassword"
-                  placeholder="Enter your new password"
-                  type={showNewPassword ? "text" : "password"} // Dynamic type
+                  placeholder="Enter new password"
+                  type={showNewPassword ? "text" : "password"} 
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.newPassword}
@@ -220,8 +211,8 @@ export default function SetNewPasswordForm() {
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
-                  placeholder="Confirm your new password"
-                  type={showConfirmPassword ? "text" : "password"} // Dynamic type
+                  placeholder="Confirm new password"
+                  type={showConfirmPassword ? "text" : "password"} 
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.confirmPassword}
@@ -268,9 +259,9 @@ export default function SetNewPasswordForm() {
               <Button
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 type="submit"
-                disabled={false}
+                disabled={isPending}
               >
-                {false ? "Verifying..." : "Done"}
+                {isPending ? "Verifying..." : "Done"}
               </Button>
             </div>
           </form>

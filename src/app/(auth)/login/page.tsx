@@ -47,8 +47,8 @@ export default function page() {
     },
     onSuccess: async (data) => {
       if (data.code === 200 && data.status === "success") {
-        toast.success("Login successful.");
         await queryClient.invalidateQueries({ queryKey: ["authUser"] });
+        toast.success("Login successful.");
         router.replace("/");
         router.refresh();
       }
@@ -59,12 +59,11 @@ export default function page() {
       const { message, errors } = error?.response?.data || {};
 
       if (errors) {
-        Object.values(errors).forEach((errorArr: any) => {
-          if (Array.isArray(errorArr)) {
-            errorArr.forEach((msg: string) => toast.error(msg));
-          } else {
-            toast.error(errorArr);
-          }
+        Object.entries(errors).forEach(([field, messages]) => {
+          formik.setFieldError(
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          );
         });
       } else if (message) {
         toast.error(message);

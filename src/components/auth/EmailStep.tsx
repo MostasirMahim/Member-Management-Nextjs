@@ -11,10 +11,11 @@ import { Mails } from "lucide-react";
 import { useForgetPassStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
+
 
 const validationSchema = Yup.object({
-  employeeEmail: Yup.string()
+  email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
 });
@@ -30,43 +31,41 @@ function EmailStep() {
       return res.data;
     },
     onSuccess: (data) => {
-      toast({
-        title: "Otp Send",
-        description: "Check your email",
-        variant: "default",
-      });
-      router.push("/forget-password/otp");
-      formik.resetForm();
+     if (data?.status === "success") {
+        toast.success(data.message || "OTP sent successfully.");
+        router.push("/forget-password/otp");
+        formik.resetForm();
+      } else {
+        toast.error(data.message);
+      }
     },
     onError: (error: any) => {
+      console.log("error", error?.response);
       const { message, errors, details } = error?.response.data;
 
       if (errors) {
-        const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: details || "Login Failed",
-          description: allErrors,
-          variant: "destructive",
+         Object.entries(errors).forEach(([field, messages]) => {
+          formik.setFieldError(
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          );
         });
+        
       } else {
-        toast({
-          title: details || "Login Failed",
-          description: message || "An error occurred during login",
-          variant: "destructive",
-        });
+        toast.error(details || message || "An error occurred during Added");
       }
     },
   });
 
   const formik = useFormik({
     initialValues: {
-      employeeEmail: email || "",
+      email: email || "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      if (values.employeeEmail) {
-        setEmail(values.employeeEmail);
-        sentOtp(values.employeeEmail);
+      if (values.email) {
+        setEmail(values.email);
+        sentOtp(values.email);
       }
     },
   });
@@ -95,22 +94,22 @@ function EmailStep() {
             <div className="space-y-2">
               <Label htmlFor="employeeEmail">Employee Email</Label>
               <Input
-                id="employeeEmail"
-                name="employeeEmail"
+                id="email"
+                name="email"
                 placeholder="m@example.com"
                 type="email"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.employeeEmail}
+                value={formik.values.email}
                 className={
-                  formik.touched.employeeEmail && formik.errors.employeeEmail
+                  formik.touched.email && formik.errors.email
                     ? "border-red-500"
                     : ""
                 }
               />
-              {formik.touched.employeeEmail && formik.errors.employeeEmail ? (
+              {formik.touched.email && formik.errors.email ? (
                 <div className="text-red-500 text-xs pl-3">
-                  {formik.errors.employeeEmail}
+                  {formik.errors.email}
                 </div>
               ) : null}
             </div>
@@ -126,9 +125,9 @@ function EmailStep() {
               <Button
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 type="submit"
-                disabled={false}
+                disabled={isPending}
               >
-                {false ? "Verifying..." : "Send OTP"}
+                {isPending ? "Verifying..." : "Send OTP"}
               </Button>
             </div>
           </form>

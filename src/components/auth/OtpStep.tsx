@@ -17,7 +17,8 @@ import { useRouter } from "next/navigation";
 import { useForgetPassStore } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
+
 
 export default function OtpStep() {
   const { email, otp: OTP, setOtp: SET_OTP, setToken } = useForgetPassStore();
@@ -49,11 +50,7 @@ export default function OtpStep() {
     onSuccess: (data) => {
       if (data?.token) {
         setToken(data?.token);
-        toast({
-          title: data.details || "OTP Verified",
-          description: data.message || "You can now set a new password.",
-          variant: "default",
-        });
+       toast.success("OTP verified successfully.");
         router.push("/forget-password/reset");
       }
     },
@@ -63,18 +60,11 @@ export default function OtpStep() {
 
       if (errors) {
         const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: details || "Verification Failed",
-          description: allErrors,
-          variant: "destructive",
-        });
+        toast.error(allErrors || "Verification Failed");
       } else {
-        toast({
-          title: details || "Verification Failed",
-          description: message || "An error occurred while verifying the OTP.",
-          variant: "destructive",
-        });
+        toast.error(details || message || "Verification Failed");
       }
+      formik.resetForm();
     },
   });
 
@@ -182,9 +172,9 @@ export default function OtpStep() {
               <Button
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 type="submit"
-                disabled={false}
+                disabled={isPending}
               >
-                {false ? "Verifying..." : "Next"}
+                {isPending ? "Verifying..." : "Next"}
               </Button>
             </div>
           </form>

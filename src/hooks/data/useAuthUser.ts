@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 
+//TODO: Check if user is logged in
 function useAuthUser() {
   return useQuery({
     queryKey: ["authUser"],
