@@ -2,8 +2,6 @@ import { protected_routes } from "@/lib/protected_routes";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const TEST_XYZ= 0;
-TEST_XYZ=0;
 
 interface PermissionCache {
   permissions: string[];
