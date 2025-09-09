@@ -2,21 +2,18 @@ import { protected_routes } from "@/lib/protected_routes";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Cache for user permissions with timestamp
 interface PermissionCache {
   permissions: string[];
   timestamp: number;
 }
 
 const permissionCache = new Map<string, PermissionCache>();
-const CACHE_TTL = 60 * 1000; // 1 minute in milliseconds
+const CACHE_TTL = 60 * 1000;
 
-// Cleanup function to remove expired entries
 function cleanupExpiredCache() {
   const now = Date.now();
   const entries = Array.from(permissionCache.entries());
-  console.log("Deleting cache entries older than 1 minute...");
-  
+
   for (const [key, value] of entries) {
     if (now - value.timestamp > CACHE_TTL) {
       permissionCache.delete(key);
@@ -24,8 +21,7 @@ function cleanupExpiredCache() {
   }
 }
 
-// Set up periodic cleanup (runs every 5 minutes)
-if (typeof setInterval !== 'undefined') {
+if (typeof setInterval !== "undefined") {
   setInterval(cleanupExpiredCache, 5 * 60 * 1000);
 }
 export async function middleware(req: NextRequest) {
@@ -39,19 +35,18 @@ export async function middleware(req: NextRequest) {
   }
 
   let user_permissions: string[] = [];
-  const cacheKey = `user_${token}`; // Simple cache key
+  const cacheKey = `user_${token}`;
 
-  // Check if we have valid cached permissions
   const cachedData = permissionCache.get(cacheKey);
   const now = Date.now();
   const oneMinute = 60 * 1000;
 
-  if (cachedData && (now - cachedData.timestamp) < oneMinute) {
-    // Use cached permissions
+  if (cachedData && now - cachedData.timestamp < oneMinute) {
     user_permissions = cachedData.permissions;
   } else {
     try {
-      const baseURL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8000";
+      const baseURL =
+        process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8000";
       const apiRes = await fetch(
         `${baseURL}/api/account/v1/authorization/get_user_all_permissions/`,
         {
@@ -71,15 +66,13 @@ export async function middleware(req: NextRequest) {
 
       const data = json.data[0];
       user_permissions = data.permissions.map((p: any) => p.permission_name);
-      
-      // Cache the permissions with timestamp
+
       permissionCache.set(cacheKey, {
         permissions: user_permissions,
-        timestamp: now
+        timestamp: now,
       });
-
     } catch (err) {
-      console.log(err); 
+      console.log(err);
       url.pathname = "/login";
       return NextResponse.redirect(url);
     }
@@ -101,5 +94,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|login|forget-password).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|login|forget-password).*)",
+  ],
 };
