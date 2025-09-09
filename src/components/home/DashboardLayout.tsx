@@ -2,23 +2,11 @@
 
 import type React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
 
 import {
   LayoutDashboard,
   Users,
   FileText,
-  LogOut,
-  Menu,
-  Bell,
-  ChevronDown,
-  ChevronRight,
-  UserCheck,
-  UserX,
-  Plus,
-  Eye,
-  Edit,
-  Logs,
   Mails,
   MailPlus,
   UserRound,
@@ -48,7 +36,6 @@ import {
   ListChecks,
   HandCoins,
   FileChartColumn,
-  CircleUser,
   History,
   Dumbbell,
   Component,
@@ -56,25 +43,13 @@ import {
   Ticket,
   MapPinHouse,
   ImageIcon,
+  UserCheck,
+  UserX,
+  Plus,
+  Eye,
+  Edit,
+  Logs,
 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 import {
   Sheet,
@@ -85,12 +60,15 @@ import {
 } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import ModeToggle from "./ThemeToggle";
-import { cn } from "@/lib/utils";
-import { LoadingDots } from "./ui/loading";
+
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
-import { filterNavigationByPermissions } from "./utils/Navigation_functions";
+
+import Sidebar from "./Sidebar";
+import { filterNavigationByPermissions } from "../utils/Navigation_functions";
+import { LoadingDots } from "../ui/loading";
+import { SidebarProvider } from "@/context/SidebarContext";
+import Navbar from "./Navbar";
 
 const navigation_sidebar_links = [
   {
@@ -517,121 +495,7 @@ const navigation_sidebar_links = [
   },
 ];
 
-interface SubItem {
-  icon: React.ReactNode;
-  label: string;
-  href: string;
-  subItems?: SubItem[];
-}
-
-interface NavItemProps {
-  icon: React.ReactNode;
-  label: string;
-  href: string;
-  active?: boolean;
-  badge?: number;
-  subItems?: SubItem[];
-  level?: number;
-}
-const NavItem = ({
-  icon,
-  label,
-  href,
-  active,
-  badge,
-  subItems,
-  level = 0,
-}: NavItemProps) => {
-  const pathname = usePathname();
-
-  const hasActiveSubItem = (items?: SubItem[]): boolean => {
-    if (!items) return false;
-    return items.some((item) => {
-      if (pathname === item.href) return true;
-      return hasActiveSubItem(item.subItems);
-    });
-  };
-
-  const isParentActive = active || hasActiveSubItem(subItems);
-  const [isOpen, setIsOpen] = useState(isParentActive);
-
-  const paddingLeft = level * 16 + 12;
-  const buttonWidth = level > 0 ? "w-full" : "w-[90%]";
-
-  if (subItems && subItems?.length > 0) {
-    return (
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className={cn(
-              `${buttonWidth} hover:translate-y-1 transition-transform duration-300 ease-in-out justify-between gap-1 h-10 px-3`,
-              isParentActive &&
-                "bg-primary hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-white my-2"
-            )}
-            style={{ paddingLeft: `${paddingLeft}px` }}
-          >
-            <div className="flex items-center gap-2">
-              {icon}
-              <span className="text-left">{label}</span>
-            </div>
-            <div className="flex items-center">
-              {badge && (
-                <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full mr-2">
-                  {badge}
-                </span>
-              )}
-              {isOpen ? (
-                <ChevronDown className="h-4 w-4" />
-              ) : (
-                <ChevronRight className="h-4 w-4" />
-              )}
-            </div>
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-1">
-          <div className="space-y-1">
-            {subItems.map((subItem, index) => (
-              <NavItem
-                key={index}
-                icon={subItem.icon}
-                label={subItem.label}
-                href={subItem.href}
-                active={pathname === subItem.href}
-                subItems={subItem.subItems}
-                level={level + 1}
-              />
-            ))}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    );
-  }
-
-  return (
-    <Link href={href} scroll={false}>
-      <Button
-        variant="ghost"
-        className={cn(
-          `${buttonWidth} hover:translate-y-1 transition-transform duration-300 ease-in-out justify-start gap-3 h-10 px-3 w-[90%]`,
-          active &&
-            "bg-blue-50 hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-primary my-1"
-        )}
-        style={{ paddingLeft: `${paddingLeft}px` }}
-      >
-        {icon}
-        <span className="flex-1 text-left">{label}</span>
-        {badge && (
-          <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
-            {badge}
-          </span>
-        )}
-      </Button>
-    </Link>
-  );
-};
-
-function AdminDashboard({ children }: { children: React.ReactNode }) {
+function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -661,7 +525,7 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
           toast.error(error?.message);
         });
       } else {
-        toast.error(details || "Logout Failed");
+        toast.error(details || message || "Logout Failed");
       }
     },
   });
@@ -674,7 +538,6 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
-  const [filteredNavigation, setFilteredNavigation] = useState([]);
   const [userData, setUserData] = useState({
     is_admin: false,
     permissions: [],
@@ -682,17 +545,15 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    // Fetch user permissions on component mount
     const fetchUserPermissions = async () => {
       try {
         const response = await axiosInstance.get(
           "/api/account/v1/authorization/get_user_all_permissions/"
-        ); // Your endpoint
+        );
         const data = response.data;
 
         if (data.status === "success") {
           const user = data.data[0];
-          // Transform the API response into the shape our function expects
           const permissionsList = user.permissions.map(
             (p: any) => p.permission_name
           );
@@ -702,7 +563,6 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
             username: user?.username,
           });
 
-          // Filter the navigation based on the fetched permissions
           const filteredNav = filterNavigationByPermissions(
             navigation_sidebar_links,
             permissionsList,
@@ -712,7 +572,6 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error("Failed to fetch user permissions:", error);
-        // Optional: Set to a default state, e.g., show nothing or a basic nav
         setNavigation([]);
       }
     };
@@ -724,109 +583,37 @@ function AdminDashboard({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  const Sidebar = () => (
-    <div className="flex flex-col  max-h-screen overflow-y-auto font-primary ">
-      <div className="p-4">
-        <div className="flex items-center justify-center">
-          <img
-            src="/assets/logo.png"
-            alt=""
-            className="object-contain rounded-full h-[120px] w-[120px]"
-          />
-        </div>
-      </div>
-
-      <ScrollArea className="flex-1  overflow-y-auto no-scrollbar border-b-2 mb-5">
-        <nav className="space-y-1 px-2">
-          {navigation.map((item: any, index: number) => (
-            <NavItem
-              key={index}
-              icon={item.icon}
-              label={item.label}
-              href={item.href}
-              active={pathname === item.href}
-              badge={item.badge}
-              subItems={item.subItems}
-            />
-          ))}
-        </nav>
-      </ScrollArea>
-    </div>
-  );
-
   if (isPending) return <LoadingDots />;
   return (
-    <div className="min-h-screen flex bg-muted/30 max-w-screen-2xl mx-auto">
-      <aside className="hidden lg:block w-[20%] border-r bg-background h-full overflow-y-auto sticky top-0">
-        <Sidebar />
-      </aside>
+    <SidebarProvider>
+      <div className="min-h-screen flex bg-muted/30 max-w-screen-2xl mx-auto">
+        <aside className="hidden lg:block w-[20%] border-r bg-background h-full overflow-y-auto sticky top-0">
+          <Sidebar navigation={navigation} />
+        </aside>
 
-      <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
-        <SheetContent side="left" className="p-0 w-64">
-          <SheetHeader>
-            <SheetTitle></SheetTitle>
-            <SheetDescription></SheetDescription>
-          </SheetHeader>
-          <Sidebar />
-        </SheetContent>
-      </Sheet>
+        <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+          <SheetContent side="left" className="p-0 w-64">
+            <SheetHeader>
+              <SheetTitle></SheetTitle>
+              <SheetDescription></SheetDescription>
+            </SheetHeader>
+            <Sidebar navigation={navigation} />
+          </SheetContent>
+        </Sheet>
 
-      <div className="flex-1 flex flex-col w-[80%] ">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            onClick={() => setIsMobileOpen(true)}
-          >
-            <Menu className="h-6 w-6" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
-          <div className="flex-1" />
-          <div className="flex items-center gap-4">
-            <ModeToggle />
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-            </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full border border-gray-500"
-                >
-                  <CircleUser className="h-10 w-10" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>
-                  {userData?.username || "My account"}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Link href={`/reset-password`} className="flex w-full">
-                    Reset Password
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
-                  <Button onClick={() => logOutFunc()} className="flex w-full">
-                    <LogOut className="h-4 w-4 mr-1" />
-                    Log Out
-                  </Button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </header>
-        <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f4f7fb] dark:bg-black/80">
-          {children}
-        </main>
+        <div className="flex-1 flex flex-col w-[80%] ">
+          <Navbar
+            userData={userData}
+            onLogout={() => logOutFunc()}
+            onMenuClick={() => setIsMobileOpen(true)}
+          />
+          <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f4f7fb] dark:bg-black/80">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
 
-export default AdminDashboard;
+export default DashboardLayout;

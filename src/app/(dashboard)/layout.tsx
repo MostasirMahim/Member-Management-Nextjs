@@ -1,9 +1,9 @@
 "use server";
-import AdminDashboard from "@/components/AdminDashboard";
+import DashboardLayout from "@/components/home/DashboardLayout";
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AdminDashboard>{children}</AdminDashboard>;
+  return <DashboardLayout>{children}</DashboardLayout>;
 }
