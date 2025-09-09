@@ -7,8 +7,8 @@ export const protected_routes: {
   { path: "/member", permission_name: "member_management" },
   { path: "/users", permission_name: "view_all_users" },
   { path: "/groups", permission_name: "group_permission_management" },
-  { path: "/choices", permission_name: null },
-  { path: "/registration/email", permission_name: "employee_onboarding" },
+  { path: "/choices", permission_name: "member_management" },
+  { path: "/registration", permission_name: "employee_onboarding" },
   { path: "/activity_logs", permission_name: "activity_log_management" },
   { path: "/emails", permission_name: "bulk_emails_management" },
   { path: "/restaurants", permission_name: "restaurant_management" },
@@ -17,4 +17,5 @@ export const protected_routes: {
   { path: "/mfm", permission_name: "member_financial_management" },
   { path: "/upload/sales", permission_name: "member_financial_management" },
   { path: "/events", permission_name: null },
+  { path: "/facilities", permission_name: "facility_management" },
 ];
