@@ -100,7 +100,7 @@ function AllMembers() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
-  const { setMemberID, memberID, setIsUpdateMode, isUpdateMode } =
+  const { setMemberID, setIsUpdateMode, } =
     useAddMemberStore();
   const searchParams = useSearchParams();
   const countries = getNames();
