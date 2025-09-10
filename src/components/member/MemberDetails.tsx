@@ -179,15 +179,15 @@ async function MemberDetails({ id }: { id: string }) {
                 </div>
 
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
-                  <div className="flex items-center gap-2">
+                  {primaryNumber?.number && <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4" />
                     <span>{primaryNumber?.number}</span>
-                  </div>
+                  </div>}
 
-                  <div className="flex items-center gap-2">
+                 {primaryEmail?.email && <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     <span>{primaryEmail?.email}</span>
-                  </div>
+                  </div>}
                 </div>
               </div>
             </div>
