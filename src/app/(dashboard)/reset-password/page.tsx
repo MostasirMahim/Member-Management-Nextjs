@@ -6,15 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useState } from "react"; // To manage success state
+import { useState } from "react";
 import { Eye, EyeOff, PartyPopper } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "react-toastify";
 
 const validationSchema = Yup.object({
-  currentPassword: Yup.string()
+  current_password: Yup.string()
     .required("Current Password is required")
     .min(8, "Password must be at least 8 characters"),
   newPassword: Yup.string()
@@ -39,7 +39,7 @@ export default function ResetPassword() {
 
   const { mutate: resetPassword, isPending } = useMutation({
     mutationFn: async (userPass: ResetPass) => {
-      const res = await await axiosInstance.patch(
+      const res = await axiosInstance.patch(
         "/api/account/v1/reset_password/",
         userPass
       );
@@ -48,38 +48,28 @@ export default function ResetPassword() {
     onSuccess: (data) => {
       if (data?.status === "success") {
         setIsSuccess(true);
-        toast({
-          title: data?.details || "Password Changed",
-          description:
-            data?.message || "Your password has been successfully changed.",
-          variant: "default",
-        });
+        toast.success(data.message || "Password Reset Successfully.");
         formik.resetForm();
       }
     },
     onError: (error: any) => {
       const { message, errors, details } = error?.response.data;
-
+      console.log(error);
       if (errors) {
-        const allErrors = Object.values(errors).flat().join("\n");
-        toast({
-          title: "Login Failed",
-          description: allErrors,
-          variant: "destructive",
+        Object.entries(errors).forEach(([field, messages]) => {
+          formik.setFieldError(
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          );
         });
-      } else {
-        toast({
-          title: details || "Login Failed",
-          description: message || "An error occurred during login",
-          variant: "destructive",
-        });
-      }
+      } 
+      toast.error(message || details || "Password Reset Failed.Try Again.");
     },
   });
 
   const formik = useFormik({
     initialValues: {
-      currentPassword: "",
+      current_password: "",
       newPassword: "",
       confirmPassword: "",
     },
@@ -87,7 +77,7 @@ export default function ResetPassword() {
     onSubmit: async (values) => {
       if (values.newPassword === values.confirmPassword) {
         resetPassword({
-          current_password: values.currentPassword,
+          current_password: values.current_password,
           new_password: values.newPassword,
           confirm_password: values.confirmPassword,
         });
@@ -104,9 +94,8 @@ export default function ResetPassword() {
               <div className="relative flex items-center justify-center w-24 h-24 mx-auto rounded-full bg-blue-100 border-2 border-blue-200">
                 <PartyPopper className="w-12 h-12 text-blue-600" />
               </div>
-
               <h1 className="text-2xl font-bold">
-                Welcome <span className="text-blue-600">Mahim</span>
+                Congratulations
               </h1>
               <p className="text-gray-700 text-sm">
                 Your password has been successfully updated.
@@ -129,7 +118,6 @@ export default function ResetPassword() {
       <Card className="w-full max-w-sm rounded-lg shadow-lg">
         <CardContent className="py-6 px-8  space-y-5">
           <div className="flex flex-col items-center space-y-4">
-            {/* Using a placeholder for the logo, similar to the login form */}
             <div className="h-16 w-16 flex items-center justify-center rounded-full bg-blue-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -150,25 +138,25 @@ export default function ResetPassword() {
             <div className="text-center space-y-2">
               <h1 className="text-2xl font-bold">Set New Password</h1>
               <p className="text-sm text-gray-500">
-                Enter your new password below
+               Reset your password to secure your account
               </p>
             </div>
           </div>
           <form onSubmit={formik.handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current Password</Label>
+              <Label htmlFor="current_password">Current Password</Label>
               <div className="relative">
                 <Input
-                  id="currentPassword"
-                  name="currentPassword"
-                  placeholder="Enter your new password"
-                  type={showCurrentPassword ? "text" : "password"} // Dynamic type
+                  id="current_password"
+                  name="current_password"
+                  placeholder="Enter current password"
+                  type={showCurrentPassword ? "text" : "password"}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.currentPassword}
+                  value={formik.values.current_password}
                   className={
-                    formik.touched.currentPassword &&
-                    formik.errors.currentPassword
+                    formik.touched.current_password &&
+                    formik.errors.current_password
                       ? "border-red-500 pr-10"
                       : "pr-10"
                   }
@@ -190,10 +178,10 @@ export default function ResetPassword() {
                   </span>
                 </Button>
               </div>
-              {formik.touched.currentPassword &&
-              formik.errors.currentPassword ? (
+              {formik.touched.current_password &&
+              formik.errors.current_password ? (
                 <div className="text-red-500 text-xs pl-3">
-                  {formik.errors.currentPassword}
+                  {formik.errors.current_password}
                 </div>
               ) : null}
             </div>
@@ -203,8 +191,8 @@ export default function ResetPassword() {
                 <Input
                   id="newPassword"
                   name="newPassword"
-                  placeholder="Enter your new password"
-                  type={showNewPassword ? "text" : "password"} // Dynamic type
+                  placeholder="Enter new password"
+                  type={showNewPassword ? "text" : "password"}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.newPassword}
@@ -243,8 +231,8 @@ export default function ResetPassword() {
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
-                  placeholder="Confirm your new password"
-                  type={showConfirmPassword ? "text" : "password"} // Dynamic type
+                  placeholder="Confirm new password"
+                  type={showConfirmPassword ? "text" : "password"}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.confirmPassword}
@@ -282,8 +270,9 @@ export default function ResetPassword() {
             <Button
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               type="submit"
+              disabled={isPending}
             >
-              {false ? "Setting Password..." : "Set Password"}
+              {isPending ? "Setting Password..." : "Set Password"}
             </Button>
           </form>
         </CardContent>
