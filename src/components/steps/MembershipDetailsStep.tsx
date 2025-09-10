@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
@@ -28,10 +28,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { LoadingCard, LoadingDots } from "../ui/loading";
 import { useAddMemberStore } from "@/store/store";
-import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import useGetMember from "@/hooks/data/useGetMember";
 import { getNames } from "country-list";
+import { ImageViewer } from "../utils/ImageViewer";
 
 const validationSchema = Yup.object({
   member_ID: Yup.string().required("Member ID is required"),
@@ -71,11 +71,9 @@ const validationSchemaForUpdate = Yup.object({
 });
 
 export default function MembershipDetailsStep() {
-  const router = useRouter();
   const countries = getNames();
   const {
     currentStep,
-    setCurrentStep,
     nextStep,
     markStepCompleted,
     setMemberID,
@@ -96,6 +94,18 @@ export default function MembershipDetailsStep() {
     membership_status,
     marital_status,
   } = choiceSections ?? {};
+
+  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const handleImageClick = (image: any) => {
+    setSelectedImage(image);
+    setIsViewerOpen(true);
+  };
+
+  const handleCloseViewer = () => {
+    setIsViewerOpen(false);
+    setSelectedImage(null);
+  };
 
   const { mutate: generateID, isPending } = useMutation({
     mutationFn: async (userData: any) => {
@@ -280,7 +290,7 @@ export default function MembershipDetailsStep() {
       }
     },
   });
-  console.log(formik.values);
+
   const handleFieldChangeAndGenerateID = (fieldName: string, value: string) => {
     formik.setFieldValue(fieldName, value);
     const otherFieldValue =
@@ -321,7 +331,7 @@ export default function MembershipDetailsStep() {
     }
   };
 
-  //Button Functions
+
   const handleSkip = () => {
     nextStep();
   };
@@ -330,6 +340,7 @@ export default function MembershipDetailsStep() {
     formik.resetForm();
   };
 
+  //TODO: When reload the page still choices are not loaded.
   if (isLoading && isLoadingMember) {
     return <LoadingCard />;
   }
@@ -501,11 +512,14 @@ export default function MembershipDetailsStep() {
                 <Label className="text-sm font-medium text-gray-700">
                   Profile Picture
                 </Label>
-                <p className="text-sm text-gray-500 pr-5">
-                  {isUpdateMode
-                    ? memberData?.profile_photo?.split("/").pop()
-                    : null}
-                </p>
+                {isUpdateMode && (
+                  <p
+                    className="text-sm text-gray-500 pr-5 cursor-pointer hover:text-indigo-500"
+                    onClick={() => handleImageClick(memberData?.profile_photo)}
+                  >
+                   { memberData?.profile_photo?.split("/").pop()}
+                  </p>
+                )}
               </div>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                 <input
@@ -813,6 +827,11 @@ export default function MembershipDetailsStep() {
           </Button>
         </div>
       </form>
+      <ImageViewer
+        image={selectedImage}
+        isOpen={isViewerOpen}
+        onClose={handleCloseViewer}
+      />
     </div>
   );
 }
