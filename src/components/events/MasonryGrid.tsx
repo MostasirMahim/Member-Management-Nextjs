@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { ImageViewer } from "../utils/ImageViewer";
 import Image from "next/image";
 
 interface MasonryGridProps {
@@ -21,6 +22,17 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     return <div className="text-center p-4">No items to display</div>;
   }
 
+    const [selectedImage, setSelectedImage] = useState<any>(null);
+    const [isViewerOpen, setIsViewerOpen] = useState(false);
+    const handleImageClick = (image: any) => {
+      setSelectedImage(image);
+      setIsViewerOpen(true);
+    };
+  
+    const handleCloseViewer = () => {
+      setIsViewerOpen(false);
+      setSelectedImage(null);
+    };
   return (
     <div
       style={{
@@ -43,6 +55,8 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
         const columnCount = getColumnCount();
         const rowIndex = Math.floor(index / columnCount);
 
+
+
         return (
           <motion.div
             key={index}
@@ -60,13 +74,13 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
             whileHover={{ scale: 1.05, rotateZ: 1 }}
           >
             <div className="relative">
-              <div className="relative w-full flex gap-1 flex-col items-start justify-start">
+              <div className="relative w-full flex gap-1 flex-col items-start justify-start cursor-pointer" onClick={() => handleImageClick(item.image)}>
                 {!imagesLoaded[item.image] && (
                   <div className="absolute inset-0 w-full h-[300px] bg-neutral-500/50 animate-pulse rounded-lg" />
                 )}
                 <Image
-                  src={item.image}
-                  alt="Image"
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8000"}${item.image}`}
+                  alt=""
                   width={400}
                   height={300}
                   className={`${
@@ -92,6 +106,8 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
           </motion.div>
         );
       })}
+
+      <ImageViewer image={selectedImage} isOpen={isViewerOpen} onClose={handleCloseViewer} />
     </div>
   );
 };
