@@ -95,6 +95,7 @@ const navigation_sidebar_links = [
         icon: <UserX className="h-4 w-4" />,
         label: "View Members",
         href: "/members/view",
+        urls:["/member/view"]
       },
       {
         icon: <History className="h-4 w-4" />,
@@ -586,8 +587,8 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (isPending) return <LoadingDots />;
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex bg-muted/30 max-w-screen-2xl mx-auto">
-        <aside className="hidden lg:block w-[20%] border-r bg-background h-full overflow-y-auto sticky top-0">
+      <div className="min-h-screen flex bg-muted/30 mx-auto">
+        <aside className="hidden lg:block w-64 border-r bg-background h-full overflow-y-auto sticky top-0">
           <Sidebar navigation={navigation} />
         </aside>
 
@@ -601,7 +602,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
           </SheetContent>
         </Sheet>
 
-        <div className="flex-1 flex flex-col w-[80%] ">
+        <div className="flex-1 flex flex-col">
           <Navbar
             userData={userData}
             onLogout={() => logOutFunc()}
