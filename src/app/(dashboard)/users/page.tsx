@@ -20,9 +20,8 @@ import { SmartPagination } from "@/components/utils/SmartPagination";
 
 function page() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data, isLoading: isLoadinAllUsers } = useGetAllUsers();
+  const { data, isLoading: isLoadinAllUsers, refetch } = useGetAllUsers();
   const paginationData = data?.pagination;
-
 
   const filteredUsers =
     data?.data?.filter((user: any) => {
@@ -36,10 +35,6 @@ function page() {
   const handleMemberClick = (member_ID: string) => {
     console.log("Member ID clicked:", member_ID);
   };
-
-
-
-
 
   if (isLoadinAllUsers) return <LoadingDots />;
   return (
@@ -114,12 +109,14 @@ function page() {
                         </p>
                       </div>
                       <Button
-                        onClick={() => setSearchQuery("")}
+                        onClick={() => {
+                          setSearchQuery(""), refetch();
+                        }}
                         variant="outline"
                         className="gap-2 bg-transparent text-green-600"
                       >
                         <Search className="h-4 w-4" />
-                        Reset
+                        Retry
                       </Button>
                     </div>
                   </Card>
@@ -198,7 +195,7 @@ function page() {
 
       {/* -- PAGINATION -- */}
       <div className=" flex justify-center">
-         <SmartPagination paginationData={paginationData} />
+        <SmartPagination paginationData={paginationData} />
       </div>
     </div>
   );
