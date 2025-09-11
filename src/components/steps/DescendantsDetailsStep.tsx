@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
@@ -37,6 +37,7 @@ import { useRouter } from "next/navigation";
 import useGetAllChoice from "@/hooks/data/useGetAllChoice";
 
 import useGetMember from "@/hooks/data/useGetMember";
+import { ImageViewer } from "../utils/ImageViewer";
 
 const validationSchema = Yup.object({
   data: Yup.array()
@@ -102,6 +103,19 @@ export default function DescendantsDetailsStep() {
   const { descendant: memberData } = data ?? {};
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { descendant_relation_choice } = choiceSections ?? {};
+
+  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const handleImageClick = (image: any) => {
+    setSelectedImage(image);
+    setIsViewerOpen(true);
+  };
+
+  const handleCloseViewer = () => {
+    setIsViewerOpen(false);
+    setSelectedImage(null);
+  };
+
   const { mutate: addDescendantFunc, isPending } = useMutation({
     mutationFn: async (userData: any[]) => {
       const errors: Record<string, string> = {};
@@ -354,7 +368,6 @@ export default function DescendantsDetailsStep() {
     }
   };
 
-  //Button Functions
   const handleSkip = () => {
     nextStep();
   };
@@ -364,273 +377,290 @@ export default function DescendantsDetailsStep() {
   };
 
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-6">
-      <div className="space-y-6">
-        {formik.values.data.map((descendant: any, index: number) => {
-          return (
-            <div
-              key={index}
-              className="border rounded-lg p-4 space-y-4 relative"
-            >
-              {formik.values.data.length > 1 && (
-                <div className="flex justify-between items-center">
-                  <h3 className="text-sm font-medium text-gray-900">
-                    Descendant {index + 1}
-                  </h3>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeDescendant(index)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
-              <div className="grid gap-4 md:grid-cols-1">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Descendant Name
-                  </Label>
-                  <Input
-                    placeholder="Enter Descendant Name"
-                    value={descendant.name}
-                    onChange={(e) =>
-                      updateDescendant(index, "name", e.target.value)
-                    }
-                    onBlur={formik.handleBlur}
-                    name={`data.${index}.name`}
-                    className="w-full"
-                  />
-
-                  {(formik.touched.data as any[])?.[index]?.name &&
-                    (formik.errors.data as any[])?.[index]?.name && (
-                      <p className="text-sm text-red-600">
-                        {(formik.errors.data as any[])?.[index]?.name}
-                      </p>
-                    )}
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Contact Number
-                  </Label>
-                  <Input
-                    type="tel"
-                    placeholder="Enter Descendant Contact"
-                    value={descendant.descendant_contact_number}
-                    onChange={(e) =>
-                      updateDescendant(
-                        index,
-                        "descendant_contact_number",
-                        e.target.value
-                      )
-                    }
-                    onBlur={formik.handleBlur}
-                    name={`data.${index}.descendant_contact_number`}
-                    className="w-full"
-                  />
-
-                  {(formik.touched.data as any[])?.[index]
-                    ?.descendant_contact_number &&
-                    (formik.errors.data as any[])?.[index]
-                      ?.descendant_contact_number && (
-                      <p className="text-sm text-red-600">
-                        {
-                          (formik.errors.data as any[])?.[index]
-                            ?.descendant_contact_number
-                        }
-                      </p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Date of Birth
-                  </Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !descendant.dob && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {descendant.dob
-                          ? format(descendant.dob, "PPP")
-                          : "Select Date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        captionLayout="dropdown"
-                        selected={
-                          descendant.dob ? new Date(descendant.dob) : undefined
-                        }
-                        onSelect={(date) => {
-                          if (date) {
-                            const formattedDate = format(date, "yyyy-MM-dd");
-                            updateDescendant(index, "dob", formattedDate);
-                          }
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-
-                  {(formik.touched.data as any[])?.[index]?.dob &&
-                    (formik.errors.data as any[])?.[index]?.dob && (
-                      <p className="text-sm text-red-600">
-                        {(formik.errors.data as any[])?.[index]?.dob}
-                      </p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-gray-700">
-                      Descendant Picture
-                    </Label>
-                    <p className="text-sm text-gray-500 pr-5">
-                      {isUpdateMode
-                        ? memberData[index]?.image?.split("/").pop()
-                        : null}
-                    </p>
+    <div>
+      <form onSubmit={formik.handleSubmit} className="space-y-6">
+        <div className="space-y-6">
+          {formik.values.data.map((descendant: any, index: number) => {
+            return (
+              <div
+                key={index}
+                className="border rounded-lg p-4 space-y-4 relative"
+              >
+                {formik.values.data.length > 1 && (
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-sm font-medium text-gray-900">
+                      Descendant {index + 1}
+                    </h3>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeDescendant(index)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                    <input
-                      ref={(el) => {
-                        fileInputRefs.current[index] = el;
-                      }}
-                      type="file"
-                      accept="image/*"
-                      onChange={(event) => handleFileUpload(index, event)}
-                      className="hidden"
+                )}
+                <div className="grid gap-4 md:grid-cols-1">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Descendant Name
+                    </Label>
+                    <Input
+                      placeholder="Enter Descendant Name"
+                      value={descendant.name}
+                      onChange={(e) =>
+                        updateDescendant(index, "name", e.target.value)
+                      }
+                      onBlur={formik.handleBlur}
+                      name={`data.${index}.name`}
+                      className="w-full"
                     />
-                    {descendant.image ? (
-                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span className="text-sm text-gray-700">
-                          {descendant.image.name}
-                        </span>
+
+                    {(formik.touched.data as any[])?.[index]?.name &&
+                      (formik.errors.data as any[])?.[index]?.name && (
+                        <p className="text-sm text-red-600">
+                          {(formik.errors.data as any[])?.[index]?.name}
+                        </p>
+                      )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Contact Number
+                    </Label>
+                    <Input
+                      type="tel"
+                      placeholder="Enter Descendant Contact"
+                      value={descendant.descendant_contact_number}
+                      onChange={(e) =>
+                        updateDescendant(
+                          index,
+                          "descendant_contact_number",
+                          e.target.value
+                        )
+                      }
+                      onBlur={formik.handleBlur}
+                      name={`data.${index}.descendant_contact_number`}
+                      className="w-full"
+                    />
+
+                    {(formik.touched.data as any[])?.[index]
+                      ?.descendant_contact_number &&
+                      (formik.errors.data as any[])?.[index]
+                        ?.descendant_contact_number && (
+                        <p className="text-sm text-red-600">
+                          {
+                            (formik.errors.data as any[])?.[index]
+                              ?.descendant_contact_number
+                          }
+                        </p>
+                      )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Date of Birth
+                    </Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !descendant.dob && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {descendant.dob
+                            ? format(descendant.dob, "PPP")
+                            : "Select Date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          captionLayout="dropdown"
+                          selected={
+                            descendant.dob
+                              ? new Date(descendant.dob)
+                              : undefined
+                          }
+                          onSelect={(date) => {
+                            if (date) {
+                              const formattedDate = format(date, "yyyy-MM-dd");
+                              updateDescendant(index, "dob", formattedDate);
+                            }
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+
+                    {(formik.touched.data as any[])?.[index]?.dob &&
+                      (formik.errors.data as any[])?.[index]?.dob && (
+                        <p className="text-sm text-red-600">
+                          {(formik.errors.data as any[])?.[index]?.dob}
+                        </p>
+                      )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium text-gray-700">
+                        Descendant Picture
+                      </Label>
+                      {isUpdateMode && (
+                        <p
+                          className="text-sm text-gray-500 pr-5 cursor-pointer hover:text-indigo-500"
+                          onClick={() =>
+                            handleImageClick(memberData[index]?.image)
+                          }
+                        >
+                          {memberData[index]?.image?.split("/").pop()}
+                        </p>
+                      )}
+                    </div>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                      <input
+                        ref={(el) => {
+                          fileInputRefs.current[index] = el;
+                        }}
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => handleFileUpload(index, event)}
+                        className="hidden"
+                      />
+                      {descendant.image ? (
+                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                          <span className="text-sm text-gray-700">
+                            {descendant.image.name}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              updateDescendant(index, "image", null);
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
                         <Button
                           type="button"
                           variant="ghost"
-                          size="sm"
                           onClick={() => {
-                            updateDescendant(index, "image", null);
+                            fileInputRefs.current[index]?.click();
                           }}
+                          className="w-full"
                         >
-                          <X className="w-4 h-4" />
+                          <Upload className="w-4 h-4 mr-2" />
+                          Choose File
                         </Button>
-                      </div>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => {
-                          fileInputRefs.current[index]?.click();
-                        }}
-                        className="w-full"
-                      >
-                        <Upload className="w-4 h-4 mr-2" />
-                        Choose File
-                      </Button>
-                    )}
+                      )}
+                    </div>
+                    {(formik.touched.data as any[])?.[index]?.image &&
+                      (formik.errors.data as any[])?.[index]?.image && (
+                        <p className="text-sm text-red-600">
+                          {(formik.errors.data as any[])?.[index]?.image}
+                        </p>
+                      )}
                   </div>
-                  {(formik.touched.data as any[])?.[index]?.image &&
-                    (formik.errors.data as any[])?.[index]?.image && (
-                      <p className="text-sm text-red-600">
-                        {(formik.errors.data as any[])?.[index]?.image}
-                      </p>
-                    )}
-                </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Relation Type
-                  </Label>
-                  <Select
-                    value={descendant.relation_type}
-                    onValueChange={(value) =>
-                      updateDescendant(index, "relation_type", value)
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="What is the Relation with Member?">
-                        {
-                          descendant_relation_choice?.find(
-                            (c: any) =>
-                              String(c.id) ===
-                              String(formik.values.data[index].relation_type)
-                          )?.name
-                        }
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {descendant_relation_choice?.map((option: any) => (
-                        <SelectItem key={option.id} value={option.id}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {(formik.touched.data as any[])?.[index]?.relation_type &&
-                    (formik.errors.data as any[])?.[index]?.relation_type && (
-                      <p className="text-sm text-red-600">
-                        {(formik.errors.data as any[])?.[index]?.relation_type}
-                      </p>
-                    )}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Relation Type
+                    </Label>
+                    <Select
+                      value={descendant.relation_type}
+                      onValueChange={(value) =>
+                        updateDescendant(index, "relation_type", value)
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="What is the Relation with Member?">
+                          {
+                            descendant_relation_choice?.find(
+                              (c: any) =>
+                                String(c.id) ===
+                                String(formik.values.data[index].relation_type)
+                            )?.name
+                          }
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {descendant_relation_choice?.map((option: any) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {(formik.touched.data as any[])?.[index]?.relation_type &&
+                      (formik.errors.data as any[])?.[index]?.relation_type && (
+                        <p className="text-sm text-red-600">
+                          {
+                            (formik.errors.data as any[])?.[index]
+                              ?.relation_type
+                          }
+                        </p>
+                      )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-        <div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addDescendant}
-            className="gap-2 bg-transparent"
-          >
-            <Plus className="w-4 h-4" />
-            Add Another
-          </Button>
+            );
+          })}
+          <div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addDescendant}
+              className="gap-2 bg-transparent"
+            >
+              <Plus className="w-4 h-4" />
+              Add Another
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
-        <div className="flex gap-3 flex-1">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
+          <div className="flex gap-3 flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleSaveAndExit()}
+              className="flex-1 sm:flex-none bg-transparent"
+            >
+              Reset
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => handleSkip()}
+              className="flex-1 sm:flex-none"
+            >
+              Skip
+            </Button>
+          </div>
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleSaveAndExit()}
-            className="flex-1 sm:flex-none bg-transparent"
+            type="submit"
+            disabled={isPending || isUpdating}
+            className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
           >
-            Reset
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => handleSkip()}
-            className="flex-1 sm:flex-none"
-          >
-            Skip
+            {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
+            <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
-        <Button
-          type="submit"
-          disabled={isPending || isUpdating}
-          className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
-        >
-          {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
-          <ChevronRight className="w-4 h-4 ml-2" />
-        </Button>
-      </div>
-    </form>
+      </form>
+      <ImageViewer
+        image={selectedImage}
+        isOpen={isViewerOpen}
+        onClose={handleCloseViewer}
+      />
+    </div>
   );
 }

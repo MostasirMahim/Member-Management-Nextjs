@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useAddMemberStore } from "@/store/store";
 
 import useGetMember from "@/hooks/data/useGetMember";
+import { ImageViewer } from "../utils/ImageViewer";
 
 const validationSchema = Yup.object({
   member_ID: Yup.string().required("Member ID is required"),
@@ -51,6 +52,19 @@ export default function CompanionDetailsStep() {
     enabled: isUpdateMode && !!memberID,
   });
   const { companion: memberData } = data ?? {};
+
+  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const handleImageClick = (image: any) => {
+    setSelectedImage(image);
+    setIsViewerOpen(true);
+  };
+
+  const handleCloseViewer = () => {
+    setIsViewerOpen(false);
+    setSelectedImage(null);
+  };
+
   const { mutate: addCompanionFunc, isPending } = useMutation({
     mutationFn: async (userData: any) => {
       const formData = new FormData();
@@ -213,232 +227,243 @@ export default function CompanionDetailsStep() {
   };
 
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-6">
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-        <div className="space-y-2">
-          <Label
-            htmlFor="companion_name"
-            className="text-sm font-medium text-gray-700"
-          >
-            Companion Name
-          </Label>
-          <Input
-            id="companion_name"
-            name="companion_name"
-            value={formik.values.companion_name}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="Enter Companion Name"
-            className="w-full"
-          />
-          {/* <CHANGE> Updated to use consistent touch/error pattern */}
-          {formik.touched.companion_name && formik.errors.companion_name && (
-            <p className="text-sm text-red-600">
-              {formik.errors.companion_name as string}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">
-            Date of Birth
-          </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !formik.values.companion_dob && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {formik.values.companion_dob
-                  ? format(formik.values.companion_dob, "PPP")
-                  : "Select Date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                captionLayout="dropdown"
-                selected={
-                  formik.values.companion_dob
-                    ? new Date(formik.values.companion_dob)
-                    : undefined
-                }
-                onSelect={(date) => {
-                  if (date) {
-                    const formattedDate = format(date, "yyyy-MM-dd");
-                    updateField("companion_dob", formattedDate);
-                  }
-                }}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-
-          {formik.touched.companion_dob && formik.errors.companion_dob && (
-            <p className="text-sm text-red-600">
-              {formik.errors.companion_dob as string}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label
-            htmlFor="companion_contact_number"
-            className="text-sm font-medium text-gray-700"
-          >
-            Contact Number
-          </Label>
-          <Input
-            id="companion_contact_number"
-            name="companion_contact_number"
-            type="tel"
-            value={formik.values.companion_contact_number}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="Enter Companion Contact"
-            className="w-full"
-          />
-
-          {formik.touched.companion_contact_number &&
-            formik.errors.companion_contact_number && (
-              <p className="text-sm text-red-600">
-                {formik.errors.companion_contact_number as string}
-              </p>
-            )}
-        </div>
-
-        <div className="space-y-2">
-          <Label
-            htmlFor="companion_card_number"
-            className="text-sm font-medium text-gray-700"
-          >
-            Companion Card Number
-          </Label>
-          <Input
-            id="companion_card_number"
-            name="companion_card_number"
-            value={formik.values.companion_card_number}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="Enter Companion Card Number"
-            className="w-full"
-          />
-
-          {formik.touched.companion_card_number &&
-            formik.errors.companion_card_number && (
-              <p className="text-sm text-red-600">
-                {formik.errors.companion_card_number as string}
-              </p>
-            )}
-        </div>
-        <div className="space-y-2">
-          <Label
-            htmlFor="relation_with_member"
-            className="text-sm font-medium text-gray-700"
-          >
-            Relation with Member
-          </Label>
-          <Input
-            id="relation_with_member"
-            name="relation_with_member"
-            value={formik.values.relation_with_member}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="Enter Relation with Member"
-            className="w-full"
-          />
-
-          {formik.touched.relation_with_member &&
-            formik.errors.relation_with_member && (
-              <p className="text-sm text-red-600">
-                {formik.errors.relation_with_member as string}
-              </p>
-            )}
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-gray-700">
-              Companion Picture
+    <div>
+      <form onSubmit={formik.handleSubmit} className="space-y-6">
+        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+          <div className="space-y-2">
+            <Label
+              htmlFor="companion_name"
+              className="text-sm font-medium text-gray-700"
+            >
+              Companion Name
             </Label>
-            <p className="text-sm text-gray-500 pr-5">
-              {isUpdateMode
-                ? memberData[0]?.companion_image?.split("/").pop()
-                : null}
-            </p>
-          </div>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="hidden"
+            <Input
+              id="companion_name"
+              name="companion_name"
+              value={formik.values.companion_name}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter Companion Name"
+              className="w-full"
             />
-            {formik.values.companion_image ? (
-              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                <span className="text-sm text-gray-700">
-                  {formik.values.companion_image.name}
-                </span>
+            {formik.touched.companion_name && formik.errors.companion_name && (
+              <p className="text-sm text-red-600">
+                {formik.errors.companion_name as string}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700">
+              Date of Birth
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !formik.values.companion_dob && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {formik.values.companion_dob
+                    ? format(formik.values.companion_dob, "PPP")
+                    : "Select Date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  captionLayout="dropdown"
+                  selected={
+                    formik.values.companion_dob
+                      ? new Date(formik.values.companion_dob)
+                      : undefined
+                  }
+                  onSelect={(date) => {
+                    if (date) {
+                      const formattedDate = format(date, "yyyy-MM-dd");
+                      updateField("companion_dob", formattedDate);
+                    }
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+
+            {formik.touched.companion_dob && formik.errors.companion_dob && (
+              <p className="text-sm text-red-600">
+                {formik.errors.companion_dob as string}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label
+              htmlFor="companion_contact_number"
+              className="text-sm font-medium text-gray-700"
+            >
+              Contact Number
+            </Label>
+            <Input
+              id="companion_contact_number"
+              name="companion_contact_number"
+              type="tel"
+              value={formik.values.companion_contact_number}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter Companion Contact"
+              className="w-full"
+            />
+
+            {formik.touched.companion_contact_number &&
+              formik.errors.companion_contact_number && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.companion_contact_number as string}
+                </p>
+              )}
+          </div>
+
+          <div className="space-y-2">
+            <Label
+              htmlFor="companion_card_number"
+              className="text-sm font-medium text-gray-700"
+            >
+              Companion Card Number
+            </Label>
+            <Input
+              id="companion_card_number"
+              name="companion_card_number"
+              value={formik.values.companion_card_number}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter Companion Card Number"
+              className="w-full"
+            />
+
+            {formik.touched.companion_card_number &&
+              formik.errors.companion_card_number && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.companion_card_number as string}
+                </p>
+              )}
+          </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="relation_with_member"
+              className="text-sm font-medium text-gray-700"
+            >
+              Relation with Member
+            </Label>
+            <Input
+              id="relation_with_member"
+              name="relation_with_member"
+              value={formik.values.relation_with_member}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter Relation with Member"
+              className="w-full"
+            />
+
+            {formik.touched.relation_with_member &&
+              formik.errors.relation_with_member && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.relation_with_member as string}
+                </p>
+              )}
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium text-gray-700">
+                Companion Picture
+              </Label>
+              {isUpdateMode && (
+                <p
+                  className="text-sm text-gray-500 pr-5 cursor-pointer hover:text-indigo-500"
+                  onClick={() =>
+                    handleImageClick(memberData[0]?.companion_image)
+                  }
+                >
+                  {memberData[0]?.companion_image?.split("/").pop()}
+                </p>
+              )}
+            </div>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              {formik.values.companion_image ? (
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm text-gray-700">
+                    {formik.values.companion_image.name}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={removeFile}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
-                  onClick={removeFile}
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                  }}
+                  className="w-full"
                 >
-                  <X className="w-4 h-4" />
+                  <Upload className="w-4 h-4 mr-2" />
+                  Choose File
                 </Button>
-              </div>
-            ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  fileInputRef.current?.click();
-                }}
-                className="w-full"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Choose File
-              </Button>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
-        <div className="flex gap-3 flex-1">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
+          <div className="flex gap-3 flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleSaveAndExit()}
+              className="flex-1 sm:flex-none bg-transparent"
+            >
+              Reset
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => handleSkip()}
+              className="flex-1 sm:flex-none"
+            >
+              Skip
+            </Button>
+          </div>
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleSaveAndExit()}
-            className="flex-1 sm:flex-none bg-transparent"
+            type="submit"
+            disabled={isPending || isUpdating}
+            className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
           >
-            Reset
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => handleSkip()}
-            className="flex-1 sm:flex-none"
-          >
-            Skip
+            {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
+            <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
-        <Button
-          type="submit"
-          disabled={isPending || isUpdating}
-          className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
-        >
-          {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
-          <ChevronRight className="w-4 h-4 ml-2" />
-        </Button>
-      </div>
-    </form>
+      </form>
+      <ImageViewer
+        image={selectedImage}
+        isOpen={isViewerOpen}
+        onClose={handleCloseViewer}
+      />
+    </div>
   );
 }

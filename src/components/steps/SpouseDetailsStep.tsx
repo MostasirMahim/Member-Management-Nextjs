@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
@@ -30,6 +30,7 @@ import { useAddMemberStore } from "@/store/store";
 import { useRouter } from "next/navigation";
 import useGetMember from "@/hooks/data/useGetMember";
 import { LoadingCard } from "../ui/loading";
+import { ImageViewer } from "../utils/ImageViewer";
 
 const validationSchema = Yup.object({
   spouse_name: Yup.string().required("Spouse name is required"),
@@ -60,13 +61,8 @@ export default function SpouseDetailsStep() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const {
-    currentStep,
-    nextStep,
-    markStepCompleted,
-    memberID,
-    isUpdateMode,
-  } = useAddMemberStore();
+  const { currentStep, nextStep, markStepCompleted, memberID, isUpdateMode } =
+    useAddMemberStore();
 
   const { data, isLoading: isLoadingMember } = useGetMember(memberID, {
     enabled: isUpdateMode && !!memberID,
@@ -74,6 +70,18 @@ export default function SpouseDetailsStep() {
   const { spouse: memberData } = data ?? {};
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { spouse_status_choice } = choiceSections ?? {};
+
+  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const handleImageClick = (image: any) => {
+    setSelectedImage(image);
+    setIsViewerOpen(true);
+  };
+
+  const handleCloseViewer = () => {
+    setIsViewerOpen(false);
+    setSelectedImage(null);
+  };
 
   const { mutate: addSpouseFunc, isPending } = useMutation({
     mutationFn: async (userData: any) => {
@@ -217,210 +225,224 @@ export default function SpouseDetailsStep() {
   };
   if (isLoading || isLoadingMember) return <LoadingCard />;
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1 space-y-2">
-          <Label
-            htmlFor="spouse_name"
-            className="text-sm font-medium text-gray-700"
-          >
-            Spouse Name
-          </Label>
-          <Input
-            id="spouse_name"
-            name="spouse_name"
-            value={formik.values.spouse_name}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="Enter Spouse Name"
-            className="w-full"
-          />
-          {formik.errors.spouse_name && formik.touched.spouse_name && (
-            <p className="text-sm text-red-600">
-              {formik.errors.spouse_name as string}
-            </p>
-          )}
-        </div>
-
-        <div className="flex-1 space-y-2">
-          <Label
-            htmlFor="contact_number"
-            className="text-sm font-medium text-gray-700"
-          >
-            Contact Number
-          </Label>
-          <Input
-            id="contact_number"
-            name="contact_number"
-            type="tel"
-            value={formik.values.contact_number}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="Enter Spouse Contact"
-            className="w-full"
-          />
-          {formik.errors.contact_number && formik.touched.contact_number && (
-            <p className="text-sm text-red-600">
-              {formik.errors.contact_number as string}
-            </p>
-          )}
-        </div>
-      </div>
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">
-            Date of Birth
-          </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !formik.values.spouse_dob && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {formik.values.spouse_dob
-                  ? format(formik.values.spouse_dob, "PPP")
-                  : "Select Date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                captionLayout="dropdown"
-                selected={
-                  formik.values.spouse_dob
-                    ? new Date(formik.values.spouse_dob)
-                    : undefined
-                }
-                onSelect={(date) => {
-                  if (date) {
-                    const formattedDate = format(date, "yyyy-MM-dd");
-                    formik.setFieldValue("spouse_dob", formattedDate);
-                  }
-                }}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-          {formik.errors.spouse_dob &&
-            formik.touched.spouse_dob &&
-            typeof formik.errors.spouse_dob === "string" && (
-              <p className="text-sm text-red-600">{formik.errors.spouse_dob}</p>
+    <div>
+      <form onSubmit={formik.handleSubmit} className="space-y-6">
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex-1 space-y-2">
+            <Label
+              htmlFor="spouse_name"
+              className="text-sm font-medium text-gray-700"
+            >
+              Spouse Name
+            </Label>
+            <Input
+              id="spouse_name"
+              name="spouse_name"
+              value={formik.values.spouse_name}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter Spouse Name"
+              className="w-full"
+            />
+            {formik.errors.spouse_name && formik.touched.spouse_name && (
+              <p className="text-sm text-red-600">
+                {formik.errors.spouse_name as string}
+              </p>
             )}
-        </div>
+          </div>
 
+          <div className="flex-1 space-y-2">
+            <Label
+              htmlFor="contact_number"
+              className="text-sm font-medium text-gray-700"
+            >
+              Contact Number
+            </Label>
+            <Input
+              id="contact_number"
+              name="contact_number"
+              type="tel"
+              value={formik.values.contact_number}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter Spouse Contact"
+              className="w-full"
+            />
+            {formik.errors.contact_number && formik.touched.contact_number && (
+              <p className="text-sm text-red-600">
+                {formik.errors.contact_number as string}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700">
+              Date of Birth
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !formik.values.spouse_dob && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {formik.values.spouse_dob
+                    ? format(formik.values.spouse_dob, "PPP")
+                    : "Select Date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  captionLayout="dropdown"
+                  selected={
+                    formik.values.spouse_dob
+                      ? new Date(formik.values.spouse_dob)
+                      : undefined
+                  }
+                  onSelect={(date) => {
+                    if (date) {
+                      const formattedDate = format(date, "yyyy-MM-dd");
+                      formik.setFieldValue("spouse_dob", formattedDate);
+                    }
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            {formik.errors.spouse_dob &&
+              formik.touched.spouse_dob &&
+              typeof formik.errors.spouse_dob === "string" && (
+                <p className="text-sm text-red-600">
+                  {formik.errors.spouse_dob}
+                </p>
+              )}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700">Status</Label>
+            <Select
+              value={formik.values.current_status}
+              onValueChange={(value) => updateField("current_status", value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="What is the spouse status?">
+                  {
+                    spouse_status_choice?.find(
+                      (c: any) =>
+                        String(c.id) === String(formik.values.current_status)
+                    )?.name
+                  }
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {spouse_status_choice?.map((option: any) => (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {formik.errors.current_status && formik.touched.current_status && (
+              <p className="text-sm text-red-600">
+                {formik.errors.current_status as string}
+              </p>
+            )}
+          </div>
+        </div>
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">Status</Label>
-          <Select
-            value={formik.values.current_status}
-            onValueChange={(value) => updateField("current_status", value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="What is the spouse status?">
-                {
-                  spouse_status_choice?.find(
-                    (c: any) =>
-                      String(c.id) === String(formik.values.current_status)
-                  )?.name
-                }
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {spouse_status_choice?.map((option: any) => (
-                <SelectItem key={option.id} value={option.id}>
-                  {option.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {formik.errors.current_status && formik.touched.current_status && (
-            <p className="text-sm text-red-600">
-              {formik.errors.current_status as string}
-            </p>
-          )}
-        </div>
-      </div>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium text-gray-700">
-            Spouse Picture
-          </Label>
-          <p className="text-sm text-gray-500 pr-5">
-            {isUpdateMode ? memberData[0]?.image?.split("/").pop() : null}
-          </p>
-        </div>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          {formik.values.image ? (
-            <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-              <span className="text-sm text-gray-700">
-                {formik.values.image.name}
-              </span>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium text-gray-700">
+              Spouse Picture
+            </Label>
+            {isUpdateMode && (
+              <p
+                className="text-sm text-gray-500 pr-5 cursor-pointer hover:text-indigo-500"
+                onClick={() => handleImageClick(memberData[0]?.image)}
+              >
+                {memberData[0]?.image?.split("/").pop()}
+              </p>
+            )}
+          </div>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            {formik.values.image ? (
+              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <span className="text-sm text-gray-700">
+                  {formik.values.image.name}
+                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    updateField("image", null);
+                  }}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
                 onClick={() => {
-                  updateField("image", null);
+                  fileInputRef.current?.click();
                 }}
+                className="w-full"
               >
-                <X className="w-4 h-4" />
+                <Upload className="w-4 h-4 mr-2" />
+                Choose File
               </Button>
-            </div>
-          ) : (
+            )}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
+          <div className="flex gap-3 flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleSaveAndExit()}
+              className="flex-1 sm:flex-none bg-transparent"
+            >
+              Reset
+            </Button>
             <Button
               type="button"
               variant="ghost"
-              onClick={() => {
-                fileInputRef.current?.click();
-              }}
-              className="w-full"
+              onClick={() => handleSkip()}
+              className="flex-1 sm:flex-none"
             >
-              <Upload className="w-4 h-4 mr-2" />
-              Choose File
+              Skip
             </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
-        <div className="flex gap-3 flex-1">
+          </div>
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleSaveAndExit()}
-            className="flex-1 sm:flex-none bg-transparent"
+            type="submit"
+            disabled={isPending || isUpdating}
+            className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
           >
-            Reset
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => handleSkip()}
-            className="flex-1 sm:flex-none"
-          >
-            Skip
+            {isPending || isUpdating ? "Saving..." : "Save & Next"}
+            <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
-        <Button
-          type="submit"
-          disabled={isPending || isUpdating}
-          className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
-        >
-          {isPending || isUpdating ? "Saving..." : "Save & Next"}
-          <ChevronRight className="w-4 h-4 ml-2" />
-        </Button>
-      </div>
-    </form>
+      </form>
+      <ImageViewer
+        image={selectedImage}
+        isOpen={isViewerOpen}
+        onClose={handleCloseViewer}
+      />
+    </div>
   );
 }
