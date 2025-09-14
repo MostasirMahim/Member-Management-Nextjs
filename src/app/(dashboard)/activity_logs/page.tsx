@@ -32,7 +32,7 @@ async function ActivityLogPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="max-h-full w-full max-w-4xl overflow-y-auto">
+    <div className="max-h-full w-full ">
       <ActivityLog data={responseData} />
     </div>
   );

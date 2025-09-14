@@ -33,7 +33,7 @@ export default async function IncomePage() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl overflow-x-auto">
+    <div className="bg-background">
       <IncomeTable incomes={incomes} />
     </div>
   );

@@ -609,13 +609,13 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
           </SheetContent>
         </Sheet>
 
-        <div className="flex-1 flex flex-col bg-[#f4f7fb] dark:bg-black/80">
+        <div className="flex-1 flex flex-col bg-[#f4f7fb] dark:bg-black/80 min-w-0">
           <Navbar
             userData={userData}
             onLogout={() => logOutFunc()}
             onMenuClick={() => setIsMobileOpen(true)}
           />
-          <main className="overflow-y-auto overflow-x-auto p-4 sm:p-6 lg:p-8">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
             {children}
           </main>
         </div>
