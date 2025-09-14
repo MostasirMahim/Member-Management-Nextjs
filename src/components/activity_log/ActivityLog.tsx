@@ -17,7 +17,7 @@ function ActivityLog({ data }: { data: any }) {
 
   return (
     <div>
-      <Table>
+      <Table className="max-w-4xl overflow-x-auto">
         <TableCaption>All user activity logs. </TableCaption>
         <TableHeader>
           <TableRow className="bg-gray-100 dark:bg-gray-700 ">

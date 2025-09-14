@@ -30,7 +30,7 @@ export default async function ProductsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 max-w-4xl overflow-x-auto">
      
 
       {/* Show in Table */}

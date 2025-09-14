@@ -59,7 +59,7 @@ function EmailConfigTable({ data }: Props) {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 ">
       <AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>

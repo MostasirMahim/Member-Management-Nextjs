@@ -25,8 +25,8 @@ async function EmailConfigPage() {
   }
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-3 justify-between items-center mb-4">
+    <div className="max-w-4xl overflow-y-auto">
+      <div className="flex flex-wrap gap-3 justify-between items-center mb-4 ">
         <div>
           <h2 className="font-bold text-4xl">Email configurations</h2>
         </div>
