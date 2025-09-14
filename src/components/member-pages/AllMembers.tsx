@@ -209,7 +209,7 @@ function AllMembers() {
 
   if (user_isLoading) return <LoadingDots />;
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <div className="flex flex-row items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">ALL Members</h1>
@@ -544,7 +544,7 @@ function AllMembers() {
         )}
       </div>
       <div className="rounded-md border my-2 font-secondary">
-        <Table className="">
+        <Table>
           <TableHeader>
             <TableRow className=" text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
               <TableHead className=" text-black dark:text-white font-bold  text-center">

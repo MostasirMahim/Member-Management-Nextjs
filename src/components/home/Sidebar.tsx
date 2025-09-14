@@ -41,11 +41,12 @@ const NavItem = ({
   const key = label + href;
   const isOpen = openKeys.includes(key);
 
+
 const isActive =
-  (href && href !== "#" && (pathname === href || pathname.startsWith(href + "/"))) ||
+  (href && href !== "#" && (pathname === href)) ||
   urls.some((u) => pathname === u || pathname.startsWith(u)) ||
   (subItems ? hasActiveSubItem(subItems) : false);
-
+  console.log(pathname , href , isActive);
 
   useEffect(() => {
     if (isActive && !isOpen) {
@@ -74,7 +75,7 @@ const isActive =
   };
 
   const paddingLeft = level * 16 + 12;
-  const buttonWidth = level > 1 ? "w-full" : "w-[90%]";
+  const buttonWidth = level > 1 ? "w-[85%]" : "w-[85%]";
   
   if (subItems && subItems.length > 0) {
     return (
@@ -83,9 +84,9 @@ const isActive =
           <Button
             variant="ghost"
             className={cn(
-              `${buttonWidth} hover:translate-y-1 transition-transform duration-300 ease-in-out justify-between gap-1 h-10 px-3`,
+              `${buttonWidth} hover:translate-y-1 hover:text-primary hover:bg-transparent dark:hover:bg-gray-900 transition-transform duration-300 ease-in-out justify-between gap-1 h-10 px-3 w-[85%]`,
               isActive &&
-                "bg-primary hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-white my-2"
+                " hover:bg-blue-500 hover:text-white rounded-xl dark:bg-accent text-primary my-1"
             )}
             style={{ paddingLeft: `${paddingLeft}px` }}
           >
@@ -108,7 +109,7 @@ const isActive =
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-1">
-          <div className="space-y-1">
+          <div className="space-y-1 my-1">
             {subItems.map((subItem, index) => (
               <NavItem
                 key={index}
@@ -131,9 +132,9 @@ const isActive =
       <Button
         variant="ghost"
         className={cn(
-          `${buttonWidth} hover:translate-y-1 transition-transform duration-300 ease-in-out justify-start gap-3 h-10 px-3 w-[90%]`,
+          `${buttonWidth} hover:translate-y-1 hover:text-primary hover:bg-transparent dark:hover:bg-gray-900 transition-transform duration-300 ease-in-out justify-start gap-3 h-10 px-3 w-[85%]`,
           isActive &&
-            "bg-blue-50 hover:bg-primary hover:text-white rounded-xl dark:bg-accent text-primary my-1"
+            "bg-primary hover:bg-blue-500  text-white rounded-xl dark:bg-accent hover:text-white"
         )}
         style={{ paddingLeft: `${paddingLeft}px` }}
       >
@@ -159,8 +160,8 @@ const Sidebar = ({ navigation }: { navigation: NavItemProps[] }) => {
           className="object-contain rounded-full h-[120px] w-[120px]"
         />
       </div>
-      <ScrollArea className="flex-1 overflow-y-auto no-scrollbar border-b-2 mb-5">
-        <nav className="space-y-1 px-2">
+      <ScrollArea className="flex-1 overflow-y-auto no-scrollbar border-b-2 mb-5 ">
+        <nav className="space-y-1 px-2 mx-auto">
           {navigation.map((item, index) => (
             <NavItem key={index} {...item} />
           ))}

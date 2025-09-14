@@ -37,18 +37,24 @@ import {
   HandCoins,
   FileChartColumn,
   History,
-  Dumbbell,
   Component,
   TableOfContents,
   Ticket,
   MapPinHouse,
   ImageIcon,
   UserCheck,
-  UserX,
   Plus,
   Eye,
-  Edit,
   Logs,
+  UserCog,
+  UserPlus,
+  UsersRound,
+  Layers,
+  SquareUser,
+  NotepadText,
+  CombineIcon,
+  ChartGanttIcon,
+  Slack,
 } from "lucide-react";
 
 import {
@@ -82,17 +88,17 @@ const navigation_sidebar_links = [
     href: "",
     subItems: [
       {
-        icon: <UserCheck className="h-4 w-4" />,
+        icon: <UserCog className="h-4 w-4" />,
         label: "Pending Members",
         href: "/members/pending",
       },
       {
-        icon: <Plus className="h-4 w-4" />,
+        icon: <UserPlus className="h-4 w-4" />,
         label: "Add Member",
         href: "/members/add",
       },
       {
-        icon: <UserX className="h-4 w-4" />,
+        icon: <UsersRound className="h-4 w-4" />,
         label: "View Members",
         href: "/members/view",
         urls:["/member/view"]
@@ -106,22 +112,22 @@ const navigation_sidebar_links = [
   },
 
   {
-    icon: <Users className="h-5 w-5" />,
+    icon: <SquareUser className="h-5 w-5" />,
     label: "All Users",
     href: "/users",
   },
   {
-    icon: <Users className="h-5 w-5" />,
+    icon: <Layers className="h-5 w-5" />,
     label: "All Groups",
     href: "/groups",
   },
   {
-    icon: <Users className="h-5 w-5" />,
+    icon: <NotepadText  className="h-5 w-5" />,
     label: "Add Choices",
     href: "/choices",
   },
   {
-    icon: <Users className="h-5 w-5" />,
+    icon: <UserPlus className="h-5 w-5" />,
     label: "Onboarding",
     href: "/registration/email",
   },
@@ -139,37 +145,38 @@ const navigation_sidebar_links = [
   {
     icon: <Mails className="h-5 w-5" />,
     label: "Email management",
-    href: "#",
+    href: "",
     subItems: [
       {
         icon: <MailPlus className="h-4 w-4" />,
         label: "Configurations",
-        href: "/emails/configurations/",
+        href: "/emails/configurations",
+        urls:["/emails/configurations/add"]
       },
       {
         icon: <UserRound className="h-4 w-4" />,
         label: "Groups",
-        href: "/emails/groups/",
+        href: "/emails/groups",
       },
       {
         icon: <BetweenHorizonalStart className="h-4 w-4" />,
         label: "Add email to group",
-        href: "/emails/add_email/",
+        href: "/emails/add_email",
       },
       {
         icon: <SquarePen className="h-4 w-4" />,
         label: "Compose email",
-        href: "/emails/compose/",
+        href: "/emails/compose",
       },
       {
         icon: <ExternalLink className="h-4 w-4" />,
         label: "Outbox",
-        href: "/emails/outbox/",
+        href: "/emails/outbox",
       },
       {
         icon: <Settings className="h-4 w-4" />,
         label: "View all composes",
-        href: "/emails/compose/view/",
+        href: "/emails/compose/view",
       },
     ],
   },
@@ -181,32 +188,32 @@ const navigation_sidebar_links = [
       {
         icon: <Soup className="h-4 w-4" />,
         label: "Restaurants",
-        href: "/restaurants/",
+        href: "/restaurants",
       },
       {
         icon: <BookCheck className="h-4 w-4" />,
         label: "Add restaurants choices",
-        href: "/restaurants/choices/",
+        href: "/restaurants/choices",
       },
       {
         icon: <ShoppingCart className="h-4 w-4" />,
         label: "Add restaurant item",
-        href: "/restaurants/items/add/",
+        href: "/restaurants/items/add",
       },
       {
         icon: <ListTodo className="h-4 w-4" />,
         label: "Add item category",
-        href: "/restaurants/items/add/category/",
+        href: "/restaurants/items/add/category",
       },
       {
         icon: <Upload className="h-4 w-4" />,
         label: "Upload restaurant sales",
-        href: "/restaurants/sales/upload/",
+        href: "/restaurants/sales/upload",
       },
       {
         icon: <ShoppingCart className="h-4 w-4" />,
         label: "View cart",
-        href: "/restaurants/checkout/",
+        href: "/restaurants/checkout",
       },
     ],
   },
@@ -218,7 +225,7 @@ const navigation_sidebar_links = [
       {
         icon: <Plus className="h-3 w-3" />,
         label: "Add Product",
-        href: "/products/add/",
+        href: "/products/add",
       },
       {
         icon: <Eye className="h-3 w-3" />,
@@ -227,53 +234,53 @@ const navigation_sidebar_links = [
       },
 
       {
-        icon: <List className="h-4 w-4" />,
+        icon: <ChartGanttIcon className="h-4 w-4" />,
         label: "Categories",
         href: "#",
         subItems: [
           {
             icon: <Plus className="h-3 w-3" />,
             label: "Add Category",
-            href: "/products/categories/add/",
+            href: "/products/categories/add",
           },
           {
             icon: <Eye className="h-3 w-3" />,
             label: "View Categories",
-            href: "/products/categories/",
+            href: "/products/categories",
           },
         ],
       },
       {
-        icon: <List className="h-4 w-4" />,
+        icon: <Slack className="h-4 w-4" />,
         label: "Brands",
         href: "#",
         subItems: [
           {
             icon: <Plus className="h-3 w-3" />,
             label: "Add Brand",
-            href: "/products/brands/add/",
+            href: "/products/brands/add",
           },
           {
             icon: <Eye className="h-3 w-3" />,
             label: "View Brands",
-            href: "/products/brands/",
+            href: "/products/brands",
           },
         ],
       },
       {
-        icon: <List className="h-4 w-4" />,
+        icon: <ImageIcon className="h-4 w-4" />,
         label: "Media",
         href: "#",
         subItems: [
           {
             icon: <Plus className="h-3 w-3" />,
             label: "Add Media",
-            href: "/products/media/add/",
+            href: "/products/media/add",
           },
           {
             icon: <Eye className="h-3 w-3" />,
             label: "View Media",
-            href: "/products/media/",
+            href: "/products/media",
           },
         ],
       },
@@ -285,12 +292,12 @@ const navigation_sidebar_links = [
           {
             icon: <Plus className="h-3 w-3" />,
             label: "Add Product Price",
-            href: "/products/prices/add/",
+            href: "/products/prices/add",
           },
           {
             icon: <Eye className="h-3 w-3" />,
             label: "View Product Price",
-            href: "/products/prices/",
+            href: "/products/prices",
           },
         ],
       },
@@ -302,12 +309,12 @@ const navigation_sidebar_links = [
           {
             icon: <Plus className="h-3 w-3" />,
             label: "Add Product Cart",
-            href: "/products/buy/add/",
+            href: "/products/buy/add",
           },
           {
             icon: <Eye className="h-3 w-3" />,
             label: "View Product Cart",
-            href: "/products/buy/",
+            href: "/products/buy",
           },
         ],
       },
@@ -321,27 +328,27 @@ const navigation_sidebar_links = [
       {
         icon: <Code className="h-4 w-4" />,
         label: "View all promo codes",
-        href: "/promo_codes/",
+        href: "/promo_codes",
       },
       {
         icon: <CirclePlus className="h-4 w-4" />,
         label: "Add promo code",
-        href: "/promo_codes/add/",
+        href: "/promo_codes/add",
       },
       {
         icon: <TicketCheck className="h-4 w-4" />,
         label: "promo codes category",
-        href: "/promo_codes/categories/",
+        href: "/promo_codes/categories",
       },
       {
         icon: <TicketPlus className="h-4 w-4" />,
         label: "Add category",
-        href: "/promo_codes/categories/add/",
+        href: "/promo_codes/categories/add",
       },
       {
         icon: <Eye className="h-4 w-4" />,
         label: "View applied promo codes",
-        href: "/promo_codes/applied_promo_codes/",
+        href: "/promo_codes/applied_promo_codes",
       },
     ],
   },
@@ -446,7 +453,7 @@ const navigation_sidebar_links = [
     ],
   },
   {
-    icon: <Dumbbell className="h-5 w-5" />,
+    icon: <CombineIcon className="h-5 w-5" />,
     label: "Facility management",
     href: "#",
     subItems: [
@@ -588,7 +595,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex bg-muted/30 mx-auto">
-        <aside className="hidden lg:block w-64 border-r bg-background h-full overflow-y-auto sticky top-0">
+        <aside className="hidden lg:block w-64 min-w-64 border-r bg-background h-full overflow-y-auto sticky top-0 mx-auto">
           <Sidebar navigation={navigation} />
         </aside>
 
@@ -602,13 +609,13 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
           </SheetContent>
         </Sheet>
 
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col bg-[#f4f7fb] dark:bg-black/80">
           <Navbar
             userData={userData}
             onLogout={() => logOutFunc()}
             onMenuClick={() => setIsMobileOpen(true)}
           />
-          <main className="overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f4f7fb] dark:bg-black/80">
+          <main className="overflow-y-auto overflow-x-auto p-4 sm:p-6 lg:p-8">
             {children}
           </main>
         </div>
