@@ -46,8 +46,7 @@ const isActive =
   (href && href !== "#" && (pathname === href)) ||
   urls.some((u) => pathname === u || pathname.startsWith(u)) ||
   (subItems ? hasActiveSubItem(subItems) : false);
-  console.log(pathname , href , isActive);
-
+  
   useEffect(() => {
     if (isActive && !isOpen) {
       setOpenKeys([...openKeys, key]);
