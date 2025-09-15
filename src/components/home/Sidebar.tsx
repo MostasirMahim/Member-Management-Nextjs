@@ -46,7 +46,7 @@ const isActive =
   (href && href !== "#" && (pathname === href)) ||
   urls.some((u) => pathname === u || pathname.startsWith(u)) ||
   (subItems ? hasActiveSubItem(subItems) : false);
-  
+
   useEffect(() => {
     if (isActive && !isOpen) {
       setOpenKeys([...openKeys, key]);
@@ -83,7 +83,7 @@ const isActive =
           <Button
             variant="ghost"
             className={cn(
-              `${buttonWidth} hover:translate-y-1 hover:text-primary hover:bg-transparent dark:hover:bg-gray-900 transition-transform duration-300 ease-in-out justify-between gap-1 h-10 px-3 w-[85%]`,
+              `${buttonWidth} hover:translate-y-1 hover:text-primary hover:bg-transparent dark:hover:bg-gray-900 transition-transform duration-300 ease-in-out justify-between gap-1 h-10 px-3 w-full`,
               isActive &&
                 " hover:bg-blue-500 hover:text-white rounded-xl dark:bg-accent text-primary my-1"
             )}
@@ -131,7 +131,7 @@ const isActive =
       <Button
         variant="ghost"
         className={cn(
-          `${buttonWidth} hover:translate-y-1 hover:text-primary hover:bg-transparent dark:hover:bg-gray-900 transition-transform duration-300 ease-in-out justify-start gap-3 h-10 px-3 w-[85%]`,
+          `${buttonWidth} hover:translate-y-1 hover:text-primary hover:bg-transparent dark:hover:bg-gray-900 transition-transform duration-300 ease-in-out justify-start gap-3 h-10 px-3 w-full`,
           isActive &&
             "bg-primary hover:bg-blue-500  text-white rounded-xl dark:bg-accent hover:text-white"
         )}
