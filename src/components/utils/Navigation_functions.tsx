@@ -436,8 +436,8 @@ export const navigationPermissions: Record<string, string | null> = {
   "Email management": "bulk_emails_management",
   "Restaurant management": "restaurant_management",
   "Products Management": "product_management",
-  "Promo code management": "promo_code_management",
-  "Member financial management": "member_financial_management",
+  "Promo code": "promo_code_management",
+  "Member financial": "member_financial_management",
   "Upload sales": "member_financial_management",
   "Facility management": "facility_management",
 };

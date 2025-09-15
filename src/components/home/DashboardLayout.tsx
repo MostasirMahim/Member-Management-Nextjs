@@ -101,7 +101,7 @@ const navigation_sidebar_links = [
         icon: <UsersRound className="h-4 w-4" />,
         label: "View Members",
         href: "/members/view",
-        urls:["/member/view"]
+        urls: ["/member/view"],
       },
       {
         icon: <History className="h-4 w-4" />,
@@ -122,7 +122,7 @@ const navigation_sidebar_links = [
     href: "/groups",
   },
   {
-    icon: <NotepadText  className="h-5 w-5" />,
+    icon: <NotepadText className="h-5 w-5" />,
     label: "Add Choices",
     href: "/choices",
   },
@@ -151,7 +151,7 @@ const navigation_sidebar_links = [
         icon: <MailPlus className="h-4 w-4" />,
         label: "Configurations",
         href: "/emails/configurations",
-        urls:["/emails/configurations/add"]
+        urls: ["/emails/configurations/add"],
       },
       {
         icon: <UserRound className="h-4 w-4" />,
@@ -322,7 +322,7 @@ const navigation_sidebar_links = [
   },
   {
     icon: <PercentCircle className="h-5 w-5" />,
-    label: "Promo code management",
+    label: "Promo code",
     href: "#",
     subItems: [
       {
@@ -355,7 +355,7 @@ const navigation_sidebar_links = [
 
   {
     icon: <Wallet className="h-5 w-5" />,
-    label: "Member financial management",
+    label: "Member financial",
     href: "#",
     subItems: [
       {
