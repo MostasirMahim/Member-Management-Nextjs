@@ -137,7 +137,7 @@ const navigation_sidebar_links = [
     href: "/activity_logs",
   },
   {
-    icon: <Logs className="h-5 w-5" />,
+    icon: <List className="h-5 w-5" />,
     label: "My activity logs",
     href: "/my-activity-logs",
   },
@@ -500,6 +500,11 @@ const navigation_sidebar_links = [
         href: "/events/media",
       },
     ],
+  },
+  {
+    icon: <Settings className="h-5 w-5" />,
+    label: "Settings",
+    href: "/settings",
   },
 ];
 
