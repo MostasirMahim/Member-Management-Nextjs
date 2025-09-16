@@ -9,7 +9,7 @@ interface ThemeStoreState {
 export const useThemeStore = create<ThemeStoreState>()(
   persist(
     (set) => ({
-      theme: "zinc",
+      theme: "blue",
       setTheme: (theme) => set({ theme }),
     }),
     {
