@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import type React from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type React from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import {
   LayoutDashboard,
@@ -35,17 +35,17 @@ import {
   CreditCard,
   ListChecks,
   HandCoins,
-  FileChartColumn,
+  FileHeartIcon as FileChartColumn,
   History,
   Component,
-  TableOfContents,
+  Table2Icon as TableOfContents,
   Ticket,
-  MapPinHouse,
+  MapPinOff as MapPinHouse,
   ImageIcon,
   UserCheck,
   Plus,
   Eye,
-  Logs,
+  LogIn as Logs,
   UserCog,
   UserPlus,
   UsersRound,
@@ -53,28 +53,22 @@ import {
   SquareUser,
   NotepadText,
   CombineIcon,
-  ChartGanttIcon,
+  CarFrontIcon as ChartGanttIcon,
   Slack,
-} from "lucide-react";
+} from "lucide-react"
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { useState, useEffect } from "react"
+import { usePathname, useRouter } from "next/navigation"
 
-import { toast } from "react-toastify";
-import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "react-toastify"
+import axiosInstance from "@/lib/axiosInstance"
 
-import Sidebar from "./Sidebar";
-import { filterNavigationByPermissions } from "../utils/Navigation_functions";
-import { LoadingDots } from "../ui/loading";
-import { SidebarProvider } from "@/context/SidebarContext";
-import Navbar from "./Navbar";
+import Sidebar from "./Sidebar"
+import { filterNavigationByPermissions } from "../utils/Navigation_functions"
+import { LoadingDots } from "../ui/loading"
+import { SidebarProvider } from "@/context/SidebarContext"
+import Navbar from "./Navbar"
 
 const navigation_sidebar_links = [
   {
@@ -110,7 +104,6 @@ const navigation_sidebar_links = [
       },
     ],
   },
-
   {
     icon: <SquareUser className="h-5 w-5" />,
     label: "All Users",
@@ -141,7 +134,6 @@ const navigation_sidebar_links = [
     label: "My activity logs",
     href: "/my-activity-logs",
   },
-  ,
   {
     icon: <Mails className="h-5 w-5" />,
     label: "Email management",
@@ -232,7 +224,6 @@ const navigation_sidebar_links = [
         label: "View Products",
         href: "/products",
       },
-
       {
         icon: <ChartGanttIcon className="h-4 w-4" />,
         label: "Categories",
@@ -352,7 +343,6 @@ const navigation_sidebar_links = [
       },
     ],
   },
-
   {
     icon: <Wallet className="h-5 w-5" />,
     label: "Member financial",
@@ -402,7 +392,6 @@ const navigation_sidebar_links = [
         label: "View Invoice PaymentOptions",
         href: "/mfm/payment_options",
       },
-
       {
         icon: <WalletCards className="h-4 w-4" />,
         label: "View all Sales",
@@ -501,111 +490,98 @@ const navigation_sidebar_links = [
       },
     ],
   },
-  {
-    icon: <Settings className="h-5 w-5" />,
-    label: "Settings",
-    href: "/settings",
-  },
-];
+]
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [navigation, setNavigation] = useState<any>([]);
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  const pathname = usePathname()
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [navigation, setNavigation] = useState<any>([])
+  const router = useRouter()
+  const queryClient = useQueryClient()
 
   const { mutate: logOutFunc, isPending } = useMutation({
     mutationFn: async () => {
-      const res = await axiosInstance.delete("/api/account/v1/logout/");
-      return res.data;
+      const res = await axiosInstance.delete("/api/account/v1/logout/")
+      return res.data
     },
     onSuccess: async (data) => {
       if (data.status === "success") {
-        toast.success(data.message || "You have been logged out successfully.");
-        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
-        router.replace("/login");
-        router.refresh();
-        window.location.reload();
+        toast.success(data.message || "You have been logged out successfully.")
+        await queryClient.invalidateQueries({ queryKey: ["authUser"] })
+        router.replace("/login")
+        router.refresh()
+        window.location.reload()
       }
     },
     onError: (error: any) => {
-      console.error("Error in Logout:", error?.response);
-      const { message, errors, details } = error?.response.data;
+      console.error("Error in Logout:", error?.response)
+      const { message, errors, details } = error?.response.data
       if (errors) {
         errors?.map((error: any) => {
-          toast.error(error?.message);
-        });
+          toast.error(error?.message)
+        })
       } else {
-        toast.error(details || message || "Logout Failed");
+        toast.error(details || message || "Logout Failed")
       }
     },
-  });
+  })
 
   useEffect(() => {
-    setIsMobileOpen(false);
-  }, [pathname]);
+    setIsMobileOpen(false)
+  }, [pathname])
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   const [userData, setUserData] = useState({
     is_admin: false,
     permissions: [],
     username: "",
-  });
+  })
 
   useEffect(() => {
     const fetchUserPermissions = async () => {
       try {
-        const response = await axiosInstance.get(
-          "/api/account/v1/authorization/get_user_all_permissions/"
-        );
-        const data = response.data;
+        const response = await axiosInstance.get("/api/account/v1/authorization/get_user_all_permissions/")
+        const data = response.data
 
         if (data.status === "success") {
-          const user = data.data[0];
-          const permissionsList = user.permissions.map(
-            (p: any) => p.permission_name
-          );
+          const user = data.data[0]
+          const permissionsList = user.permissions.map((p: any) => p.permission_name)
           setUserData({
             is_admin: user.is_admin,
             permissions: permissionsList,
             username: user?.username,
-          });
+          })
 
-          const filteredNav = filterNavigationByPermissions(
-            navigation_sidebar_links,
-            permissionsList,
-            user.is_admin
-          );
-          setNavigation(filteredNav);
+          const filteredNav = filterNavigationByPermissions(navigation_sidebar_links, permissionsList, user.is_admin)
+          setNavigation(filteredNav)
         }
       } catch (error) {
-        console.error("Failed to fetch user permissions:", error);
-        setNavigation([]);
+        console.error("Failed to fetch user permissions:", error)
+        setNavigation([])
       }
-    };
+    }
 
-    fetchUserPermissions();
-  }, []);
+    fetchUserPermissions()
+  }, [])
 
   if (!mounted) {
-    return null;
+    return null
   }
 
-  if (isPending) return <LoadingDots />;
+  if (isPending) return <LoadingDots />
   return (
     <SidebarProvider>
       <div className="min-h-screen flex bg-muted/30 mx-auto">
-        <aside className="hidden lg:block w-64 min-w-64 border-r bg-background h-full overflow-y-auto sticky top-0 mx-auto">
+        <aside className="hidden lg:block w-64 min-w-64 border-r border-border bg-card h-full overflow-y-auto sticky top-0 mx-auto shadow-sm">
           <Sidebar navigation={navigation} />
         </aside>
 
         <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
-          <SheetContent side="left" className="p-0 w-64">
+          <SheetContent side="left" className="p-0 w-64 bg-card border-border">
             <SheetHeader>
               <SheetTitle></SheetTitle>
               <SheetDescription></SheetDescription>
@@ -614,19 +590,13 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
           </SheetContent>
         </Sheet>
 
-        <div className="flex-1 flex flex-col bg-[#f4f7fb] dark:bg-black/80 min-w-0">
-          <Navbar
-            userData={userData}
-            onLogout={() => logOutFunc()}
-            onMenuClick={() => setIsMobileOpen(true)}
-          />
-          <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
-            {children}
-          </main>
+        <div className="flex-1 flex flex-col min-w-0">
+          <Navbar userData={userData} onLogout={() => logOutFunc()} onMenuClick={() => setIsMobileOpen(true)} />
+          <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 bg-background">{children}</main>
         </div>
       </div>
     </SidebarProvider>
-  );
+  )
 }
 
-export default DashboardLayout;
+export default DashboardLayout
