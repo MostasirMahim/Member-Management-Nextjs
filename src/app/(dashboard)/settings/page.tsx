@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useThemeStore } from "@/store/theme_store";
-import { themes } from "@/config/thems";
+import { themes } from "@/config/themes";
 
 const Settings = () => {
   const { theme, setTheme } = useThemeStore();
