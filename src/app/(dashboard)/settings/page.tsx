@@ -1,10 +1,9 @@
 "use client";
+
 import { cn } from "@/lib/utils";
 import React from "react";
-
 import { useTheme } from "next-themes";
 import { Check } from "lucide-react";
-import { useSelectedLayoutSegment } from "next/navigation";
 import {
   TooltipProvider,
   Tooltip,
@@ -31,13 +30,13 @@ const Settings = () => {
       } as React.CSSProperties
       }
     >
-      <div className="mb-2 relative inline-block px-3 py-[3px] rounded-md before:bg-[--theme-primary] before:absolute before:top-0 before:left-0 before:w-full  before:h-full before:rounded before:opacity-10 before:z-[-1]  text-[--theme-primary]  text-xs font-medium">
-        Theme
+      <div className="mb-2 relative inline-block text-lg px-3 py-[3px] rounded-md before:bg-[--theme-primary] before:absolute before:top-0 before:left-0 before:w-full  before:h-full before:rounded before:opacity-10 before:z-[-1]  text-[--theme-primary]   font-medium">
+        Theme Settings
       </div>
-      <div className="text-muted-foreground font-normal text-xs mb-4">
+      <div className="text-muted-foreground font-normal px-5 text-md mb-4">
         Choose a Theme
       </div>
-      <div className=" flex flex-wrap ">
+      <div className="flex flex-wrap px-5">
         {[
           "zinc",
           "slate",
@@ -52,7 +51,7 @@ const Settings = () => {
           "violet",
         ].map((value) => {
           const themeObj = themes.find((theme) => theme.name === value);
-          const isActive = theme === value; // Compare theme.name with value
+          const isActive = theme === value;
           return (
             <TooltipProvider key={value}>
               <Tooltip>
@@ -62,7 +61,7 @@ const Settings = () => {
                       type="radio"
                       className="hidden"
                       value={value}
-                      checked={theme === value} // Compare theme with value
+                      checked={theme === value}
                       onChange={handleThemeChange}
                     />
                     <div
