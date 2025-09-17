@@ -842,8 +842,8 @@
   --secondary: 240 4.8% 95.9%;
   --secondary-foreground: 240 5.9% 10%;
 
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
+  --accent: 142, 71%, 45%;
+  --accent-foreground: 355.7 100% 97.3%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
@@ -873,7 +873,7 @@
   --secondary: 240 3.7% 15.9%;
   --secondary-foreground: 0 0% 98%;
 
-  --accent: 12 6.5% 15.1%;
+  --accent: 142, 76%, 36%;
   --accent-foreground: 0 0% 98%;
 
   --destructive: 0 62.8% 30.6%;
@@ -915,8 +915,8 @@
   --secondary: 210 40% 96.1%;
   --secondary-foreground: 222.2 47.4% 11.2%;
 
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
+  --accent: 217.2 91.2% 59.8%;
+  --accent-foreground: 210 40% 98%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
@@ -958,7 +958,7 @@
   --secondary: 215.3 25% 26.7%;
   --secondary-foreground: 210 40% 98%;
 
-  --accent: 215 27.9% 16.9%;
+  --accent: 215.3 25% 26.7%;
   --accent-foreground: 210 40% 98%;
 
   --destructive: 0 62.8% 30.6%;
@@ -1011,8 +1011,8 @@
   --secondary: 20 5.9% 90%;
   --secondary-foreground: 24 9.8% 10%;
 
-  --accent: 60 4.8% 95.9%;
-  --accent-foreground: 24 9.8% 10%;
+  --accent: 45.4 93.4% 47.5%;
+  --accent-foreground: 26 83.3% 14.1%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
@@ -1054,7 +1054,7 @@
   --secondary: 30 6.3% 25.1%;
   --secondary-foreground: 60 9.1% 97.8%;
 
-  --accent: 12 6.5% 15.1%;
+  --accent: 30 6.3% 25.1%;
   --accent-foreground: 60 9.1% 97.8%;
 
   --destructive: 0 62.8% 30.6%;
@@ -1107,8 +1107,8 @@
   --secondary: 214.3 31.8% 91.4%;
   --secondary-foreground: 222.2 47.4% 11.2%;
 
-  --accent: 214.3 31.8% 91.4%;
-  --accent-foreground: 222.2 47.4% 11.2%;
+  --accent: 258, 90%, 66%;
+  --accent-foreground: 240 100% 98%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 85.7% 97.3;
@@ -1165,7 +1165,7 @@
   --secondary: 215.3 25% 26.7%;
   --secondary-foreground: 210 40% 98%;
 
-  --accent: 215 27.9% 16.9%;
+  --accent: 271, 81%, 56%;
   --accent-foreground: 210 40% 98%;
 
   --destructive: 0 84.2% 60.2%;
