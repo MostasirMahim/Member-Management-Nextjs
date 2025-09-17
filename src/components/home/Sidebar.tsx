@@ -70,7 +70,7 @@ const NavItem = ({ icon, label, href, badge, subItems, urls = [], level = 0 }: N
             variant="ghost"
             className={cn(
               `${buttonWidth} hover:bg-accent hover:text-accent-foreground hover:translate-y-1 transition-all duration-300 ease-in-out justify-between gap-1 h-10 px-3 w-full`,
-              isActive && "bg-accent text-accent-foreground border border-border/50 rounded-xl my-1 shadow-sm",
+              isActive && "text-primary border border-border/50 rounded-xl my-1 shadow-sm",
             )}
             style={{ paddingLeft: `${paddingLeft}px` }}
           >
@@ -88,8 +88,8 @@ const NavItem = ({ icon, label, href, badge, subItems, urls = [], level = 0 }: N
             </div>
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-1">
-          <div className="space-y-1 my-1">
+        <CollapsibleContent className={cn(`${isActive && (level == 1 ? "bg-primary/20 " : "bg-primary/10 ")} rounded-md`)}>
+          <div className="space-y-1">
             {subItems.map((subItem, index) => (
               <NavItem
                 key={index}
@@ -112,8 +112,8 @@ const NavItem = ({ icon, label, href, badge, subItems, urls = [], level = 0 }: N
       <Button
         variant="ghost"
         className={cn(
-          `${buttonWidth} hover:bg-accent hover:text-accent-foreground hover:translate-y-1 transition-all duration-300 ease-in-out justify-start gap-3 h-10 px-3 w-full`,
-          isActive && "bg-primary text-primary-foreground rounded-xl shadow-md border border-primary/20",
+          `${buttonWidth} hover:bg-accent hover:text-accent-foreground hover:translate-y-1 transition-all duration-300 ease-in-out justify-start gap-3 h-10 px-3 w-full my-1`,
+          isActive && "bg-primary text-primary-foreground  rounded-xl shadow-md border border-primary/20",
         )}
         style={{ paddingLeft: `${paddingLeft}px` }}
       >
