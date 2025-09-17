@@ -49,6 +49,7 @@ const Settings = () => {
           "blue",
           "yellow",
           "violet",
+          "green"
         ].map((value) => {
           const themeObj = themes.find((theme) => theme.name === value);
           const isActive = theme === value;
