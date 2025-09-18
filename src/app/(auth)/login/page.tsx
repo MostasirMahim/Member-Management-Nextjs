@@ -88,7 +88,7 @@ export default function page() {
   if (isLoading) return <LoadingDots />;
   if (user) return null;
   return (
-    <div className="flex min-h-screen bg-[#edf3fc] items-center justify-center  px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen bg-[#edf3fc] dark:bg-background items-center justify-center  px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-sm rounded-lg shadow-lg">
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col items-center space-y-4">
@@ -100,8 +100,8 @@ export default function page() {
               className="h-16 w-16"
             />
             <div className="text-center space-y-1">
-              <h1 className="text-2xl font-bold ">Gagorian Club</h1>
-              <p className="text-sm ">Your Social Campaigns</p>
+              <h1 className="text-2xl font-bold text-primary">Gagorian Club</h1>
+              <p className="text-sm text-muted-foreground">Your Social Campaigns</p>
             </div>
           </div>
           <form onSubmit={formik.handleSubmit} className="space-y-4">
@@ -171,7 +171,7 @@ export default function page() {
               </Link>
             </div>
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full"
               type="submit"
               disabled={isPending}
             >
