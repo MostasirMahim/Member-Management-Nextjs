@@ -116,18 +116,18 @@ export default function OtpStep() {
   }, [OTP]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#edf3fc] px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-sm min-h-[400px]  rounded-lg shadow-lg bg-white text-center">
+    <div className="flex min-h-screen items-center justify-center bg-[#edf3fc] dark:bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-sm min-h-[400px]  rounded-lg shadow-lg bg-background text-center">
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col items-center space-y-4">
-            <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-blue-100 border-2 border-blue-200">
-              <MailCheck className="w-12 h-12 text-blue-600" />
+            <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-primary/20 border-2 border-border">
+              <MailCheck className="w-12 h-12 text-primary" />
             </div>
             <div className="space-y-2 ">
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-foreground">
                 Please enter the OTP sent to
               </h2>
-              <p className="inline-block text-sm text-blue-600 font-medium border-2 p-1 px-2 rounded-md bg-blue-50 border-blue-700">
+              <p className="inline-block text-sm text-primary font-medium border-2 p-1 px-2 rounded-md bg-primary/10 border-border">
                 {email}
               </p>
             </div>
@@ -145,7 +145,7 @@ export default function OtpStep() {
                   ref={(el) => {
                     inputRefs.current[index] = el;
                   }}
-                  className="w-12 h-12 text-center text-xl font-bold border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500"
+                  className="w-12 h-12 text-center text-xl font-bold border border-border rounded-md focus:border-primary focus:ring-primary"
                 />
               ))}
             </div>
@@ -156,7 +156,7 @@ export default function OtpStep() {
             ) : null}
             <div className="text-sm text-gray-500">
               {"Didn't get the code? "}
-              <Link className="text-blue-600 hover:underline" href="#">
+              <Link className="text-primary hover:underline" href="#">
                 Resend
               </Link>
             </div>
@@ -170,7 +170,7 @@ export default function OtpStep() {
                 Back
               </Button>
               <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full"
                 type="submit"
                 disabled={isPending}
               >

@@ -76,12 +76,12 @@ function EmailStep() {
     router.push("/login");
   };
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#edf3fc]  px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-[#edf3fc] dark:bg-background px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-sm min-h-[400px] rounded-lg shadow-lg flex justify-center  ">
         <CardContent className="p-8 space-y-6 w-full ">
           <div className="space-y-3 text-center">
             <div className="relative flex items-center justify-center w-24 h-24 mx-auto rounded-full bg-blue-100 border-2 border-blue-200">
-              <Mails className="w-12 h-12 text-blue-600" />
+              <Mails className="w-12 h-12 text-primary" />
             </div>
             <h1 className="text-2xl font-bold ">
               Reset Your <span className="text-primary">Password</span>
@@ -123,7 +123,7 @@ function EmailStep() {
                 Cancel
               </Button>
               <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full"
                 type="submit"
                 disabled={isPending}
               >

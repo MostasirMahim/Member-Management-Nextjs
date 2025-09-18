@@ -103,19 +103,19 @@ export default function SetNewPasswordForm() {
         <Card className="w-full max-w-sm min-h-[400px] rounded-lg shadow-lg flex justify-center items-center">
           <CardContent className="p-8 space-y-6 text-center  w-full">
             <div className="space-y-3 text-center w-full ">
-              <div className="relative flex items-center justify-center w-24 h-24 mx-auto rounded-full bg-blue-100 border-2 border-blue-200">
-                <PartyPopper className="w-12 h-12 text-blue-600" />
+              <div className="relative flex items-center justify-center w-24 h-24 mx-auto rounded-full bg-primary/20 border-2 border-border">
+                <PartyPopper className="w-12 h-12 text-primary" />
               </div>
 
               <h1 className="text-2xl font-bold">
-                Welcome <span className="text-blue-600">Mahim</span>
+                Welcome <span className="text-primary">{email}</span>
               </h1>
               <p className="text-gray-700 text-sm">
                 Your password has been successfully updated.
               </p>
             </div>
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full"
               onClick={() => router.replace("/")}
             >
               Go to Dashboard
@@ -127,11 +127,11 @@ export default function SetNewPasswordForm() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#edf3fc] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen bg-[#edf3fc] dark:bg-background items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-sm rounded-lg shadow-lg">
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col items-center space-y-4">
-            <div className="h-16 w-16 flex items-center justify-center rounded-full bg-blue-100">
+            <div className="h-16 w-16 flex items-center justify-center rounded-full bg-primary/20">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -142,7 +142,7 @@ export default function SetNewPasswordForm() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-8 w-8 text-blue-600"
+                className="h-8 w-8 text-primary"
               >
                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -153,7 +153,7 @@ export default function SetNewPasswordForm() {
               <p className="text-sm text-gray-500">
                 Enter your new password below
               </p>
-              <p className="inline-block text-sm text-blue-600 font-medium border-2 p-1 px-2 rounded-md bg-blue-50 border-blue-700">
+              <p className="inline-block text-sm text-primary font-medium border-2 p-1 px-2 rounded-md bg-primary/10 border-border">
                 {email}
               </p>
             </div>
@@ -257,7 +257,7 @@ export default function SetNewPasswordForm() {
                 Back
               </Button>
               <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full"
                 type="submit"
                 disabled={isPending}
               >
