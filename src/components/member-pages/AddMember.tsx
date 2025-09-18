@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { toast } from "react-toastify";
 
 const stepTitles = [
   { full: "Membership Details", short: "Membership" },
@@ -76,7 +77,15 @@ export default function AddMember() {
   }, [path, setMemberID, setIsUpdateMode]);
 
   const handleStepClick = (stepIndex: number) => {
-    setCurrentStep(stepIndex);
+    if (isUpdatePage) {
+      setCurrentStep(stepIndex);
+    } else {
+      if (stepIndex < currentStep) {
+        setCurrentStep(stepIndex);
+      } else {
+        toast.error("Complete the previous steps first.");
+      }
+    }
   };
 
   const renderStep = () => {
@@ -109,7 +118,7 @@ export default function AddMember() {
                 <p>
                   Update Member{" "}
                   <span className="font-secondary text-lg text-sky-500">
-                    { memberID && "#" + memberID}
+                    {memberID && "#" + memberID}
                   </span>
                 </p>
               ) : (
@@ -121,7 +130,7 @@ export default function AddMember() {
                 </p>
               )}
             </h1>
-            <Badge variant="secondary" className="text-sm">
+            <Badge variant="default" className="text-sm">
               Step {currentStep + 1} of {totalSteps}
             </Badge>
           </div>
@@ -138,7 +147,9 @@ export default function AddMember() {
                 <div
                   key={index}
                   className={`flex flex-col items-center space-y-1 min-w-0 flex-1 cursor-pointer transition-colors ${
-                    index <= currentStep ? "text-primary" : "text-gray-400"
+                    index <= currentStep
+                      ? "text-primary"
+                      : "text-muted-foreground"
                   }`}
                   onClick={() => handleStepClick(index)}
                 >
@@ -150,7 +161,7 @@ export default function AddMember() {
                             ? "bg-green-500 text-white"
                             : index === currentStep
                             ? "bg-primary text-primary-foreground"
-                            : "bg-gray-200 text-gray-500 hover:bg-gray-300"
+                            : "bg-primary/30 text-foreground hover:bg-accent hover:text-accent-foreground"
                         }`}
                       >
                         {completedSteps.includes(index) ? "✓" : index + 1}
