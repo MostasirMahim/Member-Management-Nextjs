@@ -26,6 +26,7 @@ interface userInfoType {
   name: string;
   password: string;
 }
+
 const validationSchema = Yup.object({
   username: Yup.string().required("Username is required"),
   fullname: Yup.string().required("Full name is required"),
@@ -107,17 +108,17 @@ export default function OnboardingStep3() {
 
   if (isSuccess) {
     return (
-      <div className="flex min-h-screen bg-[#edf3fc] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+      <div className="flex min-h-screen  items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <Card className="w-full max-w-sm min-h-[400px] rounded-lg shadow-lg flex justify-center items-center">
           <CardContent className="p-8 space-y-6 text-center  w-full">
             <div className="space-y-3 text-center w-full ">
-              <div className="relative flex items-center justify-center w-24 h-24 mx-auto rounded-full bg-blue-100 border-2 border-blue-200">
-                <PartyPopper className="w-12 h-12 text-blue-600" />
+              <div className="relative flex items-center justify-center w-24 h-24 mx-auto rounded-full bg-primary/10 border-2 border-border">
+                <PartyPopper className="w-12 h-12 text-primary" />
               </div>
 
               <h1 className="text-2xl font-bold">
                 Employee{" "}
-                <span className="text-blue-600">{registeredUsername}</span> has
+                <span className="text-primary">{registeredUsername}</span> has
                 been added
               </h1>
               <p className="text-gray-700 text-sm">
@@ -125,7 +126,7 @@ export default function OnboardingStep3() {
               </p>
             </div>
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full"
               onClick={() => router.push("/registration/email")}
             >
               <UserPlus /> Add more
@@ -141,12 +142,12 @@ export default function OnboardingStep3() {
       <Card className="w-full max-w-xl rounded-lg shadow-lg">
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col items-center space-y-4">
-            <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-blue-100 border-2 border-blue-200">
-              <UserCog className="w-12 h-12 text-blue-600" />
+            <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-primary/20 border-2 border-border">
+              <UserCog className="w-12 h-12 text-primary" />
             </div>
             <div className="text-center space-y-2">
               <h1 className="text-2xl font-bold">Employee Details</h1>
-              <p className="text-sm inline-block px-2 text-blue-600 font-medium border-2 p-1 rounded-md bg-blue-50 border-blue-700">
+              <p className="text-sm inline-block px-2 text-primary font-medium border-2 p-1 rounded-md bg-primary/10 border-primary">
                 {email}
               </p>
             </div>
@@ -298,7 +299,7 @@ export default function OnboardingStep3() {
                 Back
               </Button>
               <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full"
                 type="submit"
                 disabled={isPending}
               >

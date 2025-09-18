@@ -27,6 +27,7 @@ const validationSchema = Yup.object({
     .required("OTP is required"),
 });
 
+
 export default function OnboardingStep2() {
   const { email, setOtpPass: SET_OTP_Pass } = useRegUserStore();
   const router = useRouter();
@@ -111,14 +112,14 @@ export default function OnboardingStep2() {
       <Card className="w-full max-w-md min-h-[400px]  rounded-lg shadow-lg text-center">
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col items-center space-y-4">
-            <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-blue-100 border-2 border-blue-200">
-              <MailCheck className="w-12 h-12 text-blue-600" />
+            <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-primary/20 border-2 border-border">
+              <MailCheck className="w-12 h-12 text-primary" />
             </div>
             <div className="space-y-2">
               <h2 className="text-xl font-bold text-gray-800">
                 Please enter the OTP sent to
               </h2>
-              <p className="text-sm inline-block px-2 text-blue-600 font-medium border-2 p-1 rounded-md bg-blue-50 border-blue-700">
+              <p className="text-sm inline-block px-2 text-primary font-medium border-2 p-1 rounded-md bg-primary/10 border-border">
                 {email}
               </p>
             </div>
@@ -136,7 +137,7 @@ export default function OnboardingStep2() {
                   ref={(el) => {
                     inputRefs.current[index] = el;
                   }}
-                  className="w-12 h-12 text-center text-xl font-bold border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500"
+                  className="w-12 h-12 text-center text-xl font-bold border border-border rounded-md focus:border-border focus:ring-ring focus:ring-offset-0"
                 />
               ))}
             </div>
@@ -147,7 +148,7 @@ export default function OnboardingStep2() {
             ) : null}
             <div className="text-sm text-gray-500">
               {"Didn't get the code? "}
-              <Link className="text-blue-600 hover:underline" href="#">
+              <Link className="text-primary hover:underline" href="#">
                 Resend
               </Link>
             </div>
@@ -161,7 +162,7 @@ export default function OnboardingStep2() {
                 Back
               </Button>
               <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full"
                 type="submit"
                 disabled={isPending}
               >
