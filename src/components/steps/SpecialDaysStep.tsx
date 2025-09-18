@@ -13,7 +13,7 @@ import {
 import { CalendarIcon, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+
 import { useAddMemberStore } from "@/store/store";
 import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -42,7 +42,6 @@ const initialValues = {
 
 export default function SpecialDaysStep() {
   const queryClient = useQueryClient();
-
   const { currentStep, nextStep, markStepCompleted, memberID, isUpdateMode } =
     useAddMemberStore();
 
@@ -110,7 +109,7 @@ export default function SpecialDaysStep() {
   const { mutate: updateSpecialDayFunc, isPending: isUpdating } = useMutation({
     mutationFn: async (userData: any) => {
       const res = await axiosInstance.patch(
-        `/api/member/v1/members/special_day/${memberID}`,
+        `/api/member/v1/members/special_day/${memberID}/`,
         userData
       );
       return res.data;
@@ -169,7 +168,7 @@ export default function SpecialDaysStep() {
             data: memberData?.map((s: any) => ({
               id: s.id || 0,
               title: s.title || "",
-              date: s.date ? new Date(s.date) : null,
+              date: s.date ? s.date : null,
             })),
           }
         : initialValues,
@@ -215,7 +214,7 @@ export default function SpecialDaysStep() {
     formik.setFieldValue(`data.${index}.${field}`, value);
   };
 
-  //Button Functions
+
   const handleSkip = () => {
     nextStep();
   };
