@@ -211,7 +211,7 @@ export default function AddressDetailsStep() {
           <div key={index} className="border rounded-lg p-4 space-y-4 relative">
             {formik.values.data.length > 1 && (
               <div className="flex justify-between items-center">
-                <h3 className="text-sm font-medium text-gray-900">
+                <h3 className="text-sm font-medium text-primary">
                   Address {index + 1}
                 </h3>
                 <Button
@@ -310,13 +310,13 @@ export default function AddressDetailsStep() {
             type="button"
             variant="outline"
             onClick={handleSaveAndExit}
-            className="flex-1 sm:flex-none bg-transparent"
+            className="flex-1 sm:flex-none"
           >
             Reset
           </Button>
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={handleSkip}
             className="flex-1 sm:flex-none"
           >
@@ -326,7 +326,7 @@ export default function AddressDetailsStep() {
         <Button
           type="submit"
           disabled={isPending || isUpdating}
-          className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
+          className="flex-1 sm:flex-none sm:min-w-[140px]"
         >
           {isPending || isUpdating ? "Saving..." : "Save & Next"}
           <ChevronRight className="w-4 h-4 ml-2" />

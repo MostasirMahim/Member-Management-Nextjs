@@ -243,7 +243,7 @@ export default function ContactDetailsStep() {
           <div key={index} className="border rounded-lg p-4 space-y-4 relative">
             {formik.values.contacts.length > 1 && (
               <div className="flex justify-between items-center">
-                <h3 className="text-sm font-medium text-gray-900">
+                <h3 className="text-sm font-medium text-primary">
                   Contact {index + 1}
                 </h3>
                 <Button
@@ -259,7 +259,7 @@ export default function ContactDetailsStep() {
             )}
             <div className="grid gap-4 md:grid-cols-1">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium">
                   Contact Type
                 </Label>
                 <Select
@@ -295,7 +295,7 @@ export default function ContactDetailsStep() {
                   )}
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium">
                   Contact Number
                 </Label>
                 <Input
@@ -326,7 +326,7 @@ export default function ContactDetailsStep() {
                     (c: any, i: any) => c.is_primary && i !== index
                   )}
                 />
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium">
                   Use as Primary
                 </Label>
               </div>
@@ -354,13 +354,13 @@ export default function ContactDetailsStep() {
             type="button"
             variant="outline"
             onClick={() => handleSaveAndExit()}
-            className="flex-1 sm:flex-none bg-transparent"
+            className="flex-1 sm:flex-none"
           >
             Reset
           </Button>
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={() => handleSkip()}
             className="flex-1 sm:flex-none"
           >
@@ -370,7 +370,7 @@ export default function ContactDetailsStep() {
         <Button
           type="submit"
           disabled={isPending || isUpdating}
-          className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
+          className="flex-1 sm:flex-none sm:min-w-[140px]"
         >
           {isPending || isUpdating ? "Saving..." : "Save & Next"}
           <ChevronRight className="w-4 h-4 ml-2" />

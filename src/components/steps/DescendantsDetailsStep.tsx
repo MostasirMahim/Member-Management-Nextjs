@@ -388,7 +388,7 @@ export default function DescendantsDetailsStep() {
               >
                 {formik.values.data.length > 1 && (
                   <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-medium text-gray-900">
+                    <h3 className="text-sm font-medium text-primary">
                       Descendant {index + 1}
                     </h3>
                     <Button
@@ -404,7 +404,7 @@ export default function DescendantsDetailsStep() {
                 )}
                 <div className="grid gap-4 md:grid-cols-1">
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">
+                    <Label className="text-sm font-medium">
                       Descendant Name
                     </Label>
                     <Input
@@ -426,7 +426,7 @@ export default function DescendantsDetailsStep() {
                       )}
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">
+                    <Label className="text-sm font-medium">
                       Contact Number
                     </Label>
                     <Input
@@ -459,7 +459,7 @@ export default function DescendantsDetailsStep() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">
+                    <Label className="text-sm font-medium">
                       Date of Birth
                     </Label>
                     <Popover>
@@ -507,12 +507,12 @@ export default function DescendantsDetailsStep() {
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label className="text-sm font-medium text-gray-700">
+                      <Label className="text-sm font-medium text-primary">
                         Descendant Picture
                       </Label>
                       {isUpdateMode && (
                         <p
-                          className="text-sm text-gray-500 pr-5 cursor-pointer hover:text-indigo-500"
+                          className="text-sm text-muted-foreground pr-5 cursor-pointer hover:text-primary"
                           onClick={() =>
                             handleImageClick(memberData[index]?.image)
                           }
@@ -570,7 +570,7 @@ export default function DescendantsDetailsStep() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">
+                    <Label className="text-sm font-medium">
                       Relation Type
                     </Label>
                     <Select
@@ -633,13 +633,13 @@ export default function DescendantsDetailsStep() {
               type="button"
               variant="outline"
               onClick={() => handleSaveAndExit()}
-              className="flex-1 sm:flex-none bg-transparent"
+              className="flex-1 sm:flex-none"
             >
               Reset
             </Button>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => handleSkip()}
               className="flex-1 sm:flex-none"
             >
@@ -649,7 +649,7 @@ export default function DescendantsDetailsStep() {
           <Button
             type="submit"
             disabled={isPending || isUpdating}
-            className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
+            className="flex-1 sm:flex-none sm:min-w-[140px]"
           >
             {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
             <ChevronRight className="w-4 h-4 ml-2" />

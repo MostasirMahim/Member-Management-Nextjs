@@ -252,7 +252,7 @@ export default function EmailDetailsStep() {
           <div key={index} className="border rounded-lg p-4 space-y-4 relative">
             {formik.values.data.length > 1 && (
               <div className="flex justify-between items-center">
-                <h3 className="text-sm font-medium text-gray-900">
+                <h3 className="text-sm font-medium text-primary">
                   Email {index + 1}
                 </h3>
                 <Button
@@ -268,7 +268,7 @@ export default function EmailDetailsStep() {
             )}
             <div className="grid gap-4 md:grid-cols-1">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium">
                   Email Type
                 </Label>
                 <Select
@@ -303,7 +303,7 @@ export default function EmailDetailsStep() {
                   )}
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium">
                   Email Address
                 </Label>
                 <Input
@@ -329,7 +329,7 @@ export default function EmailDetailsStep() {
                     updateEmail(index, "is_primary", checked)
                   }
                 />
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium">
                   Use as Primary
                 </Label>
               </div>
@@ -356,13 +356,13 @@ export default function EmailDetailsStep() {
             type="button"
             variant="outline"
             onClick={handleSaveAndExit}
-            className="flex-1 sm:flex-none bg-transparent"
+            className="flex-1 sm:flex-none"
           >
             Reset
           </Button>
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={handleSkip}
             className="flex-1 sm:flex-none"
           >
@@ -372,7 +372,7 @@ export default function EmailDetailsStep() {
         <Button
           type="submit"
           disabled={isPending || isUpdating}
-          className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
+          className="flex-1 sm:flex-none sm:min-w-[140px]"
         >
           {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
           <ChevronRight className="w-4 h-4 ml-2" />

@@ -353,7 +353,7 @@ export default function MembershipDetailsStep() {
             <div className="space-y-2">
               <Label
                 htmlFor="member_ID"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium"
               >
                 Member ID
               </Label>
@@ -374,7 +374,7 @@ export default function MembershipDetailsStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium ">
                 Membership Type
               </Label>
               <Select
@@ -403,7 +403,7 @@ export default function MembershipDetailsStep() {
                 )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Institute Name
               </Label>
               <Select
@@ -434,7 +434,7 @@ export default function MembershipDetailsStep() {
             <div className="space-y-2">
               <Label
                 htmlFor="first_name"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium"
               >
                 First Name
               </Label>
@@ -456,7 +456,7 @@ export default function MembershipDetailsStep() {
             <div className="space-y-2">
               <Label
                 htmlFor="last_name"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium"
               >
                 Last Name
               </Label>
@@ -476,7 +476,7 @@ export default function MembershipDetailsStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Gender
               </Label>
               <Select
@@ -509,7 +509,7 @@ export default function MembershipDetailsStep() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium">
                   Profile Picture
                 </Label>
                 {isUpdateMode && (
@@ -570,7 +570,7 @@ export default function MembershipDetailsStep() {
           {/* Right Column */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Date of Birth
               </Label>
               <Popover>
@@ -615,7 +615,7 @@ export default function MembershipDetailsStep() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Membership Status
               </Label>
               <Select
@@ -645,7 +645,7 @@ export default function MembershipDetailsStep() {
             <div className="space-y-2">
               <Label
                 htmlFor="batch_number"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium"
               >
                 Batch Number
               </Label>
@@ -665,7 +665,7 @@ export default function MembershipDetailsStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Marital Status
               </Label>
               <Select
@@ -693,7 +693,7 @@ export default function MembershipDetailsStep() {
                 )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Anniversary Date
               </Label>
               <Popover>
@@ -738,7 +738,7 @@ export default function MembershipDetailsStep() {
                 )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Blood Group
               </Label>
               <Select
@@ -768,7 +768,7 @@ export default function MembershipDetailsStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Nationality
               </Label>
               <Select
@@ -804,23 +804,23 @@ export default function MembershipDetailsStep() {
               type="button"
               variant="outline"
               onClick={() => handleSaveAndExit()}
-              className="flex-1 sm:flex-none bg-transparent"
+              className="flex-1 sm:flex-none"
             >
               Reset
             </Button>
-            <Button
+           {isUpdateMode && <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => handleSkip()}
-              className="flex-1 sm:flex-none"
+              className="flex-1 sm:flex-none "
             >
               Skip
-            </Button>
+            </Button>}
           </div>
           <Button
             type="submit"
             disabled={isPendingMember || isUpdating}
-            className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
+            className="flex-1 sm:flex-none sm:min-w-[140px]"
           >
             {isPendingMember || isUpdating ? "Saving..." : "Save & Next"}
             <ChevronRight className="w-4 h-4 ml-2" />

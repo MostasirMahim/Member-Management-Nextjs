@@ -233,7 +233,7 @@ export default function CompanionDetailsStep() {
           <div className="space-y-2">
             <Label
               htmlFor="companion_name"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium"
             >
               Companion Name
             </Label>
@@ -254,7 +254,7 @@ export default function CompanionDetailsStep() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
+            <Label className="text-sm font-medium">
               Date of Birth
             </Label>
             <Popover>
@@ -302,7 +302,7 @@ export default function CompanionDetailsStep() {
           <div className="space-y-2">
             <Label
               htmlFor="companion_contact_number"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium"
             >
               Contact Number
             </Label>
@@ -328,7 +328,7 @@ export default function CompanionDetailsStep() {
           <div className="space-y-2">
             <Label
               htmlFor="companion_card_number"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium"
             >
               Companion Card Number
             </Label>
@@ -352,7 +352,7 @@ export default function CompanionDetailsStep() {
           <div className="space-y-2">
             <Label
               htmlFor="relation_with_member"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium"
             >
               Relation with Member
             </Label>
@@ -376,7 +376,7 @@ export default function CompanionDetailsStep() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Companion Picture
               </Label>
               {isUpdateMode && (
@@ -436,13 +436,13 @@ export default function CompanionDetailsStep() {
               type="button"
               variant="outline"
               onClick={() => handleSaveAndExit()}
-              className="flex-1 sm:flex-none bg-transparent"
+              className="flex-1 sm:flex-none"
             >
               Reset
             </Button>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => handleSkip()}
               className="flex-1 sm:flex-none"
             >
@@ -452,7 +452,7 @@ export default function CompanionDetailsStep() {
           <Button
             type="submit"
             disabled={isPending || isUpdating}
-            className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
+            className="flex-1 sm:flex-none sm:min-w-[140px]"
           >
             {isPending || isUpdating ? "Saving..." : "Save & Next"}{" "}
             <ChevronRight className="w-4 h-4 ml-2" />

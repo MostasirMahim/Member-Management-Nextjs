@@ -231,7 +231,7 @@ export default function SpecialDaysStep() {
           <div key={index} className="border rounded-lg p-4 space-y-4 relative">
             {formik.values.data.length > 1 && (
               <div className="flex justify-between items-center">
-                <h3 className="text-sm font-medium text-gray-900">
+                <h3 className="text-sm font-medium text-primary">
                   Special Day {index + 1}
                 </h3>
                 <Button
@@ -247,7 +247,7 @@ export default function SpecialDaysStep() {
             )}
             <div className="grid gap-4 md:grid-cols-1">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium">
                   Special Day Title
                 </Label>
                 <Input
@@ -268,7 +268,7 @@ export default function SpecialDaysStep() {
                   )}
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium">
                   Select Special Day
                 </Label>
                 <Popover>
@@ -338,13 +338,13 @@ export default function SpecialDaysStep() {
             type="button"
             variant="outline"
             onClick={() => handleSaveAndExit()}
-            className="flex-1 sm:flex-none bg-transparent"
+            className="flex-1 sm:flex-none"
           >
             Reset
           </Button>
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={() => handleSkip()}
             className="flex-1 sm:flex-none"
           >
@@ -354,7 +354,7 @@ export default function SpecialDaysStep() {
         <Button
           type="submit"
           disabled={isPending || isUpdating}
-          className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
+          className="flex-1 sm:flex-none sm:min-w-[140px]"
         >
           {isPending || isUpdating ? "Saving..." : "Save & Next"}
           <ChevronRight className="w-4 h-4 ml-2" />

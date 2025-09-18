@@ -231,7 +231,7 @@ export default function SpouseDetailsStep() {
           <div className="flex-1 space-y-2">
             <Label
               htmlFor="spouse_name"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium"
             >
               Spouse Name
             </Label>
@@ -254,7 +254,7 @@ export default function SpouseDetailsStep() {
           <div className="flex-1 space-y-2">
             <Label
               htmlFor="contact_number"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium"
             >
               Contact Number
             </Label>
@@ -277,7 +277,7 @@ export default function SpouseDetailsStep() {
         </div>
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
+            <Label className="text-sm font-medium">
               Date of Birth
             </Label>
             <Popover>
@@ -324,7 +324,7 @@ export default function SpouseDetailsStep() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">Status</Label>
+            <Label className="text-sm font-medium">Status</Label>
             <Select
               value={formik.values.current_status}
               onValueChange={(value) => updateField("current_status", value)}
@@ -356,7 +356,7 @@ export default function SpouseDetailsStep() {
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-gray-700">
+            <Label className="text-sm font-medium">
               Spouse Picture
             </Label>
             {isUpdateMode && (
@@ -415,13 +415,13 @@ export default function SpouseDetailsStep() {
               type="button"
               variant="outline"
               onClick={() => handleSaveAndExit()}
-              className="flex-1 sm:flex-none bg-transparent"
+              className="flex-1 sm:flex-none"
             >
               Reset
             </Button>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => handleSkip()}
               className="flex-1 sm:flex-none"
             >
@@ -431,7 +431,7 @@ export default function SpouseDetailsStep() {
           <Button
             type="submit"
             disabled={isPending || isUpdating}
-            className="bg-black hover:bg-gray-800 text-white flex-1 sm:flex-none sm:min-w-[140px]"
+            className="flex-1 sm:flex-none sm:min-w-[140px]"
           >
             {isPending || isUpdating ? "Saving..." : "Save & Next"}
             <ChevronRight className="w-4 h-4 ml-2" />
