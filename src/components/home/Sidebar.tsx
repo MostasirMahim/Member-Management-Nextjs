@@ -136,7 +136,7 @@ const NavItem = ({ icon, label, href, badge, subItems, urls = [], level = 0 }: N
 
 const Sidebar = ({ navigation }: { navigation: NavItemProps[] }) => {
   return (
-    <div className="flex flex-col max-h-screen overflow-y-auto font-primary bg-card border-r border-border">
+    <div className="flex flex-col max-h-screen overflow-y-auto font-primary">
       <div className="p-4 flex items-center justify-center border-b border-border/50">
         <img src="/assets/logo.png" alt="" className="object-contain rounded-full h-[120px] w-[120px] shadow-lg" />
       </div>

@@ -578,7 +578,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex bg-muted/30 mx-auto">
-        <aside className="hidden lg:block w-64 min-w-64 border-r border-border bg-card h-full overflow-y-auto sticky top-0 mx-auto shadow-sm">
+        <aside className="hidden lg:block w-64 min-w-64 border-r min-h-screen border-border h-full overflow-y-auto sticky top-0 mx-auto shadow-sm">
           <Sidebar navigation={navigation} />
         </aside>
 
