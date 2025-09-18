@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
@@ -116,9 +117,9 @@ export default function ResetPassword() {
   return (
     <div className="flex  items-center justify-center">
       <Card className="w-full max-w-sm rounded-lg shadow-lg">
-        <CardContent className="py-6 px-8  space-y-5">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="h-16 w-16 flex items-center justify-center rounded-full bg-blue-100">
+        <CardContent className="py-3 px-8  space-y-4">
+          <div className="flex flex-col items-center space-y-3">
+            <div className="h-16 w-16 flex items-center justify-center rounded-full bg-primary/20">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -129,7 +130,7 @@ export default function ResetPassword() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-8 w-8 text-blue-600"
+                className="h-8 w-8 text-primary"
               >
                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -268,7 +269,7 @@ export default function ResetPassword() {
               ) : null}
             </div>
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full"
               type="submit"
               disabled={isPending}
             >
