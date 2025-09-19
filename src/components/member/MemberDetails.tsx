@@ -1,3 +1,4 @@
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,9 +22,10 @@ import {
   Droplets,
   Building,
 } from "lucide-react";
-import { cookies } from "next/headers";
-import axiosInstance from "@/lib/axiosInstance";
-import { toast } from "react-toastify";
+import useGetMember from "@/hooks/data/useGetMember";
+import { LoadingDots } from "../ui/loading";
+import { useState } from "react";
+import { ImageViewer } from "../utils/ImageViewer";
 
 const NoDetailsFound = ({ sectionName }: { sectionName: string }) => (
   <div className="text-center text-muted-foreground py-8">
@@ -31,37 +33,12 @@ const NoDetailsFound = ({ sectionName }: { sectionName: string }) => (
   </div>
 );
 
-async function MemberDetails({ id }: { id: string }) {
-  const cookieStore = cookies();
-  const authToken = cookieStore.get("access_token")?.value || "";
-  let responseData: any = {};
-  try {
-    const { data } = await axiosInstance.get(`/api/member/v1/members/${id}/`, {
-      headers: {
-        Cookie: `access_token=${authToken}`,
-      },
-    });
-    responseData = data.data;
-  } catch (error: any) {
-    toast.error(error?.response?.data?.message || "Something went wrong");
-    console.log(error.response.data);
-    const errorMsg = error?.response?.data?.message || "Something went wrong";
-    throw new Error(errorMsg);
-  }
+ function MemberDetails({ id }: { id: string }) {
+  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const {data: responseData, isLoading} = useGetMember(id);
 
-  if (!responseData || Object.keys(responseData).length === 0) {
-    return (
-      <div className="w-full mx-auto space-y-6 p-4 md:p-6">
-        <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-          <User className="h-16 w-16 text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-bold mb-2">No Member Data Found</h2>
-          <p className="text-muted-foreground">
-            No information available for member ID: {id}
-          </p>
-        </div>
-      </div>
-    );
-  }
+
   //TODO:Need Functionality Attach to See Documents File View/GET Operation
 
   const {
@@ -82,6 +59,19 @@ async function MemberDetails({ id }: { id: string }) {
   const primaryNumber = contact_info?.find((c: any) => c.is_primary);
   const primaryEmail = email_address?.find((e: any) => e.is_primary);
 
+
+  const handleImageClick = (image: any) => {
+    setSelectedImage(image);
+    setIsViewerOpen(true);
+  };
+
+  const handleCloseViewer = () => {
+    setIsViewerOpen(false);
+    setSelectedImage(null);
+  };
+
+  if(isLoading) return <LoadingDots />
+
   if (!member_info) {
     return (
       <div className="w-full mx-auto space-y-6 p-4 md:p-6">
@@ -95,9 +85,21 @@ async function MemberDetails({ id }: { id: string }) {
       </div>
     );
   }
-
+    if (!responseData || Object.keys(responseData).length === 0) {
+    return (
+      <div className="w-full mx-auto space-y-6 p-4 md:p-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+          <User className="h-16 w-16 text-muted-foreground mb-4" />
+          <h2 className="text-2xl font-bold mb-2">No Member Data Found</h2>
+          <p className="text-muted-foreground">
+            No information available for member ID: {id}
+          </p>
+        </div>
+      </div>
+    );
+  }
   return (
-    <div className="">
+    <div>
       <div className="w-full space-y-5">
         <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-800 dark:via-indigo-800 dark:to-purple-800 rounded-2xl shadow-2xl">
           <div className="absolute inset-0 opacity-20">
@@ -109,7 +111,7 @@ async function MemberDetails({ id }: { id: string }) {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative group">
                 <div className="relative">
-                  <Avatar className="h-32 w-32 md:h-40 md:w-40 border-4 border-white/20 shadow-2xl transition-transform duration-300 group-hover:scale-105">
+                  <Avatar  onClick={() => handleImageClick(member_info?.profile_photo)} className="h-32 w-32 md:h-40 md:w-40 border-4 border-white/20 shadow-2xl transition-transform duration-300 group-hover:scale-105">
                     <AvatarImage
                       src={
                         `${
@@ -852,6 +854,11 @@ async function MemberDetails({ id }: { id: string }) {
           </Tabs>
         </div>
       </div>
+      <ImageViewer
+              image={selectedImage}
+              isOpen={isViewerOpen}
+              onClose={handleCloseViewer}
+            />
     </div>
   );
 }
