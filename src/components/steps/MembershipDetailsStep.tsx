@@ -71,6 +71,8 @@ const validationSchemaForUpdate = Yup.object({
 });
 
 export default function MembershipDetailsStep() {
+  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
   const countries = getNames();
   const {
     currentStep,
@@ -95,8 +97,6 @@ export default function MembershipDetailsStep() {
     marital_status,
   } = choiceSections ?? {};
 
-  const [selectedImage, setSelectedImage] = useState<any>(null);
-  const [isViewerOpen, setIsViewerOpen] = useState(false);
   const handleImageClick = (image: any) => {
     setSelectedImage(image);
     setIsViewerOpen(true);
@@ -331,7 +331,6 @@ export default function MembershipDetailsStep() {
     }
   };
 
-
   const handleSkip = () => {
     nextStep();
   };
@@ -351,10 +350,7 @@ export default function MembershipDetailsStep() {
           {/* Left Column */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label
-                htmlFor="member_ID"
-                className="text-sm font-medium"
-              >
+              <Label htmlFor="member_ID" className="text-sm font-medium">
                 Member ID
               </Label>
               <Input
@@ -374,9 +370,7 @@ export default function MembershipDetailsStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium ">
-                Membership Type
-              </Label>
+              <Label className="text-sm font-medium ">Membership Type</Label>
               <Select
                 disabled={isUpdateMode}
                 value={formik.values.membership_type}
@@ -403,9 +397,7 @@ export default function MembershipDetailsStep() {
                 )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Institute Name
-              </Label>
+              <Label className="text-sm font-medium">Institute Name</Label>
               <Select
                 disabled={isUpdateMode}
                 value={formik.values.institute_name}
@@ -432,10 +424,7 @@ export default function MembershipDetailsStep() {
                 )}
             </div>
             <div className="space-y-2">
-              <Label
-                htmlFor="first_name"
-                className="text-sm font-medium"
-              >
+              <Label htmlFor="first_name" className="text-sm font-medium">
                 First Name
               </Label>
               <Input
@@ -454,10 +443,7 @@ export default function MembershipDetailsStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label
-                htmlFor="last_name"
-                className="text-sm font-medium"
-              >
+              <Label htmlFor="last_name" className="text-sm font-medium">
                 Last Name
               </Label>
               <Input
@@ -476,9 +462,7 @@ export default function MembershipDetailsStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Gender
-              </Label>
+              <Label className="text-sm font-medium">Gender</Label>
               <Select
                 value={formik.values.gender}
                 onValueChange={(value) => formik.setFieldValue("gender", value)}
@@ -509,15 +493,13 @@ export default function MembershipDetailsStep() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">
-                  Profile Picture
-                </Label>
+                <Label className="text-sm font-medium">Profile Picture</Label>
                 {isUpdateMode && (
                   <p
                     className="text-sm text-gray-500 pr-5 cursor-pointer hover:text-indigo-500"
                     onClick={() => handleImageClick(memberData?.profile_photo)}
                   >
-                   { memberData?.profile_photo?.split("/").pop()}
+                    {memberData?.profile_photo?.split("/").pop()}
                   </p>
                 )}
               </div>
@@ -570,9 +552,7 @@ export default function MembershipDetailsStep() {
           {/* Right Column */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Date of Birth
-              </Label>
+              <Label className="text-sm font-medium">Date of Birth</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -615,9 +595,7 @@ export default function MembershipDetailsStep() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Membership Status
-              </Label>
+              <Label className="text-sm font-medium">Membership Status</Label>
               <Select
                 value={formik.values.membership_status}
                 onValueChange={(value) =>
@@ -643,10 +621,7 @@ export default function MembershipDetailsStep() {
                 )}
             </div>
             <div className="space-y-2">
-              <Label
-                htmlFor="batch_number"
-                className="text-sm font-medium"
-              >
+              <Label htmlFor="batch_number" className="text-sm font-medium">
                 Batch Number
               </Label>
               <Input
@@ -665,9 +640,7 @@ export default function MembershipDetailsStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Marital Status
-              </Label>
+              <Label className="text-sm font-medium">Marital Status</Label>
               <Select
                 value={formik.values.marital_status}
                 onValueChange={(value) =>
@@ -693,9 +666,7 @@ export default function MembershipDetailsStep() {
                 )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Anniversary Date
-              </Label>
+              <Label className="text-sm font-medium">Anniversary Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -738,9 +709,7 @@ export default function MembershipDetailsStep() {
                 )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Blood Group
-              </Label>
+              <Label className="text-sm font-medium">Blood Group</Label>
               <Select
                 value={formik.values.blood_group}
                 onValueChange={(value) =>
@@ -768,9 +737,7 @@ export default function MembershipDetailsStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Nationality
-              </Label>
+              <Label className="text-sm font-medium">Nationality</Label>
               <Select
                 value={formik.values.nationality}
                 onValueChange={(value) =>
@@ -808,14 +775,16 @@ export default function MembershipDetailsStep() {
             >
               Reset
             </Button>
-           {isUpdateMode && <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleSkip()}
-              className="flex-1 sm:flex-none "
-            >
-              Skip
-            </Button>}
+            {isUpdateMode && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleSkip()}
+                className="flex-1 sm:flex-none "
+              >
+                Skip
+              </Button>
+            )}
           </div>
           <Button
             type="submit"
