@@ -80,14 +80,18 @@ export default function AddMember() {
     if (isUpdatePage) {
       setCurrentStep(stepIndex);
     } else {
-      if (stepIndex < currentStep) {
-        setCurrentStep(stepIndex);
+      if (!completedSteps.includes(0)) {
+        toast.error("Please complete the first step.");
+        return;
+      }
+      if (completedSteps.includes(stepIndex)) {
+        toast.error("Already Completed Step.");
       } else {
-        toast.error("Complete the previous steps first.");
+        setCurrentStep(stepIndex);
       }
     }
   };
-
+  console.log(completedSteps);
   const renderStep = () => {
     const stepComponents = [
       <MembershipDetailsStep key="membership" />,
@@ -117,14 +121,14 @@ export default function AddMember() {
               {isUpdatePage ? (
                 <p>
                   Update Member{" "}
-                  <span className="font-secondary text-lg text-sky-500">
+                  <span className="font-secondary text-lg text-primary">
                     {memberID && "#" + memberID}
                   </span>
                 </p>
               ) : (
                 <p>
                   Add New Member{" "}
-                  <span className="font-secondary text-lg text-sky-500">
+                  <span className="font-secondary text-lg text-primary">
                     {memberID && "#" + memberID}
                   </span>
                 </p>
