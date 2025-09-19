@@ -35,7 +35,7 @@ const Navbar: React.FC<NavbarProps> = ({ userData, onLogout, onMenuClick }) => {
     }
   };
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-background/80 backdrop-blur-md px-4 sm:px-6 shadow-sm">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border  backdrop-blur-md px-4 sm:px-6 shadow-sm">
       <Button
         variant="ghost"
         size="icon"
