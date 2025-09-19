@@ -43,11 +43,7 @@ export default function UnauthorizedPage() {
   };
 
   return (
-    <div className="min-h-screen h-screen max-h-screen flex items-center justify-center p-4 bg-gray-100 dark:bg-sky-100 relative overflow-hidden font-primary">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-gray-200/30 dark:bg-gray-700/20 blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-purple-200/20 dark:bg-purple-800/10 blur-3xl" />
-      </div>
+    <div className="min-h-screen h-screen max-h-screen flex items-center justify-center p-4 bg-white  relative overflow-hidden font-primary">
 
       <motion.div
         className="max-w-2xl w-full text-center relative z-10"
@@ -69,11 +65,11 @@ export default function UnauthorizedPage() {
         </motion.div>
 
         <motion.div variants={itemVariants} className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900  mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Oops! Access Denied
           </h1>
           <p className="text-lg text-gray-600 max-w-lg mx-auto leading-relaxed">
-            The page you are looking for might have been removed or you have no
+            The page might have been removed or you have no
             permission to view it.
           </p>
         </motion.div>
