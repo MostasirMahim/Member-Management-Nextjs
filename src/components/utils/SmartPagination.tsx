@@ -93,7 +93,7 @@ export function SmartPagination({
     if (page === "...") {
       return (
         <PaginationItem key={`ellipsis-${index}`} >
-          <PaginationEllipsis className="cursor-pointer font-bold text-indigo-600 rounded-md p-2 hover:bg-indigo-400 transition-colors" />
+          <PaginationEllipsis className="cursor-pointer font-bold text-primary hover:bg-accent hover:text-accent-foreground rounded-md p-2  transition-colors" />
         </PaginationItem>
       );
     }
@@ -103,7 +103,7 @@ export function SmartPagination({
     return (
       <PaginationItem key={`page-${pageNumber}`}>
         <PaginationLink
-          className="cursor-pointer font-bold text-indigo-600 rounded-md p-2 hover:bg-indigo-400 transition-colors"
+          className="cursor-pointer font-bold text-primary hover:bg-accent hover:text-accent-foreground rounded-md p-2 transition-colors"
           isActive={pageNumber === current_page}
           onClick={(e) => {
             e.preventDefault();
@@ -125,7 +125,7 @@ export function SmartPagination({
             {previous && (
               <PaginationItem>
                 <PaginationPrevious
-                  className="cursor-pointer font-bold text-indigo-600 rounded-md p-2 hover:bg-indigo-400 transition-colors"
+                  className="cursor-pointer font-bold text-primary hover:bg-accent hover:text-accent-foreground rounded-md p-2 transition-colors"
                   onClick={(e) => {
                     e.preventDefault();
                     goToPage(current_page - 1);
@@ -143,7 +143,7 @@ export function SmartPagination({
             {next && (
               <PaginationItem>
                 <PaginationNext
-                  className="cursor-pointer font-bold text-indigo-600 rounded-md p-2 hover:bg-indigo-400 transition-colors"
+                  className="cursor-pointer font-bold text-primary hover:bg-accent hover:text-accent-foreground rounded-md p-2  transition-colors"
                   onClick={(e) => {
                     e.preventDefault();
                     goToPage(current_page + 1);
