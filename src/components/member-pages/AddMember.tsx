@@ -91,7 +91,6 @@ export default function AddMember() {
       }
     }
   };
-  console.log(completedSteps);
   const renderStep = () => {
     const stepComponents = [
       <MembershipDetailsStep key="membership" />,

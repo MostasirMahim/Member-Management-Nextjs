@@ -236,7 +236,7 @@ function PendingMembers() {
             <Input
               type="search"
               placeholder="Search users..."
-              className="pl-10 border-0 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
+              className="pl-10 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -247,7 +247,7 @@ function PendingMembers() {
               setIsFilterOpen(!isFilterOpen);
               if (!isFilterOpen) setIsUserFilterOpen(false);
             }}
-            className="gap-2 border-0 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="gap-2 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <Filter className="h-4 w-4" />
             Filter
@@ -258,7 +258,7 @@ function PendingMembers() {
               setIsUserFilterOpen(!isUserFilterOpen);
               if (!isUserFilterOpen) setIsFilterOpen(false);
             }}
-            className="gap-2 border-0 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="gap-2 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <UserRoundSearch className="h-4 w-4" />
             Query

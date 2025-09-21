@@ -54,7 +54,7 @@ function page() {
             <Input
               type="search"
               placeholder="Search users..."
-              className="pl-10 border-0 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
+              className="pl-10 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
