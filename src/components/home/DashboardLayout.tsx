@@ -95,7 +95,7 @@ const navigation_sidebar_links = [
         icon: <UsersRound className="h-4 w-4" />,
         label: "View Members",
         href: "/members/view",
-        urls: ["/member/view"],
+        urls: ["/member/view", "/member/update/"],
       },
       {
         icon: <History className="h-4 w-4" />,
