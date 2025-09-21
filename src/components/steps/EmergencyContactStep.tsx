@@ -172,6 +172,64 @@ export default function EmergencyContactStep() {
       },
     });
 
+  const { mutate: deleteEmergencyContactFunc, isPending: isDeleting } =
+    useMutation({
+      mutationFn: async (userData: any) => {
+        const res = await axiosInstance.delete(
+          `/api/member/v1/members/emergency_contact/${memberID}/`,
+          { data: userData }
+        );
+        return res.data;
+      },
+      onSuccess: (data) => {
+        if (data?.status === "success") {
+          queryClient.invalidateQueries({
+            queryKey: ["useGetMember", memberID],
+          });
+          toast.success(
+            data.message || "Emergency Contact has been successfully updated."
+          );
+        }
+      },
+      onError: (error: any) => {
+        console.log("error", error?.response);
+        const { message, errors, detail } = error?.response?.data || {};
+        if (errors?.data && Array.isArray(errors.data)) {
+          const contactsErrors = errors.data;
+          contactsErrors.forEach(
+            (contactErrorObj: any, contactIndex: number) => {
+              if (contactErrorObj && typeof contactErrorObj === "object") {
+                for (const [fieldName, messages] of Object.entries(
+                  contactErrorObj
+                )) {
+                  if (Array.isArray(messages) && messages.length > 0) {
+                   toast.error(messages[0]);
+                  }
+                }
+              }
+            }
+          );
+        }
+        if (errors && typeof errors === "object") {
+          const otherErrorKeys = Object.keys(errors).filter(
+            (key) => key !== "data"
+          );
+
+          if (otherErrorKeys.length > 0) {
+            const firstKey = otherErrorKeys[0];
+            const messages = errors[firstKey];
+
+            if (Array.isArray(messages) && messages.length > 0) {
+              toast.error(messages[0]);
+              return;
+            }
+          }
+        }
+
+        toast.error(detail || message || "Submission Failed");
+      },
+    });
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
@@ -214,14 +272,16 @@ export default function EmergencyContactStep() {
   };
 
   const removeEmergencyContact = (index: number) => {
-    if (formik.values.data.length > 1) {
-      const updatedContacts = formik.values.data.filter(
+    const data = formik.values.data[index];
+    if (!data?.id) {
+      const updated = formik.values.data.filter(
         (_: any, i: any) => i !== index
       );
-      formik.setFieldValue("data", updatedContacts);
-    } else {
-      toast.error("At least one emergency contact is required");
+      formik.setFieldValue("data", updated);
+      return;
     }
+
+    deleteEmergencyContactFunc({ id: data.id });
   };
 
   const updateEmergencyContact = (index: number, field: string, value: any) => {

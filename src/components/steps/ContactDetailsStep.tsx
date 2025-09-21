@@ -34,16 +34,13 @@ const validationSchema = Yup.object({
 });
 
 export default function ContactDetailsStep() {
-  const router = useRouter();
   const path = usePathname();
   const isUpdateMode = path?.startsWith("/member/update/");
   const {
     currentStep,
-    setCurrentStep,
     nextStep,
     markStepCompleted,
     memberID,
-    setMemberID,
   } = useAddMemberStore();
   const { data: choiceSections, isLoading } = useGetAllChoice();
   const { contact_type } = choiceSections ?? {};
@@ -109,6 +106,7 @@ export default function ContactDetailsStep() {
       toast.error(detail || message || "Submission Failed");
     },
   });
+
   const { mutate: updateContactFunc, isPending: isUpdating } = useMutation({
     mutationFn: async (userData: any) => {
       const res = await axiosInstance.patch(
@@ -119,7 +117,6 @@ export default function ContactDetailsStep() {
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-        console.log(data);
         querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Contact successfully updated.");
         markStepCompleted(currentStep);
@@ -164,6 +161,59 @@ export default function ContactDetailsStep() {
       toast.error(detail || message || "Submission Failed");
     },
   });
+  const { mutate: deleteContactFunc, isPending: isDeleting } = useMutation({
+    mutationFn: async (id: any) => {
+      const res = await axiosInstance.delete(
+        `/api/member/v1/members/contact_numbers/${memberID}/`,
+        { data: id }
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        querClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Contact successfully deleted.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+      if (errors?.data && Array.isArray(errors.data)) {
+        const contactsErrors = errors.data;
+
+        contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+          if (contactErrorObj && typeof contactErrorObj === "object") {
+            for (const [fieldName, messages] of Object.entries(
+              contactErrorObj
+            )) {
+              if (Array.isArray(messages) && messages.length > 0) {
+                toast.error(messages[0]);
+                return;
+              }
+            }
+          }
+        });
+      }
+      if (errors && typeof errors === "object") {
+        const otherErrorKeys = Object.keys(errors).filter(
+          (key) => key !== "data"
+        );
+
+        if (otherErrorKeys.length > 0) {
+          const firstKey = otherErrorKeys[0];
+          const messages = errors[firstKey];
+
+          if (Array.isArray(messages) && messages.length > 0) {
+            toast.error(messages[0]);
+            return;
+          }
+        }
+      }
+
+      toast.error(detail || message || "Submission Failed");
+    },
+  });
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
@@ -213,21 +263,23 @@ export default function ContactDetailsStep() {
   };
 
   const removeContact = (index: number) => {
-    if (formik.values.contacts.length > 1) {
-      const updatedContacts = formik.values.contacts.filter(
+    const contact = formik.values.contacts[index];
+    if (!contact?.id) {
+      const updated = formik.values.contacts.filter(
         (_: any, i: any) => i !== index
       );
-      formik.setFieldValue("contacts", updatedContacts);
-    } else {
-      toast.error("At least one contact is required");
+      formik.setFieldValue("contacts", updated);
+      return;
     }
+
+    deleteContactFunc({ id: contact.id });
   };
 
   const updateContact = (index: number, field: string, value: any) => {
     formik.setFieldValue(`contacts.${index}.${field}`, value);
   };
 
-  //Button Functions
+
   const handleSkip = () => {
     nextStep();
   };
@@ -259,9 +311,7 @@ export default function ContactDetailsStep() {
             )}
             <div className="grid gap-4 md:grid-cols-1">
               <div className="space-y-2">
-                <Label className="text-sm font-medium">
-                  Contact Type
-                </Label>
+                <Label className="text-sm font-medium">Contact Type</Label>
                 <Select
                   value={contact.contact_type}
                   onValueChange={(value) =>
@@ -295,9 +345,7 @@ export default function ContactDetailsStep() {
                   )}
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium">
-                  Contact Number
-                </Label>
+                <Label className="text-sm font-medium">Contact Number</Label>
                 <Input
                   type="tel"
                   placeholder="Enter contact number"
@@ -326,9 +374,7 @@ export default function ContactDetailsStep() {
                     (c: any, i: any) => c.is_primary && i !== index
                   )}
                 />
-                <Label className="text-sm font-medium">
-                  Use as Primary
-                </Label>
+                <Label className="text-sm font-medium">Use as Primary</Label>
               </div>
             </div>
           </div>

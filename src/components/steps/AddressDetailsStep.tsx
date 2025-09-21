@@ -93,10 +93,26 @@ export default function AddressDetailsStep() {
     },
     onSuccess: (data) => {
       if (data?.status === "success") {
-        toast.success(data.message || "Address has been successfully updated.");
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Address has been successfully updated.");
         markStepCompleted(currentStep);
         nextStep();
+      }
+    },
+    onError: handleError,
+  });
+  const { mutate: deleteAddressFunc, isPending: isDeleting } = useMutation({
+    mutationFn: async (userData: any) => {
+      const res = await axiosInstance.delete(
+        `/api/member/v1/members/address/${memberID}/`,
+        { data: userData }
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Address has been successfully deleted.");
       }
     },
     onError: handleError,
@@ -175,14 +191,16 @@ export default function AddressDetailsStep() {
   };
 
   const removeAddress = (index: number) => {
-    if (formik.values.data.length > 1) {
-      formik.setFieldValue(
-        "data",
-        formik.values.data.filter((_: any, i: any) => i !== index)
+    const data = formik.values.data[index];
+    if (!data?.id) {
+      const updated = formik.values.data.filter(
+        (_: any, i: any) => i !== index
       );
-    } else {
-      toast.error("At least one address is required");
+      formik.setFieldValue("data", updated);
+      return;
     }
+
+    deleteAddressFunc({ id: data.id });
   };
 
   const updateAddress = (index: number, field: string, value: any) => {

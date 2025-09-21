@@ -47,15 +47,12 @@ const initialValues = {
 };
 
 export default function EmailDetailsStep() {
-  const router = useRouter();
   const queryClient = useQueryClient();
   const {
     currentStep,
-    setCurrentStep,
     nextStep,
     markStepCompleted,
     memberID,
-    setMemberID,
     isUpdateMode,
   } = useAddMemberStore();
 
@@ -171,6 +168,56 @@ export default function EmailDetailsStep() {
       toast.error(detail || message || "Submission Failed");
     },
   });
+  
+  const { mutate: deleteEmailFunc, isPending: isDeleting } = useMutation({
+    mutationFn: async (userData: any) => {
+      const res = await axiosInstance.delete(
+        `/api/member/v1/members/email_address/${memberID}/`,
+        { data: userData }
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data?.status === "success") {
+        queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Email successfully deleted.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+      if (errors?.data && Array.isArray(errors.data)) {
+        const contactsErrors = errors.data;
+        contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+          if (contactErrorObj && typeof contactErrorObj === "object") {
+            for (const [fieldName, messages] of Object.entries(
+              contactErrorObj
+            )) {
+              if (Array.isArray(messages) && messages.length > 0) {
+               toast.error(messages[0]);
+               return;
+              }
+            }
+          }
+        });
+      }
+
+      if (errors && typeof errors === "object") {
+        const otherErrorKeys = Object.keys(errors).filter(
+          (key) => key !== "data"
+        );
+        if (otherErrorKeys.length > 0) {
+          const firstKey = otherErrorKeys[0];
+          const messages = errors[firstKey];
+          if (Array.isArray(messages) && messages.length > 0) {
+            toast.error(messages[0]);
+            return;
+          }
+        }
+      }
+      toast.error(detail || message || "Submission Failed");
+    },
+  });
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -218,6 +265,16 @@ export default function EmailDetailsStep() {
     } else {
       toast.error("At least one email is required");
     }
+     const email = formik.values.data[index];
+    if (!email?.id) {
+      const updated = formik.values.data.filter(
+        (_: any, i: any) => i !== index
+      );
+      formik.setFieldValue("data", updated);
+      return;
+    }
+
+    deleteEmailFunc({ id: email.id });
   };
 
   const updateEmail = (index: number, field: string, value: any) => {

@@ -222,6 +222,55 @@ export default function DocumentDetailsStep() {
       toast.error(error?.message || "Some documents failed to update.");
     },
   });
+  const { mutate: deleteDocumentFunc, isPending: isDeleting } = useMutation({
+      mutationFn: async (id: any) => {
+        const res = await axiosInstance.delete(
+          `/api/member/v1/members/documents/${id}/`,
+          { data: {member_ID: memberID} }
+        );
+        return res.data;
+      },
+      onSuccess: async (data) => {
+        if (data?.status === "success") {
+          await queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+          toast.success(data.message || "Document successfully deleted.");
+        }
+      },
+      onError: (error: any) => {
+        console.log("error", error?.response);
+        const { message, errors, detail } = error?.response?.data || {};
+        if (errors?.data && Array.isArray(errors.data)) {
+          const contactsErrors = errors.data;
+          contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+            if (contactErrorObj && typeof contactErrorObj === "object") {
+              for (const [fieldName, messages] of Object.entries(
+                contactErrorObj
+              )) {
+                if (Array.isArray(messages) && messages.length > 0) {
+                 toast.error(messages[0]);
+                 return;
+                }
+              }
+            }
+          });
+        }
+  
+        if (errors && typeof errors === "object") {
+          const otherErrorKeys = Object.keys(errors).filter(
+            (key) => key !== "data"
+          );
+          if (otherErrorKeys.length > 0) {
+            const firstKey = otherErrorKeys[0];
+            const messages = errors[firstKey];
+            if (Array.isArray(messages) && messages.length > 0) {
+              toast.error(messages[0]);
+              return;
+            }
+          }
+        }
+        toast.error(detail || message || "Submission Failed");
+      },
+    });
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -268,14 +317,16 @@ export default function DocumentDetailsStep() {
     formik.setFieldValue("data", updatedDocuments);
   };
   const removeDocument = (index: number) => {
-    if (formik.values.data.length > 1) {
-      const updatedDocuments = formik.values.data.filter(
+    const data = formik.values.data[index];
+    if (!data?.id) {
+      const updated = formik.values.data.filter(
         (_: any, i: any) => i !== index
       );
-      formik.setFieldValue("data", updatedDocuments);
-    } else {
-      toast.error("At least one document is required");
+      formik.setFieldValue("data", updated);
+      return;
     }
+
+    deleteDocumentFunc(data.id);
   };
 
   const updateDocument = (index: number, field: string, value: any) => {

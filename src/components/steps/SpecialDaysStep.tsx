@@ -155,6 +155,56 @@ export default function SpecialDaysStep() {
           }
         }
       }
+      toast.error(detail || message || "Submission Failed");
+    },
+  });
+
+  const { mutate: deleteSpecialDayFunc, isPending: isDeleting } = useMutation({
+    mutationFn: async (userData: any) => {
+      const res = await axiosInstance.delete(
+        `/api/member/v1/members/special_day/${memberID}/`,
+        { data: userData }
+      );
+      return res.data;
+    },
+    onSuccess: async (data) => {
+      if (data?.status === "success") {
+        await queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Special day successfully deleted.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+      if (errors?.data && Array.isArray(errors.data)) {
+        const contactsErrors = errors.data;
+        contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+          if (contactErrorObj && typeof contactErrorObj === "object") {
+            for (const [fieldName, messages] of Object.entries(
+              contactErrorObj
+            )) {
+              if (Array.isArray(messages) && messages.length > 0) {
+               toast.error(messages[0]);
+              }
+            }
+          }
+        });
+      }
+      if (errors && typeof errors === "object") {
+        const otherErrorKeys = Object.keys(errors).filter(
+          (key) => key !== "data"
+        );
+
+        if (otherErrorKeys.length > 0) {
+          const firstKey = otherErrorKeys[0];
+          const messages = errors[firstKey];
+
+          if (Array.isArray(messages) && messages.length > 0) {
+            toast.error(messages[0]);
+            return;
+          }
+        }
+      }
 
       toast.error(detail || message || "Submission Failed");
     },
@@ -200,14 +250,16 @@ export default function SpecialDaysStep() {
   };
 
   const removeSpecialDay = (index: number) => {
-    if (formik.values.data.length > 1) {
-      const updatedSpecialDays = formik.values.data.filter(
+    const data = formik.values.data[index];
+    if (!data?.id) {
+      const updated = formik.values.data.filter(
         (_: any, i: any) => i !== index
       );
-      formik.setFieldValue("data", updatedSpecialDays);
-    } else {
-      toast.error("At least one special day is required");
+      formik.setFieldValue("data", updated);
+      return;
     }
+
+    deleteSpecialDayFunc({ id: data.id });
   };
 
   const updateSpecialDay = (index: number, field: string, value: any) => {

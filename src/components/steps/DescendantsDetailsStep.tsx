@@ -283,6 +283,56 @@ export default function DescendantsDetailsStep() {
     },
   });
 
+const { mutate: deleteDescendantFunc, isPending: isDeleting } = useMutation({
+    mutationFn: async (id: any) => {
+      const res = await axiosInstance.delete(
+        `/api/member/v1/members/descendants/${id}/`,
+        { data: {member_ID: memberID} }
+      );
+      return res.data;
+    },
+    onSuccess: async (data) => {
+      if (data?.status === "success") {
+       await queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+        toast.success(data.message || "Descendant successfully deleted.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+      if (errors?.data && Array.isArray(errors.data)) {
+        const contactsErrors = errors.data;
+        contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+          if (contactErrorObj && typeof contactErrorObj === "object") {
+            for (const [fieldName, messages] of Object.entries(
+              contactErrorObj
+            )) {
+              if (Array.isArray(messages) && messages.length > 0) {
+               toast.error(messages[0]);
+               return;
+              }
+            }
+          }
+        });
+      }
+
+      if (errors && typeof errors === "object") {
+        const otherErrorKeys = Object.keys(errors).filter(
+          (key) => key !== "data"
+        );
+        if (otherErrorKeys.length > 0) {
+          const firstKey = otherErrorKeys[0];
+          const messages = errors[firstKey];
+          if (Array.isArray(messages) && messages.length > 0) {
+            toast.error(messages[0]);
+            return;
+          }
+        }
+      }
+      toast.error(detail || message || "Submission Failed");
+    },
+  });
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
@@ -340,16 +390,15 @@ export default function DescendantsDetailsStep() {
   };
 
   const removeDescendant = (index: number) => {
-    if (formik.values.data.length > 1) {
-      const updatedDescendants = formik.values.data.filter(
+    const data = formik.values.data[index];
+    if (!data?.id) {
+      const updated = formik.values.data.filter(
         (_: any, i: any) => i !== index
       );
-      formik.setFieldValue("data", updatedDescendants);
-    } else {
-      toast.error(
-        "Cannot remove descendant - at least one descendant is required"
-      );
+      formik.setFieldValue("data", updated);
+      return;
     }
+    deleteDescendantFunc(data.id);
   };
 
   const updateDescendant = (index: number, field: string, value: any) => {
