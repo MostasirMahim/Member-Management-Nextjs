@@ -159,6 +159,57 @@ export default function CompanionDetailsStep() {
     },
   });
 
+   const { mutate: deleteCompanionFunc, isPending: isDeleting } = useMutation({
+      mutationFn: async (id: any) => {
+        const res = await axiosInstance.delete(
+          `/api/member/v1/members/companion/${id}/`,
+          { data: {member_ID: memberID} }
+        );
+        return res.data;
+      },
+      onSuccess: async (data) => {
+        if (data?.status === "success") {
+         await queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+         formik.resetForm();
+         toast.success(data.message || "Companion has been successfully deleted.");
+        }
+      },
+      onError: (error: any) => {
+        console.log("error", error?.response);
+        const { message, errors, detail } = error?.response?.data || {};
+        if (errors?.data && Array.isArray(errors.data)) {
+          const contactsErrors = errors.data;
+          contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+            if (contactErrorObj && typeof contactErrorObj === "object") {
+              for (const [fieldName, messages] of Object.entries(
+                contactErrorObj
+              )) {
+                if (Array.isArray(messages) && messages.length > 0) {
+                 toast.error(messages[0]);
+                 return;
+                }
+              }
+            }
+          });
+        }
+  
+        if (errors && typeof errors === "object") {
+          const otherErrorKeys = Object.keys(errors).filter(
+            (key) => key !== "data"
+          );
+          if (otherErrorKeys.length > 0) {
+            const firstKey = otherErrorKeys[0];
+            const messages = errors[firstKey];
+            if (Array.isArray(messages) && messages.length > 0) {
+              toast.error(messages[0]);
+              return;
+            }
+          }
+        }
+        toast.error(detail || message || "Submission Failed");
+      },
+    });
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues:
@@ -212,6 +263,15 @@ export default function CompanionDetailsStep() {
       fileInputRef.current.value = "";
     }
   };
+
+    const removeCompanion = (id:number) => {
+     if(isUpdateMode && id){
+        deleteCompanionFunc(id);
+     } else {
+       toast.error("No Companion to delete");
+     }
+    };
+  
 
   const updateField = (field: string, value: any) => {
     formik.setFieldValue(field, value);
@@ -448,6 +508,14 @@ export default function CompanionDetailsStep() {
             >
               Skip
             </Button>
+              {isUpdateMode && formik.values?.id && <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {removeCompanion(formik.values?.id as number)}}
+              className="flex-1 sm:flex-none"
+            >
+              Delete
+            </Button>}
           </div>
           <Button
             type="submit"
