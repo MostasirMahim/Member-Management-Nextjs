@@ -46,7 +46,15 @@ const validationSchemaForUpdate = Yup.object({
   image: Yup.mixed().nullable(),
   current_status: Yup.string().required("Current status is required"),
 });
-
+type SpouseFormValues = {
+  member_ID: string;
+  spouse_name: string;
+  contact_number: string;
+  spouse_dob: Date | string | null;
+  image: File | null;
+  current_status: string;
+  id?: number;
+};
 const initialValues = {
   member_ID: "",
   spouse_name: "",
@@ -169,8 +177,59 @@ export default function SpouseDetailsStep() {
       }
     },
   });
+  
+ const { mutate: deleteSpouseFunc, isPending: isDeleting } = useMutation({
+    mutationFn: async (id: any) => {
+      const res = await axiosInstance.delete(
+        `/api/member/v1/members/spouse/${id}/`,
+        { data: {member_ID: memberID} }
+      );
+      return res.data;
+    },
+    onSuccess: async (data) => {
+      if (data?.status === "success") {
+       await queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
+       formik.resetForm();
+       toast.success(data.message || "Spouse has been successfully deleted.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("error", error?.response);
+      const { message, errors, detail } = error?.response?.data || {};
+      if (errors?.data && Array.isArray(errors.data)) {
+        const contactsErrors = errors.data;
+        contactsErrors.forEach((contactErrorObj: any, contactIndex: number) => {
+          if (contactErrorObj && typeof contactErrorObj === "object") {
+            for (const [fieldName, messages] of Object.entries(
+              contactErrorObj
+            )) {
+              if (Array.isArray(messages) && messages.length > 0) {
+               toast.error(messages[0]);
+               return;
+              }
+            }
+          }
+        });
+      }
 
-  const formik = useFormik({
+      if (errors && typeof errors === "object") {
+        const otherErrorKeys = Object.keys(errors).filter(
+          (key) => key !== "data"
+        );
+        if (otherErrorKeys.length > 0) {
+          const firstKey = otherErrorKeys[0];
+          const messages = errors[firstKey];
+          if (Array.isArray(messages) && messages.length > 0) {
+            toast.error(messages[0]);
+            return;
+          }
+        }
+      }
+      toast.error(detail || message || "Submission Failed");
+    },
+  });
+
+  const formik = useFormik<SpouseFormValues>({
     enableReinitialize: true,
     initialValues:
       isUpdateMode && memberData && memberData?.length > 0
@@ -210,6 +269,13 @@ export default function SpouseDetailsStep() {
     } else {
       toast.error("No file selected");
     }
+  };
+  const removeSpouse = (id:number) => {
+   if(isUpdateMode && id){
+      deleteSpouseFunc(id);
+   } else {
+     toast.error("No Spouse to delete");
+   }
   };
 
   const updateField = (field: string, value: any) => {
@@ -427,6 +493,14 @@ export default function SpouseDetailsStep() {
             >
               Skip
             </Button>
+            {isUpdateMode && formik.values?.id && <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {removeSpouse(formik.values?.id as number)}}
+              className="flex-1 sm:flex-none"
+            >
+              Delete
+            </Button>}
           </div>
           <Button
             type="submit"
