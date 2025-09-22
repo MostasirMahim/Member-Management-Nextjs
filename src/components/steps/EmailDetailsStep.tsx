@@ -257,14 +257,6 @@ export default function EmailDetailsStep() {
   };
 
   const removeEmail = (index: number) => {
-    if (formik.values.data.length > 1) {
-      formik.setFieldValue(
-        "data",
-        formik.values.data.filter((_: any, i: any) => i !== index)
-      );
-    } else {
-      toast.error("At least one email is required");
-    }
      const email = formik.values.data[index];
     if (!email?.id) {
       const updated = formik.values.data.filter(
@@ -307,7 +299,6 @@ export default function EmailDetailsStep() {
       <div className="space-y-6">
         {formik.values.data.map((email: any, index: number) => (
           <div key={index} className="border rounded-lg p-4 space-y-4 relative">
-            {formik.values.data.length > 1 && (
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-medium text-primary">
                   Email {index + 1}
@@ -322,7 +313,6 @@ export default function EmailDetailsStep() {
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
-            )}
             <div className="grid gap-4 md:grid-cols-1">
               <div className="space-y-2">
                 <Label className="text-sm font-medium">

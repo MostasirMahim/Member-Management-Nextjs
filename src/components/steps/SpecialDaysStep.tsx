@@ -280,7 +280,6 @@ export default function SpecialDaysStep() {
       <div className="space-y-6">
         {formik.values.data.map((specialDay: any, index: number) => (
           <div key={index} className="border rounded-lg p-4 space-y-4 relative">
-            {formik.values.data.length > 1 && (
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-medium text-primary">
                   Special Day {index + 1}
@@ -295,7 +294,6 @@ export default function SpecialDaysStep() {
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
-            )}
             <div className="grid gap-4 md:grid-cols-1">
               <div className="space-y-2">
                 <Label className="text-sm font-medium">

@@ -227,7 +227,6 @@ export default function AddressDetailsStep() {
       <div className="space-y-6">
         {formik.values.data.map((address: any, index: number) => (
           <div key={index} className="border rounded-lg p-4 space-y-4 relative">
-            {formik.values.data.length > 1 && (
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-medium text-primary">
                   Address {index + 1}
@@ -242,7 +241,6 @@ export default function AddressDetailsStep() {
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
-            )}
             <div className="grid gap-4 md:grid-cols-1">
               <div className="space-y-2">
                 <Label>Address Type</Label>
