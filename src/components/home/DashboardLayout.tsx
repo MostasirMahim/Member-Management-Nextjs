@@ -379,19 +379,19 @@ const navigation_sidebar_links = [
           },
           {
             icon: <ListChecks className="h-4 w-4" />,
-            label: "View Income Particulars",
+            label: "Income Particulars",
             href: "/mfm/income_particulars",
           },
           {
             icon: <CreditCard className="h-4 w-4" />,
-            label: "View Income Receiving Options",
+            label: "Receiving Options",
             href: "/mfm/income_receiving_options",
           },
         ],
       },
       {
         icon: <CreditCard className="h-4 w-4" />,
-        label: "View Invoice PaymentOptions",
+        label: "Invoice Payment Options",
         href: "/mfm/payment_options",
       },
       {
