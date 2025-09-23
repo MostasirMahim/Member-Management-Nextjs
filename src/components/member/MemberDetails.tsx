@@ -537,10 +537,15 @@ const NoDetailsFound = ({ sectionName }: { sectionName: string }) => (
                             key={s.id}
                             className="flex items-center gap-4 p-4 rounded-lg bg-white/60 dark:bg-pink-900/20 border border-pink-200/50 dark:border-pink-700/30"
                           >
-                            <Avatar className="h-16 w-16 ring-4 ring-pink-200 dark:ring-pink-700">
+                            <Avatar onClick={() => handleImageClick(s?.image)} className="h-16 w-16 ring-4 ring-pink-200 dark:ring-pink-700">
                               <AvatarImage
-                                src={s?.image || "/placeholder.svg"}
+                              src={`${
+                                      process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+                                      "http://localhost:8000"
+                                    }${s?.image}`
+                                  }
                                 alt={s?.spouse_name}
+                                
                               />
                               <AvatarFallback className="bg-pink-100 text-pink-700 dark:bg-pink-800 dark:text-pink-200">
                                 {s.spouse_name?.[0]}
@@ -591,9 +596,13 @@ const NoDetailsFound = ({ sectionName }: { sectionName: string }) => (
                             key={d.id}
                             className="flex items-center gap-4 p-4 rounded-lg bg-white/60 dark:bg-indigo-900/20 border border-indigo-200/50 dark:border-indigo-700/30"
                           >
-                            <Avatar className="h-16 w-16 ring-4 ring-indigo-200 dark:ring-indigo-700">
+                            <Avatar onClick={() => handleImageClick(d?.image)} className="h-16 w-16 ring-4 ring-indigo-200 dark:ring-indigo-700">
                               <AvatarImage
-                                src={d?.image || "/placeholder.svg"}
+                                 src={`${
+                                      process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+                                      "http://localhost:8000"
+                                    }${d?.image}`
+                                  }
                                 alt={d.name}
                               />
                               <AvatarFallback className="bg-indigo-100 text-indigo-700 dark:bg-indigo-800 dark:text-indigo-200">
@@ -784,9 +793,13 @@ const NoDetailsFound = ({ sectionName }: { sectionName: string }) => (
                           key={comp.id}
                           className="flex items-center gap-4 p-4 border border-violet-200 dark:border-violet-700/30 rounded-lg bg-white/60 dark:bg-violet-900/20"
                         >
-                          <Avatar className="h-16 w-16 ring-4 ring-violet-200 dark:ring-violet-700">
+                          <Avatar onClick={() => handleImageClick(comp.companion_image)} className="h-16 w-16 ring-4 ring-violet-200 dark:ring-violet-700">
                             <AvatarImage
-                              src={comp.companion_image || "/placeholder.svg"}
+                              src={`${
+                                    process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+                                    "http://localhost:8000"
+                                  }${comp.companion_image}`
+                                }
                               alt={comp.companion_name}
                             />
                             <AvatarFallback className="bg-violet-100 text-violet-700 dark:bg-violet-800 dark:text-violet-200">
