@@ -53,7 +53,7 @@ function page() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search users..."
+              placeholder="Search Users..."
               className="pl-10 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -65,28 +65,28 @@ function page() {
         <Table className="">
           <TableHeader>
             <TableRow className=" text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
-              <TableHead className=" text-black dark:text-white font-bold  text-center">
+              <TableHead className="font-bold  text-center">
                 ID
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Username
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 First Name
               </TableHead>
-              <TableHead className=" text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Last Name
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Email
               </TableHead>
-              <TableHead className=" text-black dark:text-white font-bold text-center">
+              <TableHead className="font-bold text-center">
                 Staff
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold text-center">
+              <TableHead className="font-bold text-center">
                 Status
               </TableHead>
-              <TableHead className=" text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Joined At
               </TableHead>
             </TableRow>

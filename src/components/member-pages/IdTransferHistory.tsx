@@ -118,18 +118,18 @@ function IdTransferHistory() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search users..."
-              className="pl-10 border-0 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
+              placeholder="Search History..."
+              className="pl-10  focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <Button
-            variant="outline"
+            variant={isFilterOpen ? "default" : "outline"}
             onClick={() => {
               setIsFilterOpen(!isFilterOpen);
             }}
-            className="gap-2 border-0 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="gap-2 h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <Filter className="h-4 w-4" />
             Filter
@@ -257,31 +257,31 @@ function IdTransferHistory() {
         <Table>
           <TableHeader>
             <TableRow className=" text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
-              <TableHead className="text-black dark:text-white font-bold  text-center">
+              <TableHead className="font-bold text-center">
                 ID
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Current ID
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Transferred from ID
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Reason
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold text-center">
+              <TableHead className="font-bold text-center">
                 Transferred
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold text-center">
+              <TableHead className="font-bold text-center">
                 Start Date
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold text-center">
+              <TableHead className="font-bold text-center">
                 End Date
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.length === 0 ? (
+            {filteredUsers?.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
