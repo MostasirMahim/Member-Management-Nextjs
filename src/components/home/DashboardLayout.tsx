@@ -469,6 +469,7 @@ const navigation_sidebar_links = [
         icon: <TableOfContents className="h-4 w-4" />,
         label: "Events",
         href: "/events",
+        urls: ["/events/"],
       },
       {
         icon: <MapPinHouse className="h-4 w-4" />,
@@ -479,6 +480,7 @@ const navigation_sidebar_links = [
         icon: <Ticket className="h-4 w-4" />,
         label: "Tickets",
         href: "/events/tickets",
+        urls:["/events/tickets/"]
       },
       {
         icon: <HandCoins className="h-4 w-4" />,

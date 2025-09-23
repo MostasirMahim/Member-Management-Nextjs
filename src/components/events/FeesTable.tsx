@@ -139,14 +139,14 @@ export function FeesTable({ onCreateFee }: FeesTableProps) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               type="search.."
-              placeholder="Search users..."
-              className="pl-10 border-0 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
+              placeholder="Search Fees..."
+              className="pl-10  focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
             />
           </div>
           <Button
-            variant="outline"
+            variant={showFilters ? "default" : "outline"}
             onClick={() => setShowFilters(!showFilters)}
-            className="gap-2 border-0 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="gap-2  h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <Filter className="h-4 w-4" />
             Filter
