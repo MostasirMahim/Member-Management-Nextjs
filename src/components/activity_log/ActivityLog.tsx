@@ -1,5 +1,5 @@
 "use client"
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 import { SmartPagination } from "../utils/SmartPagination"
 
@@ -9,40 +9,59 @@ function ActivityLog({ data }: { data: any }) {
 
   return (
     <div className="w-full">
-      <div className="w-full overflow-x-auto rounded-md border bg-background">
-        <Table className="min-w-[1400px]">
-          <TableCaption className="text-foreground">All user activity logs.</TableCaption>
-          <TableHeader>
+      <div className="w-full max-h-screen overflow-auto rounded-md border bg-background">
+        <Table>
+          <TableHeader className="sticky top-0 z-10 bg-background">
             <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="text-center font-bold text-foreground">User</TableHead>
-              <TableHead className="text-center font-bold text-foreground">Timestamp</TableHead>
-              <TableHead className="text-center font-bold text-foreground">IP Address</TableHead>
-              <TableHead className="text-center font-bold text-foreground min-w-[300px]">Location</TableHead>
-              <TableHead className="text-center font-bold text-foreground">User Agent</TableHead>
-              <TableHead className="text-center font-bold text-foreground">Request Method</TableHead>
-              <TableHead className="text-center font-bold text-foreground">Referrer URL</TableHead>
-              <TableHead className="text-center font-bold text-foreground">Device</TableHead>
-              <TableHead className="text-center font-bold text-foreground">Path</TableHead>
-              <TableHead className="text-center font-bold text-foreground">Verb</TableHead>
-              <TableHead className="text-center font-bold text-foreground">Severity Level</TableHead>
-              <TableHead className="text-center font-bold text-foreground">Description</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[100px]">User</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[140px]">Timestamp</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[120px]">IP Address</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[120px]">Location</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[200px]">User Agent</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[100px]">Request Method</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[150px]">Referrer URL</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[100px]">Device</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[150px]">Path</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[80px]">Verb</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[120px]">Severity Level</TableHead>
+              <TableHead className="text-center font-bold text-foreground min-w-[200px]">Description</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {activityLogs?.map((log: any, indx: number) => (
               <TableRow key={indx} className="hover:bg-muted/50 transition-colors border-b border-border">
-                <TableCell className="text-center font-medium text-foreground">{log.user || "None"}</TableCell>
-                <TableCell className="text-center text-muted-foreground">
+                <TableCell
+                  className="text-center font-medium text-foreground min-w-[100px] max-w-[120px] truncate"
+                  title={log.user || "None"}
+                >
+                  {log.user || "None"}
+                </TableCell>
+                <TableCell className="text-center text-muted-foreground min-w-[140px] text-sm">
                   {new Date(log.timestamp).toLocaleString("en-US", {
-                    dateStyle: "medium",
+                    dateStyle: "short",
                     timeStyle: "short",
                   })}
                 </TableCell>
-                <TableCell className="text-center text-foreground">{log.ip_address}</TableCell>
-                <TableCell className="text-center text-foreground min-w-[300px]">{log.location}</TableCell>
-                <TableCell className="text-center text-muted-foreground">{log.user_agent}</TableCell>
                 <TableCell
-                  className={`text-center text-xs font-semibold
+                  className="text-center text-foreground min-w-[120px] max-w-[140px] truncate font-mono text-sm"
+                  title={log.ip_address}
+                >
+                  {log.ip_address}
+                </TableCell>
+                <TableCell
+                  className="text-center text-foreground min-w-[120px] max-w-[140px] truncate"
+                  title={log.location}
+                >
+                  {log.location}
+                </TableCell>
+                <TableCell
+                  className="text-center text-muted-foreground min-w-[200px] max-w-[250px] truncate text-xs"
+                  title={log.user_agent}
+                >
+                  {log.user_agent}
+                </TableCell>
+                <TableCell
+                  className={`text-center text-xs font-semibold min-w-[100px]
                 ${
                   log.request_method === "POST"
                     ? "text-blue-800 dark:text-blue-300"
@@ -60,13 +79,30 @@ function ActivityLog({ data }: { data: any }) {
                 >
                   {log.request_method}
                 </TableCell>
-                <TableCell className="text-center text-muted-foreground">{log.referrer_url}</TableCell>
-                <TableCell className="text-center text-foreground">{log.device}</TableCell>
-                <TableCell className="text-center text-foreground">{log.path}</TableCell>
-                <TableCell className="text-center text-foreground">{log.verb}</TableCell>
-                <TableCell className="text-center">
+                <TableCell
+                  className="text-center text-muted-foreground min-w-[150px] max-w-[180px] truncate text-sm"
+                  title={log.referrer_url}
+                >
+                  {log.referrer_url}
+                </TableCell>
+                <TableCell
+                  className="text-center text-foreground min-w-[100px] max-w-[120px] truncate"
+                  title={log.device}
+                >
+                  {log.device}
+                </TableCell>
+                <TableCell
+                  className="text-center text-foreground min-w-[150px] max-w-[200px] line-clamp-3 break-words font-mono text-sm"
+                  title={log.path}
+                >
+                  {log.path}
+                </TableCell>
+                <TableCell className="text-center text-foreground min-w-[80px] max-w-[100px] truncate" title={log.verb}>
+                  {log.verb}
+                </TableCell>
+                <TableCell className="text-center min-w-[120px]">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       log.severity_level === "warning"
                         ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-300"
                         : log.severity_level === "info"
@@ -77,7 +113,12 @@ function ActivityLog({ data }: { data: any }) {
                     {log.severity_level}
                   </span>
                 </TableCell>
-                <TableCell className="text-center text-foreground">{log.description}</TableCell>
+                <TableCell
+                  className="text-center text-foreground min-w-[200px] max-w-[250px] truncate text-sm"
+                  title={log.description}
+                >
+                  {log.description}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

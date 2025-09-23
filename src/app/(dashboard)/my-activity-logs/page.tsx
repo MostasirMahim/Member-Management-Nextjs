@@ -32,8 +32,18 @@ async function ActivityLogPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="max-h-full w-full">
-      <ActivityLog data={responseData} />
+    <div className="w-full space-y-6">
+       <div className="flex flex-row items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">My Activity Logs</h1>
+          <p className="text-muted-foreground">
+            A list of all my activity logs in the system.
+          </p>
+        </div>
+      </div>
+      <div className="w-full">
+        <ActivityLog data={responseData} />
+      </div>
     </div>
   );
 }
