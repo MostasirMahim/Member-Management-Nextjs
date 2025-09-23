@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import useGetMember from "@/hooks/data/useGetMember";
+import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
   data: Yup.array()
@@ -42,6 +43,7 @@ const initialValues = {
 
 export default function SpecialDaysStep() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { currentStep, nextStep, markStepCompleted, memberID, isUpdateMode } =
     useAddMemberStore();
 
@@ -65,7 +67,7 @@ export default function SpecialDaysStep() {
           data.message || "Special day has been successfully added."
         );
         markStepCompleted(currentStep);
-        nextStep();
+        router.push("/members/view");
       }
     },
     onError: (error: any) => {
@@ -119,7 +121,7 @@ export default function SpecialDaysStep() {
         queryClient.invalidateQueries({ queryKey: ["useGetMember", memberID] });
         toast.success(data.message || "Special day successfully updated.");
         markStepCompleted(currentStep);
-        nextStep();
+        router.push("/members/view");
       }
     },
     onError: (error: any) => {
