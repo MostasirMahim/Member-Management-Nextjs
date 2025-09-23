@@ -57,15 +57,13 @@ export async function DashBoardActivityLog() {
             {logs?.map((log: any) => (
               <div key={log.id} className="flex flex-col space-y-1">
                 <div className="flex items-center space-x-2">
-                  <Badge variant="secondary">{log.user}</Badge>
-                  <p className="text-sm text-muted-foreground">
+                  <Badge variant="default">{log.user}</Badge>
+                  <p className="text-sm text-foreground">
                     <span className="font-semibold">{log.verb}</span>:{" "}
-                    {log.description}
+                    {log.description} {" -"}
+                     {formatTimestamp(log.timestamp)}
                   </p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {formatTimestamp(log.timestamp)}
-                </p>
               </div>
             ))}
           </div>

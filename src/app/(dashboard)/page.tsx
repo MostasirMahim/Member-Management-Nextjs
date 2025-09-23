@@ -44,7 +44,7 @@ async function Home({ searchParams }: Props) {
       </Suspense>
 
       {/* charts */}
-      <div className="shadow p-4 rounded-lg border border-gray-200">
+      <div className="shadow p-4 rounded-lg border border-border">
         <h4 className="text-xl font-bold mb-4">Analytical data</h4>
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
@@ -60,21 +60,21 @@ async function Home({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className=" flex flex-col md:flex-row justify-between items-start  gap-4 space-y-4">
-        <div className="flex-1  border-gray-200">
-          <Suspense fallback={<DashboardLoader />}>
-            <DashBoardActivityLog />
-          </Suspense>
-        </div>
-        <div className="flex-1  border-gray-200">
-          <DashBoardInfo />
-        </div>
-      </div>
-
       <div className="space-y-4">
         <Suspense fallback={<DashboardLoader />}>
           <KPICards />
         </Suspense>
+      </div>
+
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4 space-y-4">
+        <div className="flex-1 border-border">
+          <Suspense fallback={<DashboardLoader />}>
+            <DashBoardActivityLog />
+          </Suspense>
+        </div>
+        <div className="flex-1 border-border">
+          <DashBoardInfo />
+        </div>
       </div>
     </div>
   );

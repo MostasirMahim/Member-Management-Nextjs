@@ -40,7 +40,7 @@ export default function DashboardStats({ data }: Props) {
           <div className="p-4 bg-green-400">
             <Users className="h-12 w-12 text-white" />
           </div>
-          <div className="px-4 text-gray-700">
+          <div className="px-4  ">
             <h3 className="text-sm tracking-wider">Total Members</h3>
             <p className="text-3xl">
               <AnimatedNumber value={stats.total_member_count} />
@@ -57,7 +57,7 @@ export default function DashboardStats({ data }: Props) {
           <div className="p-4 bg-[#B3A7B8]">
             <Zap className="h-12 w-12 text-white" />
           </div>
-          <div className="px-4 text-gray-700">
+          <div className="px-4  ">
             <h3 className="text-sm tracking-wider">Total active members</h3>
             <p className="text-3xl">
               <AnimatedNumber value={stats.total_active_member_count} />
@@ -74,7 +74,7 @@ export default function DashboardStats({ data }: Props) {
           <div className="p-4 bg-[#D54B38]">
             <ZapOff className="h-12 w-12 text-white" />
           </div>
-          <div className="px-4 text-gray-700">
+          <div className="px-4  ">
             <h3 className="text-sm tracking-wider">Total pending members</h3>
             <p className="text-3xl">
               <AnimatedNumber value={stats.total_pending_member_count} />
@@ -91,7 +91,7 @@ export default function DashboardStats({ data }: Props) {
           <div className="p-4 bg-[#ED983B]">
             <Store className="h-12 w-12 text-white" />
           </div>
-          <div className="px-4 text-gray-700">
+          <div className="px-4">
             <h3 className="text-sm tracking-wider">Total Restaurants</h3>
             <p className="text-3xl">
               <AnimatedNumber value={stats.total_restaurants_count} />
@@ -108,7 +108,7 @@ export default function DashboardStats({ data }: Props) {
           <div className="p-4 bg-[#315047]">
             <ShoppingCart className="h-12 w-12 text-white" />
           </div>
-          <div className="px-4 text-gray-700">
+          <div className="px-4  ">
             <h3 className="text-sm tracking-wider">Total products</h3>
             <p className="text-3xl">
               <AnimatedNumber value={stats.total_products_count} />
@@ -125,7 +125,7 @@ export default function DashboardStats({ data }: Props) {
           <div className="p-4 bg-[#AC8D72]">
             <Calendar className="h-12 w-12 text-white" />
           </div>
-          <div className="px-4 text-gray-700">
+          <div className="px-4  ">
             <h3 className="text-sm tracking-wider">Total events</h3>
             <p className="text-3xl">
               <AnimatedNumber value={stats.total_events_count} />
