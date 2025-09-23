@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Label } from "@/components/ui/label";
@@ -310,11 +310,11 @@ export default function MemberIdTransfer() {
         <div className="flex justify-between items-center py-3">
           {!isCustomMode ? (
             <p className="text-xs">
-              ID will be auto-generated when both are selected
+             Note : ID will be auto-generated when both are selected
             </p>
           ) : (
             <p className="text-xs">
-              ID will be Transferred If Already Not Exist Same ID
+             Note : ID will be Transferred If Already Not Exist Same ID
             </p>
           )}
 
