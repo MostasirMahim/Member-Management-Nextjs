@@ -18,30 +18,30 @@ function SpecificIdHistory(memberId: { memberId: string }) {
 
   if(!filteredUsers || filteredUsers?.length === 0) return null
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <div className="rounded-md border my-2 font-secondary">
         <Table className="">
           <TableHeader>
-            <TableRow className=" text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
-              <TableHead className="text-black dark:text-white font-bold  text-center">
+            <TableRow className="text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
+              <TableHead className="text-center">
                 ID
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead >
                 Current ID
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead >
                 Transferred ID
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead >
                 Reason
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold text-center">
+              <TableHead className="text-center">
                 Transferred
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold text-center">
+              <TableHead >
                 Start Date
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold text-center">
+              <TableHead >
                 End Date
               </TableHead>
             </TableRow>

@@ -207,6 +207,7 @@ function PendingMembers() {
     router.push(`/member/transferID/${member_ID}`);
   };
 
+
   if (user_isLoading) return <LoadingDots />;
   return (
     <div className="space-y-6 ">
@@ -235,7 +236,7 @@ function PendingMembers() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search users..."
+              placeholder="Search Members..."
               className="pl-10 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -243,22 +244,32 @@ function PendingMembers() {
           </div>
           <Button
             variant="outline"
+            onClick={() => refetch()}
+            className="gap-2 h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+          >
+            <RefreshCcwIcon
+             className={`h-4 w-4 ${isFetching && "animate-spin"}`}
+            />
+            Refresh
+          </Button>
+          <Button
+            variant={isFilterOpen ? "default" : "outline"}
             onClick={() => {
               setIsFilterOpen(!isFilterOpen);
               if (!isFilterOpen) setIsUserFilterOpen(false);
             }}
-            className="gap-2 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="gap-2 h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <Filter className="h-4 w-4" />
             Filter
           </Button>
           <Button
-            variant="outline"
+            variant={isUserFilterOpen ? "default" : "outline"}
             onClick={() => {
               setIsUserFilterOpen(!isUserFilterOpen);
               if (!isUserFilterOpen) setIsFilterOpen(false);
             }}
-            className="gap-2 bg-background h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="gap-2 h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <UserRoundSearch className="h-4 w-4" />
             Query
@@ -539,37 +550,37 @@ function PendingMembers() {
         )}
       </div>
       <div className="rounded-md border my-2 font-secondary">
-        <Table className="">
+        <Table>
           <TableHeader>
-            <TableRow className=" text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
-              <TableHead className=" text-black dark:text-white font-bold  text-center">
+            <TableRow className="text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
+              <TableHead className="font-bold text-center">
                 ID
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Member
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Type
               </TableHead>
-              <TableHead className=" text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Status
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Batch
               </TableHead>
-              <TableHead className=" text-black dark:text-white font-bold text-center">
+              <TableHead className="font-bold text-center">
                 Martial St.
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold text-center">
+              <TableHead className="font-bold text-center">
                 DOB
               </TableHead>
-              <TableHead className=" text-black dark:text-white font-bold">
+              <TableHead className="font-bold">
                 Blood Group
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold ">
+              <TableHead className="font-bold ">
                 Nationality
               </TableHead>
-              <TableHead className="text-black dark:text-white font-bold text-center">
+              <TableHead className="font-bold text-center">
                 Actions
               </TableHead>
             </TableRow>
