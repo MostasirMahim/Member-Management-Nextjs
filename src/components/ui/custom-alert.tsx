@@ -21,10 +21,10 @@ const CustomAlertDialog: React.FC<CustomAlertDialogProps> = ({
 }) => {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center ">
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-6 w-full max-w-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center font-primary ">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-6 w-full max-w-sm border-2 border-red-500">
         <h2 className="text-lg font-bold mb-2">{title}</h2>
-        <p className="mb-6 text-sm text-gray-600 dark:text-gray-300">{description}</p>
+        <p className="mb-6 text-sm text-red-600 dark:text-red-300">{description}</p>
         <div className="flex justify-end gap-2">
           <button
             className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300"

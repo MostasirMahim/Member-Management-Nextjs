@@ -2,13 +2,10 @@
 import { useState } from "react";
 import {
   Search,
-  Filter,
   MoreHorizontal,
   Trash2,
-  FileSpreadsheet,
   Users,
   RefreshCcwIcon,
-  Factory,
   ShieldMinus,
 } from "lucide-react";
 
@@ -72,7 +69,21 @@ function RecycleBin() {
 
     onError: (error: any) => {
       console.log("error", error?.response);
-      toast.error(`Error deleting member: ${error?.statusText}`);
+       const { message, errors, detail } = error?.response?.data;
+      if (errors) {
+        if (errors && typeof errors === "object") {
+          Object.entries(errors).forEach(([field, messages]) => {
+            if (Array.isArray(messages)) {
+              toast.error(messages[0]);
+            }
+          });
+        }
+      } else {
+        toast.error(detail || message || "Member Delete Failed");
+      }
+       refetch();
+        setDeleteDialogOpen(false);
+        setSelectedMemberId(null);
     },
   });
 
@@ -84,7 +95,7 @@ function RecycleBin() {
       if (res.status === 204) {
         toast.success("Recycled members deleted successfully");
         refetch();
-        setDeleteDialogOpen(false);
+        setBulkDialogOpen(false);
         setSelectedMemberId(null);
       }
       return res.data;
@@ -92,7 +103,9 @@ function RecycleBin() {
 
     onError: (error: any) => {
       console.log("error", error?.response);
-      toast.error(`Error deleting members: ${error?.statusText}`);
+      toast.error(`${error?.response?.data?.message}`);
+      refetch();
+      setBulkDialogOpen(false);
     },
   });
 
@@ -119,7 +132,8 @@ function RecycleBin() {
 
   if (user_isLoading) return <LoadingDots />;
   return (
-    <div className={`space-y-6 ${bulkDialogOpen ? "bg-red-600" : ""}`}>
+    <div>
+    <div className={`space-y-6 ${bulkDialogOpen ? "bg-gradient-to-b from-red-300 to-red-200 rounded-lg p-2 animate-pulse" : ""}`}>
       <div className="flex flex-row items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Recycle Bin</h1>
@@ -299,12 +313,11 @@ function RecycleBin() {
           </TableBody>
         </Table>
       </div>
-
-      {/* -- PAGINATION -- */}
       <div className="flex justify-center">
         <SmartPagination paginationData={paginationData} />
       </div>
-      <CustomAlertDialog
+    </div>
+     <CustomAlertDialog
         open={deleteDialogOpen}
         title="Are you sure?"
         description={`Do you want to delete member - ${selectedMemberId}?`}
@@ -318,7 +331,7 @@ function RecycleBin() {
       <CustomAlertDialog
         open={bulkDialogOpen}
         title="Are you sure?"
-        description={`Are you sure you want to permanently delete all recycled members? This action cannot be undone.`}
+        description={`Are you sure you want to permanently delete all recycled members?`}
         onCancel={() => setBulkDialogOpen(false)}
         onConfirm={() => {
             deleteBulkMember();
