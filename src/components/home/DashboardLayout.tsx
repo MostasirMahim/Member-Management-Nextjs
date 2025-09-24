@@ -55,6 +55,7 @@ import {
   CombineIcon,
   CarFrontIcon as ChartGanttIcon,
   Slack,
+  Trash2Icon,
 } from "lucide-react"
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
@@ -101,6 +102,11 @@ const navigation_sidebar_links = [
         icon: <History className="h-4 w-4" />,
         label: "Transfer History",
         href: "/members/history",
+      },
+      {
+        icon: <Trash2Icon className="h-4 w-4" />,
+        label: "Recycle Bin",
+        href: "/members/bin",
       },
     ],
   },
