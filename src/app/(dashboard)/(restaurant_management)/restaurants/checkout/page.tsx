@@ -17,7 +17,8 @@ async function RestaurantItemCheckoutPage({ searchParams }: Props) {
 
   try {
     const [memberRes, promoCodeRes] = await Promise.all([
-      axiosInstance.get(`/api/member/v1/members/list/?page=${page}`, {
+      //chenge member list to member ID list API
+      axiosInstance.get(`/api/member/v1/members/list/ids/`, {
         headers: {
           Cookie: `access_token=${authToken}`,
         },

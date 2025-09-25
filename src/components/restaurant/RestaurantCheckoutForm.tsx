@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Form,
   FormControl,
@@ -8,114 +9,28 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-
 import { useForm } from "react-hook-form";
-
-import { Percent } from "lucide-react";
-
+import { Percent, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
 import { Button } from "../ui/button";
 import { useRestaurantCartStore } from "@/store/restaurantStore";
-import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "react-toastify";
+import { Checkbox } from "../ui/checkbox";
+import { ScrollArea } from "../ui/scroll-area";
+import { useState } from "react";
+import { Label } from "../ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 interface Props {
   memberData: any;
   promoCodeData: any;
-}
-
-interface PaginationProps {
-  data: any;
-}
-
-function PaginationForItems({ data }: PaginationProps) {
-  const paginationData = data;
-  const router = useRouter();
-  const currentPage = paginationData?.current_page || 1;
-  const totalPages = paginationData?.total_pages || 1;
-
-  const goToPage = (page: number) => {
-    if (page !== currentPage) {
-      router.push(`?page=${page}`);
-      router.refresh();
-    }
-  };
-
-  const renderPageLinks = () => {
-    const pagesToShow = [];
-
-    for (let i = 1; i <= totalPages; i++) {
-      pagesToShow.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={() => goToPage(i)}
-            isActive={i === currentPage}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return pagesToShow;
-  };
-  return (
-    <div>
-      <div className="my-5 pb-11">
-        {/* -- PAGINATION -- */}
-        <div className=" flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              {/* Previous Button */}
-              {paginationData?.previous && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={(e) => {
-                      e.preventDefault();
-                      goToPage(currentPage - 1);
-                    }}
-                  />
-                </PaginationItem>
-              )}
-
-              {/* Page Numbers */}
-              {renderPageLinks()}
-
-              {/* Next Button */}
-              {paginationData?.next && (
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={(e) => {
-                      e.preventDefault();
-                      goToPage(currentPage + 1);
-                    }}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 function RestaurantCheckoutForm({ memberData, promoCodeData }: Props) {
@@ -132,9 +47,17 @@ function RestaurantCheckoutForm({ memberData, promoCodeData }: Props) {
   const cart = useRestaurantCartStore((state) => state.cart);
   const restaurant = useRestaurantCartStore((state) => state.restaurant);
   const removeItem = useRestaurantCartStore((state) => state.removeItem);
+  const [searchMember, setSearchMember] = useState("");
   const members = memberData.data;
-  const promoCodes = promoCodeData.data;
-  const paginationData = memberData.pagination;
+  const promoCodes = promoCodeData.data; //Not Used anywhere
+
+  const filteredMembers =
+    members?.filter((id: any) => {
+      const matchesSearch = id
+        .toLowerCase()
+        .includes(searchMember.toLowerCase());
+      return matchesSearch;
+    }) || [];
 
   async function onSubmit(values: any) {
     try {
@@ -143,7 +66,9 @@ function RestaurantCheckoutForm({ memberData, promoCodeData }: Props) {
         restaurant: restaurant,
         member_ID: values.member_ID,
       };
+
       if (values.promo_code !== "") {
+        //Where is the promo code applied?
         requestData.promo_code = values.promo_code;
       }
       const response = await axiosInstance.post(
@@ -187,25 +112,29 @@ function RestaurantCheckoutForm({ memberData, promoCodeData }: Props) {
   }
 
   return (
-    <div>
-      <div className="my-6 p-4 bg-white  rounded-2xl shadow-md border">
-        <h2 className="text-xl font-bold mb-4 border-b pb-2">
-          🛒 Selected Items
-        </h2>
+    <div className="space-y-6 font-primary">
+      <div className="space-y-1">
+        <h1 className="text-3xl font-bold tracking-tight">Checkout</h1>
+        <p className="text-muted-foreground">
+          Review your selected items and complete the purchase.
+        </p>
+      </div>
+      <div className="p-4  rounded-2xl shadow-md border">
+        <h2 className="text-xl font-bold border-b pb-2">🛒 Selected Items</h2>
 
         <div className="space-y-3">
           {cart.length > 0 ? (
             cart.map((item: any) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between bg-gray-50 rounded-xl p-3 hover:shadow-sm transition"
+                className="flex items-center justify-between rounded-xl p-3 hover:shadow-sm transition"
               >
-                <div>
-                  <p className="font-semibold text-gray-800">{item.name}</p>
-                  <p className="text-sm text-gray-500">
+                <div className="space-y-1">
+                  <p className="font-semibold ">{item.name}</p>
+                  <p className="text-sm ">
                     Qty: <span className="font-medium">{item.quantity}</span>
                   </p>
-                  <p className="text-sm text-green-600 font-bold">
+                  <p className="text-green-600 font-bold">
                     ${item.selling_price * item.quantity}
                   </p>
                 </div>
@@ -224,99 +153,129 @@ function RestaurantCheckoutForm({ memberData, promoCodeData }: Props) {
           )}
         </div>
       </div>
-      <div className="my-6 p-4 bg-white  rounded-2xl shadow-md border">
+      <div className=" p-4 rounded-2xl shadow-md border">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             onReset={onReset}
-            className="space-y-8 @container"
+            className="space-y-8 w-full "
           >
-            <div className="grid grid-cols-12 gap-4">
-              <FormField
-                control={form.control}
-                name="member_ID"
-                render={({ field }) => (
-                  <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                    <FormLabel className="flex shrink-0">
-                      Select member
-                    </FormLabel>
-
-                    <div className="w-full">
-                      <FormControl>
-                        <Select
-                          key="select-0"
-                          {...field}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger className="w-full ">
-                            <SelectValue placeholder="Select member id" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {members.map((member: any) => (
-                              <SelectItem
-                                key={member.id}
-                                value={member.member_ID}
-                              >
-                                {member.member_ID}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormDescription>
-                        Select the member id for whom you want to buy the items
-                      </FormDescription>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <div className="col-span-12 col-start-auto flex self-end flex-col gap-2  items-start">
-                <PaginationForItems data={paginationData} />
-              </div>
-              <FormField
-                control={form.control}
-                name="promo_code"
-                render={({ field }) => (
-                  <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                    <FormLabel className="flex shrink-0">Promo code</FormLabel>
-
-                    <div className="w-full">
-                      <FormControl>
-                        <div className="relative w-full">
-                          <Input
-                            key="text-input-0"
-                            placeholder="Enter promo code"
-                            type="text"
-                            id="promo_code"
-                            className=" ps-9"
-                            {...field}
-                          />
-                          <div
-                            className={
-                              "text-muted-foreground pointer-events-none absolute inset-y-0 flex items-center justify-center  peer-disabled:opacity-50 start-0 ps-3"
-                            }
-                          >
-                            <Percent className="size-4" strokeWidth={2} />
+            <div className="flex flex-col md:flex-row justify-start items-start gap-3 w-full ">
+              <div className="w-full">
+                <FormField
+                  control={form.control}
+                  name="member_ID"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div>
+                        <FormControl>
+                          <div className="w-full flex flex-col space-y-2 shadow-lg rounded-xl p-4 dark:bg-muted border">
+                            <h2 className="text-lg font-semibold mb-2">
+                              Select Member ID
+                            </h2>
+                            <div className="space-y-3">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div className="relative flex-1">
+                                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                  <Input
+                                    type="search"
+                                    placeholder="Search Members..."
+                                    className="pl-10 bg-background focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
+                                    value={searchMember}
+                                    onChange={(e) =>
+                                      setSearchMember(e.target.value)
+                                    }
+                                  />
+                                </div>
+                              </div>
+                              <ScrollArea className="h-[250px] sm:h-[300px] border rounded-md p-3 sm:p-4">
+                                <div className="space-y-2 sm:space-y-3">
+                                  {filteredMembers?.map(
+                                    (ids: any, index: number) => (
+                                      <div
+                                        key={index}
+                                        className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded"
+                                      >
+                                        <Checkbox
+                                          id={ids}
+                                          checked={
+                                            form.getValues("member_ID") === ids
+                                          }
+                                          onCheckedChange={(checked) =>
+                                            field.onChange(checked ? ids : "")
+                                          }
+                                        />
+                                        <Label
+                                          htmlFor={ids}
+                                          className="text-xs sm:text-sm font-mono cursor-pointer flex-1 leading-tight"
+                                        >
+                                          {ids}
+                                        </Label>
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </ScrollArea>
+                            </div>
                           </div>
-                        </div>
-                      </FormControl>
-                      <FormDescription>
-                        Enter any promo codes if you have
-                      </FormDescription>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Card className="w-full h-full shadow-md rounded-2xl border">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">
+                    Promo Code
+                  </CardTitle>
+                  <CardDescription>
+                    Apply your discount code to save on your order
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="promo_code"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="sr-only">Promo Code</FormLabel>
+                        <FormControl>
+                          <div className="relative w-full">
+                            <Input
+                              key="text-input-0"
+                              placeholder="Enter promo code"
+                              type="text"
+                              id="promo_code"
+                              className="ps-9"
+                              {...field}
+                            />
+                            <div className="text-muted-foreground pointer-events-none absolute inset-y-0 flex items-center start-0 ps-3">
+                              <Percent className="size-4" strokeWidth={2} />
+                            </div>
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Enter any promo codes if you have
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+            <div className="flex flex-col md:flex-row items-start gap-2 w-full">
               <FormField
                 control={form.control}
                 name="reset-button-0"
                 render={({ field }) => (
-                  <FormItem className="col-span-6 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
+                  <FormItem className="w-full">
                     <FormLabel className="hidden shrink-0">Reset</FormLabel>
 
-                    <div className="w-full">
+                    <div className="w-full ">
                       <FormControl>
                         <Button
                           key="reset-button-0"
@@ -339,7 +298,7 @@ function RestaurantCheckoutForm({ memberData, promoCodeData }: Props) {
                 control={form.control}
                 name="submit-button-0"
                 render={({ field }) => (
-                  <FormItem className="col-span-6 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
+                  <FormItem className="w-full">
                     <FormLabel className="hidden shrink-0">Submit</FormLabel>
 
                     <div className="w-full">
