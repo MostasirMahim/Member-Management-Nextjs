@@ -79,7 +79,7 @@ export function EventCard({ event }: EventCardProps) {
 
         <div className="flex items-center justify-between pt-2">
           <Badge variant="outline">{event.event_type}</Badge>
-          <Link href={`/events/${event.id}`}>
+          <Link href={`/events/views/${event.id}`}>
             <Button variant="default" size="sm">
               View Details
             </Button>

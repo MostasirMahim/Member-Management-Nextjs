@@ -7,12 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, TicketIcon } from "lucide-react";
+import { BookPlusIcon, DollarSign, TicketIcon } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useGetTicket from "@/hooks/data/useGetTicket";
 import { LoadingDots } from "@/components/ui/loading";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { MembersList } from "@/components/events/MembersList";
+import { useState } from "react";
 
 interface PurchasePageProps {
   params: {
@@ -28,6 +31,7 @@ const purchaseSchema = Yup.object({
 });
 
 export default function PurchasePage({ params }: PurchasePageProps) {
+  const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false);
   const ticketId = params.id;
   const { data: ticket, isLoading: ticketLoading } = useGetTicket(ticketId);
 
@@ -157,14 +161,17 @@ export default function PurchasePage({ params }: PurchasePageProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="member_ID">Member ID</Label>
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="member_ID">Member ID</Label>
+                    <BookPlusIcon onClick={() => setAddMemberDialogOpen(true)} className="h-5 w-5 text-primary hover:text-primary/80 hover:scale-105 cursor-pointer" />
+                  </div>
                   <Input
                     id="member_ID"
                     name="member_ID"
                     value={formik.values.member_ID}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    placeholder="GM0001-PU"
+                    placeholder="Enter Member ID"
                   />
                   {formik.touched.member_ID && formik.errors.member_ID && (
                     <p className="text-sm text-red-500">
@@ -192,8 +199,27 @@ export default function PurchasePage({ params }: PurchasePageProps) {
               </form>
             </CardContent>
           </Card>
+          <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
+              <DialogContent className="sm:max-w-[600px] h-fit">
+                <DialogHeader>
+                  <DialogTitle>
+                   Select Members
+                  </DialogTitle>
+                  <DialogDescription>
+                    Select a member to purchase the ticket for.
+                  </DialogDescription>
+                </DialogHeader>
+                <MembersList
+                  variables= {formik}
+                  isSingle={true}
+                  onCancel={() => setAddMemberDialogOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
         </div>
+         
       </div>
+      
     </div>
   );
 }

@@ -475,7 +475,7 @@ const navigation_sidebar_links = [
         icon: <TableOfContents className="h-4 w-4" />,
         label: "Events",
         href: "/events",
-        urls: ["/events/"],
+        urls: ["/events/view"],
       },
       {
         icon: <MapPinHouse className="h-4 w-4" />,
