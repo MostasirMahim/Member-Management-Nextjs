@@ -29,8 +29,7 @@ export default async function MemberIDs() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Show in Table */}
+    <div >
       <FacilityCart member_ids={member_ids} />
     </div>
   );
