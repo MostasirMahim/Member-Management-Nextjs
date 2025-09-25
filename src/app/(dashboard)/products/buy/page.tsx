@@ -21,9 +21,7 @@ export default async function MemberIDs() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-     
-      {/* Show in Table */}
+    <div>
       <ViewProductCart member_ids={member_ids} />
     </div>
   );
