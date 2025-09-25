@@ -326,7 +326,7 @@ const navigation_sidebar_links = [
     subItems: [
       {
         icon: <Code className="h-4 w-4" />,
-        label: "View all promo codes",
+        label: "All promo codes",
         href: "/promo_codes",
       },
       {
@@ -336,7 +336,7 @@ const navigation_sidebar_links = [
       },
       {
         icon: <TicketCheck className="h-4 w-4" />,
-        label: "promo codes category",
+        label: "Promo codes category",
         href: "/promo_codes/categories",
       },
       {
@@ -346,7 +346,7 @@ const navigation_sidebar_links = [
       },
       {
         icon: <Eye className="h-4 w-4" />,
-        label: "View applied promo codes",
+        label: "Applied promo codes",
         href: "/promo_codes/applied_promo_codes",
       },
     ],
