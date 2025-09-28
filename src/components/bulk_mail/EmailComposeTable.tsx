@@ -37,6 +37,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { SmartPagination } from "../utils/SmartPagination";
+import RefreshButton from "../utils/RefreshButton";
 interface Props {
   data: any;
 }
@@ -95,6 +96,7 @@ const EmailComposeTable = ({ data }: Props) => {
               All composes set by the software are listed here.
             </p>
           </div>
+          <RefreshButton />
         </div>
       </div>
       <Table>

@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
 import { SmartPagination } from "../utils/SmartPagination";
+import RefreshButton from "../utils/RefreshButton";
 
 interface Props {
   data: any;
@@ -56,7 +57,10 @@ const OutboxTable = ({ data }: Props) => {
               All emails sent from the software are listed here.
             </p>
           </div>
-          <div>
+          <div className="flex flex-wrap gap-2">
+            <div>
+              <RefreshButton />
+            </div>
             <Button variant="destructive" onClick={handleRetry}>
               {" "}
               <RotateCcw /> Retry

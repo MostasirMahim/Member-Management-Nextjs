@@ -1,5 +1,6 @@
 import EmailConfigTable from "@/components/bulk_mail/EmailConfigTable";
 import { Button } from "@/components/ui/button";
+import RefreshButton from "@/components/utils/RefreshButton";
 import axiosInstance from "@/lib/axiosInstance";
 import { MailPlus } from "lucide-react";
 import { cookies } from "next/headers";
@@ -30,7 +31,10 @@ async function EmailConfigPage() {
         <div>
           <h2 className="font-bold text-4xl">Email configurations</h2>
         </div>
-        <div>
+        <div className="flex flex-wrap gap-2">
+          <div>
+            <RefreshButton />
+          </div>
           <Button variant="outline" size="lg">
             <Link href="/emails/configurations/add/">
               <span className="flex items-center justify-center gap-1">

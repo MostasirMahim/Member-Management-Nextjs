@@ -1,5 +1,6 @@
 import EmailGroupsTable from "@/components/bulk_mail/EmailGroupsTable";
 import { Button } from "@/components/ui/button";
+import RefreshButton from "@/components/utils/RefreshButton";
 import axiosInstance from "@/lib/axiosInstance";
 import { CirclePlus } from "lucide-react";
 import { cookies } from "next/headers";
@@ -30,7 +31,10 @@ async function EmailGroupsPage() {
         <div>
           <h2 className="font-bold text-4xl">Groups List</h2>
         </div>
-        <div>
+        <div className="flex flex-wrap gap-2">
+          <div>
+            <RefreshButton />
+          </div>
           <Button variant="outline" size="lg">
             <Link href="/emails/groups/add/">
               <span className="flex items-center justify-center gap-1">
