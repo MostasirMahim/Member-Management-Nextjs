@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Search, Users } from "lucide-react";
+import { RefreshCcwIcon, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,7 +20,7 @@ import { SmartPagination } from "@/components/utils/SmartPagination";
 
 function page() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data, isLoading: isLoadinAllUsers, refetch } = useGetAllUsers();
+  const { data, isLoading: isLoadinAllUsers, refetch, isFetching } = useGetAllUsers();
   const paginationData = data?.pagination;
 
   const filteredUsers =
@@ -59,36 +59,30 @@ function page() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <Button
+            variant="outline"
+            onClick={() => refetch()}
+            className="gap-2 h-10 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+          >
+            <RefreshCcwIcon
+              className={`h-4 w-4 ${isFetching && "animate-spin"}`}
+            />
+            Refresh
+          </Button>
         </div>
       </div>
       <div className="rounded-md border my-2 font-secondary">
         <Table className="">
           <TableHeader>
             <TableRow className=" text-center font-bold h-14 bg-background border-b-2 border-primary dark:bg-accent">
-              <TableHead className="font-bold  text-center">
-                ID
-              </TableHead>
-              <TableHead className="font-bold">
-                Username
-              </TableHead>
-              <TableHead className="font-bold">
-                First Name
-              </TableHead>
-              <TableHead className="font-bold">
-                Last Name
-              </TableHead>
-              <TableHead className="font-bold">
-                Email
-              </TableHead>
-              <TableHead className="font-bold text-center">
-                Staff
-              </TableHead>
-              <TableHead className="font-bold text-center">
-                Status
-              </TableHead>
-              <TableHead className="font-bold">
-                Joined At
-              </TableHead>
+              <TableHead className="font-bold  text-center">ID</TableHead>
+              <TableHead className="font-bold">Username</TableHead>
+              <TableHead className="font-bold">First Name</TableHead>
+              <TableHead className="font-bold">Last Name</TableHead>
+              <TableHead className="font-bold">Email</TableHead>
+              <TableHead className="font-bold text-center">Staff</TableHead>
+              <TableHead className="font-bold text-center">Status</TableHead>
+              <TableHead className="font-bold">Joined At</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
