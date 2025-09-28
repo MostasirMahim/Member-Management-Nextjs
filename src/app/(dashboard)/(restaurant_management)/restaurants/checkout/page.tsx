@@ -34,8 +34,8 @@ async function RestaurantItemCheckoutPage({ searchParams }: Props) {
   } catch (error: any) {
     console.log("Error occurred");
     console.log(error.response?.data);
-    console.log(error.response.status);
-    if (error.response.status == 403) {
+    console.log(error.response?.status); //ToDo:Error: Cannot read properties of undefined (reading 'status')
+    if (error.response?.status == 403) {
       redirect("/unauthorized");
     }
     const errorMsg = error?.response?.data?.message || "Something went wrong";

@@ -49,7 +49,7 @@ function RestaurantCheckoutForm({ memberData, promoCodeData }: Props) {
   const removeItem = useRestaurantCartStore((state) => state.removeItem);
   const [searchMember, setSearchMember] = useState("");
   const members = memberData.data;
-  const promoCodes = promoCodeData.data; //Not Used anywhere
+  const promoCodes = promoCodeData.data;
 
   const filteredMembers =
     members?.filter((id: any) => {
@@ -68,7 +68,6 @@ function RestaurantCheckoutForm({ memberData, promoCodeData }: Props) {
       };
 
       if (values.promo_code !== "") {
-        //Where is the promo code applied?
         requestData.promo_code = values.promo_code;
       }
       const response = await axiosInstance.post(

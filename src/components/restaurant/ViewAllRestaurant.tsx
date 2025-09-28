@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import { SmartPagination } from "../utils/SmartPagination";
+import RefreshButton from "../utils/RefreshButton";
 
 interface Props {
   data: any;
@@ -31,9 +32,12 @@ function ViewAllRestaurant({ data }: Props) {
           <h4 className="text-2xl font-bold">Restaurants</h4>
           <p>Viewing all restaurants</p>
         </div>
-        <div>
+        <div className="flex flex-wrap gap-2">
+          <div>
+            <RefreshButton />
+          </div>
           <Link href="restaurants/add/">
-            <Button variant="default">
+            <Button variant="default" >
               <Plus /> Add
             </Button>
           </Link>
