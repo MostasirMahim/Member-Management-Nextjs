@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableHeader,
@@ -27,6 +22,7 @@ import { MoreVertical, Pencil, Trash2, Layers } from "lucide-react";
 import { usePathname } from "next/navigation";
 import EditCategoryModal from "@/components/products/categories/EditCategoryModal";
 import DeleteCategoryDialog from "@/components/products/categories/DeleteCategoryDialog";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface Category {
   id: number;
@@ -50,7 +46,9 @@ interface Props {
 export default function CategoryTable({ categories }: Props) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
   const pathname = usePathname();
 
   const formatBDTime = (isoString: string) => {
@@ -68,9 +66,12 @@ export default function CategoryTable({ categories }: Props) {
   return (
     <div>
       <CardHeader className="flex flex-row items-center gap-2">
-        <Layers className="h-6 w-6 text-gray-500 dark:text-gray-300" />
-        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100">
-          All Product Categories
+        <CardTitle className="flex flex-1 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Layers className="h-6 w-6" />
+            <span className="text-2xl font-bold">Category List</span>
+          </div>
+          <RefreshButton />
         </CardTitle>
       </CardHeader>
 
@@ -125,7 +126,10 @@ export default function CategoryTable({ categories }: Props) {
                         <MoreVertical className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="dark:bg-gray-800">
+                    <DropdownMenuContent
+                      align="end"
+                      className="dark:bg-gray-800"
+                    >
                       <DropdownMenuItem
                         onClick={() => {
                           setSelectedCategory(cat);

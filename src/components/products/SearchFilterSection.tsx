@@ -106,7 +106,7 @@ export function SearchFilterSection({ filterOptions }: Props) {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-1">
+            <Button variant="outline"  className="gap-1">
               <Filter className="h-4 w-4" /> Filter
             </Button>
           </DropdownMenuTrigger>

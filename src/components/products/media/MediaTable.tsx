@@ -23,6 +23,7 @@ import { usePathname } from "next/navigation";
 import EditCategoryModal from "@/components/products/categories/EditCategoryModal";
 import DeleteCategoryDialog from "@/components/products/categories/DeleteCategoryDialog";
 import Image from "next/image";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface Product {
   id: number;
@@ -67,13 +68,16 @@ export default function MediaTable({ media }: Props) {
       minute: "2-digit",
     });
   };
-
+  //TODO: need to work on theme - Media Table
   return (
     <div>
       <CardHeader className="flex flex-row items-center gap-2">
-        <Layers className="h-6 w-6 text-gray-500 dark:text-gray-300" />
-        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100">
-          All Products Media
+        <CardTitle className="flex flex-1 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Layers className="h-6 w-6" />
+            <span className="text-2xl font-bold">Media List</span>
+          </div>
+          <RefreshButton />
         </CardTitle>
       </CardHeader>
 

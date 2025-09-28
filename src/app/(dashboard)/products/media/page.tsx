@@ -32,7 +32,7 @@ export default async function MediaPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div>
       <MediaTable media={media} />
     </div>
   );

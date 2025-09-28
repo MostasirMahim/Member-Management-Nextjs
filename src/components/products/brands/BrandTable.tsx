@@ -22,6 +22,7 @@ import { MoreVertical, Pencil, Trash2, Layers } from "lucide-react";
 import { usePathname } from "next/navigation";
 import EditBrandModal from "@/components/products/brands/EditBrandModal";
 import DeleteBrandDialog from "@/components/products/brands/DeleteBrandDialog";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface Brand {
   readonly id: number;
@@ -60,25 +61,29 @@ export default function BrandTable({ brands }: Props) {
       minute: "2-digit",
     });
   };
+  //TODO: need to work on theme - Brand Table
 
   return (
-    <div>
-      <CardHeader className="flex flex-row items-center gap-2">
-        <Layers className="h-6 w-6 text-gray-600 dark:text-gray-300 opacity-75" />
-        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100 opacity-90">
-          All Product Brands
+    <div className="w-full">
+      <CardHeader className="flex flex-row items-center gap-2 w-full p-0">
+        <CardTitle className="flex flex-1 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Layers className="h-6 w-6" />
+            <span className="text-2xl font-bold">Brand List</span>
+          </div>
+          <RefreshButton />
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Table className="w-full text-sm text-gray-700 dark:text-gray-300">
-          <TableHeader className="bg-gray-100 dark:bg-gray-800">
+        <Table className="w-full text-sm ">
+          <TableHeader className="">
             <TableRow className="font-bold text-sm">
-              <TableHead className="w-10 text-gray-500 dark:text-gray-400">ID</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-300">Brand Name</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-300">Status</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-300">Created At</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-300">Updated At</TableHead>
-              <TableHead className="text-right text-gray-500 dark:text-gray-400">Actions</TableHead>
+              <TableHead className="w-10 ">ID</TableHead>
+              <TableHead className="">Brand Name</TableHead>
+              <TableHead className="">Status</TableHead>
+              <TableHead className="">Created At</TableHead>
+              <TableHead className="">Updated At</TableHead>
+              <TableHead className="">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -121,7 +126,10 @@ export default function BrandTable({ brands }: Props) {
                         <MoreVertical className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white dark:bg-gray-900">
+                    <DropdownMenuContent
+                      align="end"
+                      className="bg-white dark:bg-gray-900"
+                    >
                       <DropdownMenuItem
                         onClick={() => {
                           setSelectedBrand(brand);

@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MoreVertical, Pencil, Trash2, Layers } from "lucide-react";
 import { usePathname } from "next/navigation";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface Product {
   id: number;
@@ -72,13 +73,18 @@ export default function ProductPricesTable({ productPrices }: Props) {
     });
   };
 
+  //TODO: need to work on theme - Price Table
+
   return (
     <div className="space-y-4">
       {/* Header */}
       <CardHeader className="flex flex-row items-center gap-2">
-        <Layers className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100">
-          All Product Prices
+        <CardTitle className="flex flex-1 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Layers className="h-6 w-6" />
+            <span className="text-2xl font-bold">Price List</span>
+          </div>
+          <RefreshButton />
         </CardTitle>
       </CardHeader>
 
@@ -86,15 +92,33 @@ export default function ProductPricesTable({ productPrices }: Props) {
         <Table className="w-full text-sm text-gray-700 dark:text-gray-300">
           <TableHeader className="bg-gray-100 dark:bg-gray-800">
             <TableRow className="font-extrabold text-sm">
-              <TableHead className="w-10 text-gray-600 dark:text-gray-400">ID</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">Product Name</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">Product SKU</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">Membership Type</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">Price</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">Is Active</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">Created At</TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">Updated At</TableHead>
-              <TableHead className="text-right text-gray-500 dark:text-gray-400">Actions</TableHead>
+              <TableHead className="w-10 text-gray-600 dark:text-gray-400">
+                ID
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-400">
+                Product Name
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-400">
+                Product SKU
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-400">
+                Membership Type
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-400">
+                Price
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-400">
+                Is Active
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-400">
+                Created At
+              </TableHead>
+              <TableHead className="text-gray-600 dark:text-gray-400">
+                Updated At
+              </TableHead>
+              <TableHead className="text-right text-gray-500 dark:text-gray-400">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
 
@@ -104,11 +128,21 @@ export default function ProductPricesTable({ productPrices }: Props) {
                 key={price.id}
                 className="hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-colors duration-200"
               >
-                <TableCell className="font-medium text-gray-700 dark:text-gray-300">{price.id}</TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">{price.product.name}</TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">{price.product.sku}</TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">{price.membership_type.name}</TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">{price.price} $</TableCell>
+                <TableCell className="font-medium text-gray-700 dark:text-gray-300">
+                  {price.id}
+                </TableCell>
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                  {price.product.name}
+                </TableCell>
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                  {price.product.sku}
+                </TableCell>
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                  {price.membership_type.name}
+                </TableCell>
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                  {price.price} $
+                </TableCell>
                 <TableCell>
                   <Badge
                     className={
@@ -120,8 +154,12 @@ export default function ProductPricesTable({ productPrices }: Props) {
                     {price.is_active ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">{formatBDTime(price.created_at)}</TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">{formatBDTime(price.updated_at)}</TableCell>
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                  {formatBDTime(price.created_at)}
+                </TableCell>
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                  {formatBDTime(price.updated_at)}
+                </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -133,7 +171,10 @@ export default function ProductPricesTable({ productPrices }: Props) {
                         <MoreVertical className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white dark:bg-gray-900">
+                    <DropdownMenuContent
+                      align="end"
+                      className="bg-white dark:bg-gray-900"
+                    >
                       <DropdownMenuItem
                         onClick={() => {
                           setSelectedPrice(price);

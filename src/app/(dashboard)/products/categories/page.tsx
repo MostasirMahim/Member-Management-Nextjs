@@ -21,11 +21,7 @@ export default async function CategoriesPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* User Input (select box etc) */}
-      {/* <CategorySelect categories={categories} /> */}
-
-      {/* Show in Table */}
+    <div>
       <CategoryTable categories={categories} />
     </div>
   );

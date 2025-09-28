@@ -11,6 +11,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import { SmartPagination } from "@/components/utils/SmartPagination"
+import RefreshButton from "../utils/RefreshButton"
 
 interface Media {
   id: number
@@ -91,12 +92,17 @@ export default function ProductTable({ products }: Props) {
               Product Inventory
             </CardTitle>
           </div>
-          <SearchFilterSection
+          <div className="flex flex-wrap gap-2 items-center">
+         
+           <SearchFilterSection
             filterOptions={{
               categories: Array.from(new Set(products?.data?.map((p) => p.category))),
               brands: Array.from(new Set(products?.data?.map((p) => p.brand))),
             }}
           />
+             <RefreshButton />
+          </div>
+         
         </CardHeader>
 
         <CardContent>
