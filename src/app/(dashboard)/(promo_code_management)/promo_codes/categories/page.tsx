@@ -1,5 +1,7 @@
 import ViewAllCategoryTable from "@/components/promo_code/ViewAllCategoryTable";
+import RefreshButton from "@/components/utils/RefreshButton";
 import axiosInstance from "@/lib/axiosInstance";
+import { Layers } from "lucide-react";
 import { cookies } from "next/headers";
 
 async function ViewAllCategoryPage() {
@@ -24,13 +26,15 @@ async function ViewAllCategoryPage() {
     throw new Error(errorMsg);
   }
   return (
-    <div>
-      <div>
-        <div className="mb-4 ">
-          <h4 className="text-center font-bold text-3xl">
-            All available promo codes categories
-          </h4>
+    <div className="w-full bg-background space-y-6">
+      <div className="flex flex-1 items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Layers className="h-6 w-6" />
+          <span className="text-2xl font-bold">
+            All available promo code categories
+          </span>
         </div>
+        <RefreshButton />
       </div>
       <ViewAllCategoryTable data={responseData} />
     </div>
