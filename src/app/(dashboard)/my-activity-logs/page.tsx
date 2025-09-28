@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 import ActivityLog from "@/components/activity_log/ActivityLog";
+import RefreshButton from "@/components/utils/RefreshButton";
 import axiosInstance from "@/lib/axiosInstance";
 import { cookies } from "next/headers";
 
@@ -33,12 +34,17 @@ async function ActivityLogPage({ searchParams }: Props) {
 
   return (
     <div className="w-full space-y-6">
-       <div className="flex flex-row items-center justify-between gap-4">
+      <div className="flex flex-row items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Activity Logs</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            My Activity Logs
+          </h1>
           <p className="text-muted-foreground">
             A list of all my activity logs in the system.
           </p>
+        </div>
+        <div>
+          <RefreshButton />
         </div>
       </div>
       <div className="w-full">
