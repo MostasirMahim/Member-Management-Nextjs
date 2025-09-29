@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MoreVertical, Pencil, Trash2, Layers, Plus } from "lucide-react";
 import AddPaymentOption from "./AddPaymentOptionForm";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface InvoicePaymentOption {
   id: number;
@@ -57,7 +58,7 @@ export default function InvoicePaymentOptionsTable({ invoice_payment_options }: 
       minute: "2-digit",
     });
   };
-
+//TODO: Implement Theme
   return (
     <div>
       {/* Header with + button */}
@@ -69,16 +70,16 @@ export default function InvoicePaymentOptionsTable({ invoice_payment_options }: 
           </CardTitle>
         </div>
 
-        {/* Plus button */}
-        <Button
-          variant="outline"
-          size="lg"
-          className="flex shadow-md items-center gap-1 text-indigo-600 hover:bg-indigo-50"
-          onClick={() => setAddFormOpen(true)}
-        >
-          <Plus className="h-5 w-5 font-bold " />
-          Add
-        </Button>
+        <div className="flex items-center gap-2">
+                <Button
+                 variant="outline"
+                 onClick={() => setAddFormOpen(true)}
+               >
+                 <Plus className="h-5 w-5 font-bold " />
+                 Add
+               </Button>
+               <RefreshButton />
+              </div>
       </CardHeader>
 
       <CardContent>

@@ -24,6 +24,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { PaymentSearchFilterSection } from "./PaymentSearchFilterSection";
 import { SmartPagination } from "@/components/utils/SmartPagination";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface Payment {
   id: number;
@@ -97,7 +98,8 @@ export default function PaymentTable({ payments }: Props) {
           </CardTitle>
         </div>
 
-        <PaymentSearchFilterSection
+       <div className="flex flex-row items-center gap-2">
+         <PaymentSearchFilterSection
           filterOptions={{
             members: Array.from(new Set(payments.map((p) => p.member))),
             payment_methods: Array.from(
@@ -106,6 +108,8 @@ export default function PaymentTable({ payments }: Props) {
             statuses: ["paid", "unpaid", "partial_paid"],
           }}
         />
+        <RefreshButton />
+       </div>
       </CardHeader>
 
       <CardContent>

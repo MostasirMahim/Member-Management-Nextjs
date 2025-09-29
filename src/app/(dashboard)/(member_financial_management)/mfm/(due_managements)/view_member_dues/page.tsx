@@ -1,5 +1,7 @@
 import ViewMemberDueTable from "@/components/member_financial_management/due/ViewMemberDueTable";
+import RefreshButton from "@/components/utils/RefreshButton";
 import axiosInstance from "@/lib/axiosInstance";
+import { Layers } from "lucide-react";
 import { cookies } from "next/headers";
 
 interface Props {
@@ -30,10 +32,14 @@ async function PayMemberDue({ searchParams }: Props) {
   }
 
   return (
-    <div>
-      <div className="text-center">
-        <h4 className="text-2xl font-bold mb-4">Member Dues</h4>
-      </div>
+    <div className="w-full bg-background space-y-6">
+       <div className="flex flex-1 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Layers className="h-6 w-6" />
+            <span className="text-2xl font-bold">All available member dues</span>
+          </div>
+          <RefreshButton />
+        </div>
       <ViewMemberDueTable data={responseData} />
     </div>
   );

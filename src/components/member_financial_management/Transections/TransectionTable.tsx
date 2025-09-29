@@ -24,6 +24,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { TransactionSearchFilterSection } from "./TransectionSearchFilterSection";
 import { SmartPagination } from "@/components/utils/SmartPagination";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface Transaction {
   id: number;
@@ -106,13 +107,16 @@ export default function TransactionTable({ transactions }: Props) {
           </CardTitle>
         </div>
 
-        <TransactionSearchFilterSection
+        <div className="flex flex-row items-center gap-2">
+          <TransactionSearchFilterSection
           filterOptions={{
             members: Array.from(new Set(transactions.data.map((t) => t.member))),
             payment_methods: Array.from(new Set(transactions.data.map((t) => t.payment_method))),
             statuses: ["paid", "unpaid", "partial_paid"],
           }}
         />
+        <RefreshButton />
+        </div>
       </CardHeader>
 
       <CardContent>

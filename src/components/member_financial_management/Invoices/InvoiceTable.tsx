@@ -25,6 +25,7 @@ import { InvoiceSearchFilterSection } from "./InvoiceSearchFilterSection";
 import InvoiceDeleteDialog from "./InvoiceDeleteDialog";
 import InvoiceEditModal from "./InvoiceEditModal";
 import { SmartPagination } from "@/components/utils/SmartPagination";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface Invoice {
   id: number;
@@ -103,7 +104,7 @@ export default function InvoiceTable({ invoices }: Props) {
     previous: currentPage > 1 ? "prev" : null,
     page_size: itemsPerPage,
   };
-
+//TODO: Need to check Theme for Table
   return (
     <div>
       {/* Header + Filters */}
@@ -114,7 +115,8 @@ export default function InvoiceTable({ invoices }: Props) {
           </CardTitle>
         </div>
 
-        <InvoiceSearchFilterSection
+      <div className="flex items-center gap-2">
+          <InvoiceSearchFilterSection
           filterOptions={{
             invoice_types: Array.from(
               new Set(invoices.data.map((i) => i.invoice_type))
@@ -123,6 +125,8 @@ export default function InvoiceTable({ invoices }: Props) {
             statuses: ["paid", "unpaid", "partial_paid", "due"],
           }}
         />
+        <RefreshButton />
+      </div>
       </CardHeader>
 
       {/* Table */}

@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MoreVertical, Pencil, Trash2, Layers, Plus } from "lucide-react";
 import AddIncomeParticular from "./IncomeParticularAddForm";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface IncomeParticular {
   id: number;
@@ -57,7 +58,7 @@ export default function IncomeParticularTable({ income_particulars }: Props) {
       minute: "2-digit",
     });
   };
-
+//TODO: Need to check Theme for Table
   return (
     <div>
       {/* Header with + button */}
@@ -70,21 +71,22 @@ export default function IncomeParticularTable({ income_particulars }: Props) {
         </div>
 
         {/* Plus button */}
-        <Button
+       <div className="flex items-center gap-2">
+         <Button
           variant="outline"
-          size="lg"
-          className="flex shadow-md items-center gap-1 text-indigo-600 hover:bg-indigo-50"
           onClick={() => setAddFormOpen(true)}
         >
           <Plus className="h-5 w-5 font-bold " />
           Add
         </Button>
+        <RefreshButton />
+       </div>
       </CardHeader>
 
       <CardContent>
         <Table className="w-full text-sm text-gray-700">
-          <TableHeader className="bg-gray-100">
-            <TableRow className="bg-gray-100 font-extrabold text-sm">
+          <TableHeader className="">
+            <TableRow className=" font-extrabold text-sm">
               <TableHead className="w-10 text-gray-600">ID</TableHead>
               <TableHead className="text-gray-600">Name</TableHead>
               <TableHead className="text-gray-600">Is Active</TableHead>

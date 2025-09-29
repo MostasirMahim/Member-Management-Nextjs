@@ -11,6 +11,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { IncomeSearchFilterSection } from "./IncomeSearchFilterSection"
 import { SmartPagination } from "@/components/utils/SmartPagination"
+import RefreshButton from "@/components/utils/RefreshButton"
 
 interface Income {
   id: number
@@ -107,15 +108,17 @@ export default function IncomeTable({ incomes }: Props) {
       <div>
         <CardHeader>
           <div className="flex flex-row items-center gap-2">
-            <DollarSign className="h-7 w-7 text-primary drop-shadow" />
-            <CardTitle className="text-xl md:text-2xl font-extrabold text-foreground tracking-tight">
+            <CardTitle className="text-2xl  text-foreground tracking-tight">
               All Incomes
             </CardTitle>
           </div>
         </CardHeader>
 
-        <CardContent>
-          <IncomeSearchFilterSection filterOptions={filterOptions} />
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <IncomeSearchFilterSection filterOptions={filterOptions} />
+            <RefreshButton />
+          </div>
 
           <div className="w-full overflow-x-auto rounded-md border bg-background">
             <Table className="text-sm">

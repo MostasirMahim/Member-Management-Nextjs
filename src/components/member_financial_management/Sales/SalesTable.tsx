@@ -25,6 +25,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SalesSearchFilterSection } from "./SalesSearchFilterSection";
 import SalesDeleteDialog from "./SalesDeleteDialog";
 import { SmartPagination } from "@/components/utils/SmartPagination"; 
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface Sale {
   id: number;
@@ -115,7 +116,8 @@ export default function SalesTable({ sales }: Props) {
           </CardTitle>
         </div>
 
-        <SalesSearchFilterSection
+       <div className="flex flex-row items-center gap-2" >
+         <SalesSearchFilterSection
           filterOptions={{
             sale_source_types: Array.from(
               new Set(sales.data.map((s) => s.sale_source_type))
@@ -124,6 +126,8 @@ export default function SalesTable({ sales }: Props) {
             statuses: ["paid", "unpaid", "partial_paid"],
           }}
         />
+        <RefreshButton />
+       </div>
       </CardHeader>
 
       {/* Table */}

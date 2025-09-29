@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MoreVertical, Pencil, Trash2, Layers, Plus } from "lucide-react";
 import IncomeReceivingOption from "./IncomeReceivingOptionAddFrom";
+import RefreshButton from "@/components/utils/RefreshButton";
 
 interface IncomeReceivingOption {
   id: number;
@@ -40,11 +41,12 @@ interface Props {
   income_receiving_options: IncomeReceivingOptionResponse;
 }
 
-export default function IncomeReceivingOptionTable({ income_receiving_options }: Props) {
+export default function IncomeReceivingOptionTable({
+  income_receiving_options,
+}: Props) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [addFormOpen, setAddFormOpen] = useState(false);
-  
 
   const formatBDTime = (isoString: string) => {
     const date = new Date(isoString);
@@ -57,7 +59,7 @@ export default function IncomeReceivingOptionTable({ income_receiving_options }:
       minute: "2-digit",
     });
   };
-
+//TODO: Implement Theme
   return (
     <div>
       {/* Header with + button */}
@@ -69,22 +71,19 @@ export default function IncomeReceivingOptionTable({ income_receiving_options }:
           </CardTitle>
         </div>
 
-        {/* Plus button */}
-        <Button
-          variant="outline"
-          size="lg"
-          className="flex shadow-md items-center gap-1 text-indigo-600 hover:bg-indigo-50"
-          onClick={() => setAddFormOpen(true)}
-        >
-          <Plus className="h-5 w-5 font-bold " />
-          Add
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setAddFormOpen(true)}>
+            <Plus className="h-5 w-5 font-bold " />
+            Add
+          </Button>
+          <RefreshButton />
+        </div>
       </CardHeader>
 
       <CardContent>
         <Table className="w-full text-sm text-gray-700">
-          <TableHeader className="bg-gray-100">
-            <TableRow className="bg-gray-100 font-extrabold text-sm">
+          <TableHeader className="">
+            <TableRow className=" font-extrabold text-sm">
               <TableHead className="w-10 text-gray-600">ID</TableHead>
               <TableHead className="text-gray-600">Name</TableHead>
               <TableHead className="text-gray-600">Is Active</TableHead>
@@ -164,7 +163,10 @@ export default function IncomeReceivingOptionTable({ income_receiving_options }:
 
       {/* Add Income Particular Form Modal */}
       {addFormOpen && (
-        <IncomeReceivingOption open={addFormOpen} onClose={() => setAddFormOpen(false)} />
+        <IncomeReceivingOption
+          open={addFormOpen}
+          onClose={() => setAddFormOpen(false)}
+        />
       )}
     </div>
   );

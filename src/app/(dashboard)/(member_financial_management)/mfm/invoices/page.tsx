@@ -20,19 +20,16 @@ export default async function InvoicePage() {
 
   } catch (err: any) {
     if (err.response) {
-      // Axios server responded with error status
       throw new Error(err.response.data?.message || `Request failed with status code ${err.response.status}`);
     } else if (err.request) {
-      // No response received from server
       throw new Error("No response from server");
     } else {
-      // Other errors
       throw new Error(err.message || "Failed to fetch invoices");
     }
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div>
       <InvoiceTable invoices={invoices} />
     </div>
   );

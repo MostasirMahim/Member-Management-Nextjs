@@ -45,7 +45,7 @@ export function IncomeSearchFilterSection({ filterOptions }: Props) {
   }, [member, receivedBy, receivingType]);
 
   return (
-    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mb-4">
+    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
       <Input
         placeholder="Search by Member"
         value={member}

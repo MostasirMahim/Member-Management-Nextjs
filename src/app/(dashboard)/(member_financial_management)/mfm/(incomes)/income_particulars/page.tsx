@@ -21,8 +21,7 @@ export default async function IncomeParticularPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-     
+    <div>
       <IncomeParticularTable income_particulars={income_particulars} />
     </div>
   );

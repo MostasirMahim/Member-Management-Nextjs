@@ -21,8 +21,7 @@ export default async function PaymentOptionsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-
+    <div>
       <InvoicePaymentTable invoice_payment_options={invoice_payment_options} />
     </div>
   );
