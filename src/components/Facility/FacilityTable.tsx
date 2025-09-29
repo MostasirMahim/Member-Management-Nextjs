@@ -35,6 +35,7 @@ import Link from "next/link";
 import { useFacilityCartStore } from "@/store/cartStore";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import RefreshButton from "../utils/RefreshButton";
 
 interface Facility {
   id: number;
@@ -80,11 +81,15 @@ export function FacilitiesTable({ data, pagination }: FacilitiesTableProps) {
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Club Facilities</CardTitle>
-        <CardDescription>
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
+        <div>
+          <CardTitle>Club Facilities</CardTitle>
+          <CardDescription>
           Manage and view all club facilities and their details
         </CardDescription>
+        </div>
+        <RefreshButton/>
+        
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
