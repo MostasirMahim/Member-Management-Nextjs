@@ -59,9 +59,9 @@ export default function IncomeReceivingOptionTable({
       minute: "2-digit",
     });
   };
-//TODO: Implement Theme
+
   return (
-    <div>
+    <Card>
       {/* Header with + button */}
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div className="flex flex-row items-center gap-2">
@@ -81,15 +81,15 @@ export default function IncomeReceivingOptionTable({
       </CardHeader>
 
       <CardContent>
-        <Table className="w-full text-sm text-gray-700">
+        <Table className="w-full text-sm">
           <TableHeader className="">
             <TableRow className=" font-extrabold text-sm">
-              <TableHead className="w-10 text-gray-600">ID</TableHead>
-              <TableHead className="text-gray-600">Name</TableHead>
-              <TableHead className="text-gray-600">Is Active</TableHead>
-              <TableHead className="text-gray-600">Created At</TableHead>
-              <TableHead className="text-gray-600">Updated At</TableHead>
-              <TableHead className="text-right text-gray-500">
+              <TableHead className="w-10">ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Is Active</TableHead>
+              <TableHead>Created At</TableHead>
+              <TableHead>Updated At</TableHead>
+              <TableHead className="text-right">
                 Actions
               </TableHead>
             </TableRow>
@@ -100,10 +100,10 @@ export default function IncomeReceivingOptionTable({
                 key={option.id}
                 className="hover:bg-indigo-50 transition-all duration-200"
               >
-                <TableCell className="font-medium text-gray-700">
+                <TableCell className="font-medium">
                   {option.id}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900">
+                <TableCell className="font-semibold">
                   {option.name}
                 </TableCell>
                 <TableCell>
@@ -129,7 +129,7 @@ export default function IncomeReceivingOptionTable({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-gray-500 hover:text-indigo-600"
+                        className=""
                       >
                         <MoreVertical className="h-5 w-5" />
                       </Button>
@@ -139,13 +139,13 @@ export default function IncomeReceivingOptionTable({
                         onClick={() => {
                           setEditModalOpen(true);
                         }}
-                        className="text-indigo-600 hover:bg-indigo-100 cursor-pointer"
+                        className="cursor-pointer"
                       >
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
 
                       <DropdownMenuItem
-                        className="text-red-600 hover:bg-red-100 cursor-pointer"
+                        className="cursor-pointer"
                         onClick={() => {
                           setDeleteDialogOpen(true);
                         }}
@@ -168,6 +168,6 @@ export default function IncomeReceivingOptionTable({
           onClose={() => setAddFormOpen(false)}
         />
       )}
-    </div>
+    </Card>
   );
 }
