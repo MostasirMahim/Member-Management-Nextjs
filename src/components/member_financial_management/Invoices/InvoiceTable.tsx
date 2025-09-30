@@ -106,7 +106,7 @@ export default function InvoiceTable({ invoices }: Props) {
   };
 //TODO: Need to check Theme for Table
   return (
-    <div>
+    <Card>
       {/* Header + Filters */}
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-row items-center gap-2">
@@ -261,6 +261,6 @@ export default function InvoiceTable({ invoices }: Props) {
           invoice={selectedInvoice}
         />
       )}
-    </div>
+    </Card>
   );
 }
