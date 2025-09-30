@@ -61,11 +61,10 @@ export default function BrandTable({ brands }: Props) {
       minute: "2-digit",
     });
   };
-  //TODO: need to work on theme - Brand Table
 
   return (
-    <div className="w-full">
-      <CardHeader className="flex flex-row items-center gap-2 w-full p-0">
+    <Card >
+      <CardHeader className="flex flex-row items-center gap-2 w-full">
         <CardTitle className="flex flex-1 items-center justify-between">
           <div className="flex items-center gap-2">
             <Layers className="h-6 w-6" />
@@ -76,7 +75,7 @@ export default function BrandTable({ brands }: Props) {
       </CardHeader>
       <CardContent>
         <Table className="w-full text-sm ">
-          <TableHeader className="">
+          <TableHeader>
             <TableRow className="font-bold text-sm">
               <TableHead className="w-10 ">ID</TableHead>
               <TableHead className="">Brand Name</TableHead>
@@ -90,12 +89,12 @@ export default function BrandTable({ brands }: Props) {
             {brands.data?.map((brand) => (
               <TableRow
                 key={brand.id}
-                className="hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-all duration-200"
+                className="transition-all duration-200"
               >
-                <TableCell className="font-medium text-gray-700 dark:text-gray-300">
+                <TableCell className="font-medium">
                   {brand.id}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold">
                   {brand.name}
                 </TableCell>
                 <TableCell>
@@ -109,10 +108,10 @@ export default function BrandTable({ brands }: Props) {
                     {brand.is_active ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold">
                   {formatBDTime(brand.created_at)}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold">
                   {formatBDTime(brand.updated_at)}
                 </TableCell>
                 <TableCell className="text-right">
@@ -120,22 +119,20 @@ export default function BrandTable({ brands }: Props) {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        size="icon"
-                        className="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                        size="icon"       
                       >
                         <MoreVertical className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="bg-white dark:bg-gray-900"
                     >
                       <DropdownMenuItem
                         onClick={() => {
                           setSelectedBrand(brand);
                           setEditModalOpen(true);
                         }}
-                        className="text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-800 cursor-pointer"
+                        className="cursor-pointer"
                       >
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
@@ -157,8 +154,6 @@ export default function BrandTable({ brands }: Props) {
           </TableBody>
         </Table>
       </CardContent>
-
-      {/* Edit Modal */}
       {selectedBrand && (
         <EditBrandModal
           open={editModalOpen}
@@ -166,8 +161,6 @@ export default function BrandTable({ brands }: Props) {
           brand={selectedBrand}
         />
       )}
-
-      {/* Delete Confirmation Dialog */}
       {selectedBrand && (
         <DeleteBrandDialog
           open={deleteDialogOpen}
@@ -175,6 +168,6 @@ export default function BrandTable({ brands }: Props) {
           brandId={selectedBrand.id}
         />
       )}
-    </div>
+    </Card>
   );
 }
