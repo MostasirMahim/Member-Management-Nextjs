@@ -73,10 +73,8 @@ export default function ProductPricesTable({ productPrices }: Props) {
     });
   };
 
-  //TODO: need to work on theme - Price Table
-
   return (
-    <div className="space-y-4">
+    <Card >
       {/* Header */}
       <CardHeader className="flex flex-row items-center gap-2">
         <CardTitle className="flex flex-1 items-center justify-between">
@@ -89,34 +87,34 @@ export default function ProductPricesTable({ productPrices }: Props) {
       </CardHeader>
 
       <CardContent className="p-0">
-        <Table className="w-full text-sm text-gray-700 dark:text-gray-300">
-          <TableHeader className="bg-gray-100 dark:bg-gray-800">
+        <Table className="w-full text-sm">
+          <TableHeader >
             <TableRow className="font-extrabold text-sm">
-              <TableHead className="w-10 text-gray-600 dark:text-gray-400">
+              <TableHead className="w-10">
                 ID
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">
+              <TableHead >
                 Product Name
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">
+              <TableHead >
                 Product SKU
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">
+              <TableHead >
                 Membership Type
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">
+              <TableHead >
                 Price
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">
+              <TableHead >
                 Is Active
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">
+              <TableHead >
                 Created At
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-400">
+              <TableHead >
                 Updated At
               </TableHead>
-              <TableHead className="text-right text-gray-500 dark:text-gray-400">
+              <TableHead className="text-right ">
                 Actions
               </TableHead>
             </TableRow>
@@ -126,21 +124,20 @@ export default function ProductPricesTable({ productPrices }: Props) {
             {productPrices?.data?.map((price) => (
               <TableRow
                 key={price.id}
-                className="hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-colors duration-200"
               >
-                <TableCell className="font-medium text-gray-700 dark:text-gray-300">
+                <TableCell className="font-medium ">
                   {price.id}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold ">
                   {price.product.name}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold ">
                   {price.product.sku}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold ">
                   {price.membership_type.name}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold ">
                   {price.price} $
                 </TableCell>
                 <TableCell>
@@ -154,10 +151,10 @@ export default function ProductPricesTable({ productPrices }: Props) {
                     {price.is_active ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold ">
                   {formatBDTime(price.created_at)}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold ">
                   {formatBDTime(price.updated_at)}
                 </TableCell>
                 <TableCell className="text-right">
@@ -166,7 +163,6 @@ export default function ProductPricesTable({ productPrices }: Props) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-gray-500 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <MoreVertical className="h-5 w-5" />
                       </Button>
@@ -180,7 +176,7 @@ export default function ProductPricesTable({ productPrices }: Props) {
                           setSelectedPrice(price);
                           setEditModalOpen(true);
                         }}
-                        className="text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-800 cursor-pointer"
+                        className="cursor-pointer"
                       >
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
@@ -219,6 +215,6 @@ export default function ProductPricesTable({ productPrices }: Props) {
           priceId={selectedPrice.id}
         />
       )} */}
-    </div>
+    </Card>
   );
 }
