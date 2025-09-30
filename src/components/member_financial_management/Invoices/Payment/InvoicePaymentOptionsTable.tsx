@@ -58,9 +58,8 @@ export default function InvoicePaymentOptionsTable({ invoice_payment_options }: 
       minute: "2-digit",
     });
   };
-//TODO: Implement Theme
   return (
-    <div>
+    <Card>
       {/* Header with + button */}
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div className="flex flex-row items-center gap-2">
@@ -83,15 +82,15 @@ export default function InvoicePaymentOptionsTable({ invoice_payment_options }: 
       </CardHeader>
 
       <CardContent>
-        <Table className="w-full text-sm text-gray-700">
-          <TableHeader className="bg-gray-100">
-            <TableRow className="bg-gray-100 font-extrabold text-sm">
-              <TableHead className="w-10 text-gray-600">ID</TableHead>
-              <TableHead className="text-gray-600">Name</TableHead>
-              <TableHead className="text-gray-600">Is Active</TableHead>
-              <TableHead className="text-gray-600">Created At</TableHead>
-              <TableHead className="text-gray-600">Updated At</TableHead>
-              <TableHead className="text-right text-gray-500">
+        <Table className="w-full text-sm ">
+          <TableHeader className="">
+            <TableRow className="font-extrabold text-sm">
+              <TableHead className="w-10">ID</TableHead>
+              <TableHead >Name</TableHead>
+              <TableHead >Is Active</TableHead>
+              <TableHead >Created At</TableHead>
+              <TableHead >Updated At</TableHead>
+              <TableHead >
                 Actions
               </TableHead>
             </TableRow>
@@ -100,12 +99,12 @@ export default function InvoicePaymentOptionsTable({ invoice_payment_options }: 
             {invoice_payment_options?.data?.map((option) => (
               <TableRow
                 key={option.id}
-                className="hover:bg-indigo-50 transition-all duration-200"
+                className="transition-all duration-200"
               >
-                <TableCell className="font-medium text-gray-700">
+                <TableCell className="font-medium ">
                   {option.id}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900">
+                <TableCell className="font-semibold">
                   {option.name}
                 </TableCell>
                 <TableCell>
@@ -131,7 +130,6 @@ export default function InvoicePaymentOptionsTable({ invoice_payment_options }: 
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-gray-500 hover:text-indigo-600"
                       >
                         <MoreVertical className="h-5 w-5" />
                       </Button>
@@ -141,7 +139,7 @@ export default function InvoicePaymentOptionsTable({ invoice_payment_options }: 
                         onClick={() => {
                           setEditModalOpen(true);
                         }}
-                        className="text-indigo-600 hover:bg-indigo-100 cursor-pointer"
+                        className="cursor-pointer"
                       >
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
@@ -167,6 +165,6 @@ export default function InvoicePaymentOptionsTable({ invoice_payment_options }: 
       {addFormOpen && (
         <AddPaymentOption open={addFormOpen} onClose={() => setAddFormOpen(false)} />
       )}
-    </div>
+    </Card>
   );
 }

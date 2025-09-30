@@ -104,7 +104,6 @@ export default function InvoiceTable({ invoices }: Props) {
     previous: currentPage > 1 ? "prev" : null,
     page_size: itemsPerPage,
   };
-//TODO: Need to check Theme for Table
   return (
     <Card>
       {/* Header + Filters */}
