@@ -35,7 +35,7 @@ async function EmailConfigPage() {
           <div>
             <RefreshButton />
           </div>
-          <Button variant="outline" size="lg">
+          <Button variant="outline" >
             <Link href="/emails/configurations/add/">
               <span className="flex items-center justify-center gap-1">
                 <MailPlus /> Create configurations
