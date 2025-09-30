@@ -68,9 +68,8 @@ export default function MediaTable({ media }: Props) {
       minute: "2-digit",
     });
   };
-  //TODO: need to work on theme - Media Table
   return (
-    <div>
+    <Card>
       <CardHeader className="flex flex-row items-center gap-2">
         <CardTitle className="flex flex-1 items-center justify-between">
           <div className="flex items-center gap-2">
@@ -82,31 +81,31 @@ export default function MediaTable({ media }: Props) {
       </CardHeader>
 
       <CardContent>
-        <Table className="w-full text-sm text-gray-700 dark:text-gray-200">
+        <Table className="w-full text-sm ">
           <TableHeader className="bg-gray-100 dark:bg-gray-800">
             <TableRow className="font-extrabold text-sm">
-              <TableHead className="w-10 text-gray-600 dark:text-gray-300">
+              <TableHead className="w-10 ">
                 ID
               </TableHead>
-              <TableHead className="w-10 text-gray-600 dark:text-gray-300">
+              <TableHead className="w-10 ">
                 Image
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-300">
+              <TableHead >
                 Product Name
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-300">
+              <TableHead >
                 Product SKU
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-300">
+              <TableHead>
                 Is Active
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-300">
+              <TableHead >
                 Created At
               </TableHead>
-              <TableHead className="text-gray-600 dark:text-gray-300">
+              <TableHead>
                 Updated At
               </TableHead>
-              <TableHead className="text-right text-gray-500 dark:text-gray-400">
+              <TableHead>
                 Actions
               </TableHead>
             </TableRow>
@@ -116,9 +115,9 @@ export default function MediaTable({ media }: Props) {
             {media.data?.map((med: Media) => (
               <TableRow
                 key={med.id}
-                className="hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200"
+                className="transition-all duration-200"
               >
-                <TableCell className="font-medium text-gray-700 dark:text-gray-200">
+                <TableCell className="font-medium">
                   {med.id}
                 </TableCell>
                 <TableCell>
@@ -131,13 +130,13 @@ export default function MediaTable({ media }: Props) {
                     alt={med.product.name}
                     width={80}
                     height={80}
-                    className="rounded-md object-cover border border-gray-300 dark:border-gray-600"
+                    className="rounded-md object-cover border"
                   />
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold">
                   {med.product.name}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold">
                   {med.product.sku}
                 </TableCell>
                 <TableCell>
@@ -149,10 +148,10 @@ export default function MediaTable({ media }: Props) {
                     {med.is_active ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold">
                   {formatBDTime(med.created_at)}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
+                <TableCell className="font-semibold">
                   {formatBDTime(med.updated_at)}
                 </TableCell>
                 <TableCell className="text-right">
@@ -161,21 +160,19 @@ export default function MediaTable({ media }: Props) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-gray-500 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <MoreVertical className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="dark:bg-gray-800"
                     >
                       <DropdownMenuItem
                         onClick={() => {
                           setSelectedMedia(med);
                           setEditModalOpen(true);
                         }}
-                        className="text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-700 cursor-pointer"
+                        className="cursor-pointer"
                       >
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
@@ -197,7 +194,6 @@ export default function MediaTable({ media }: Props) {
         </Table>
       </CardContent>
 
-      {/* Edit Modal */}
       {selectedMedia && (
         <EditCategoryModal
           open={editModalOpen}
@@ -210,7 +206,6 @@ export default function MediaTable({ media }: Props) {
         />
       )}
 
-      {/* Delete Dialog */}
       {selectedMedia && (
         <DeleteCategoryDialog
           open={deleteDialogOpen}
@@ -218,6 +213,6 @@ export default function MediaTable({ media }: Props) {
           categoryId={selectedMedia.id}
         />
       )}
-    </div>
+    </Card>
   );
 }
