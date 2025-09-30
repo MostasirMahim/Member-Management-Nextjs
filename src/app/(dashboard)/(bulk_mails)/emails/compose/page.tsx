@@ -1,5 +1,6 @@
 import ComposeMailForm from "@/components/bulk_mail/ComposeMailForm";
 import axiosInstance from "@/lib/axiosInstance";
+import { MailPlus } from "lucide-react";
 import { cookies } from "next/headers";
 
 export default async function EmailEditor() {
@@ -31,11 +32,19 @@ export default async function EmailEditor() {
     throw new Error(errorMsg);
   }
   return (
-    <div className="border rounded-md p-2">
-      <div>
-        <h4 className="text-2xl font-bold text-center mb-2">
-          Compose your email
-        </h4>
+    <div>
+      <div className="flex items-start gap-4 border-b border-border/50 pb-6">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 ring-1 ring-primary/20">
+          <MailPlus className="size-6 text-primary" strokeWidth={2.5} />
+        </div>
+        <div className="flex-1">
+          <h2 className="text-balance text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            Compose Email
+          </h2>
+          <p className="mt-1.5 text-pretty text-sm text-muted-foreground sm:text-base">
+            Create and send your email message to recipients
+          </p>
+        </div>
       </div>
       <ComposeMailForm configData={configsData} groupData={groupsData} />
     </div>
