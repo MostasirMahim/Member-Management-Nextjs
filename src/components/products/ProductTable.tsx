@@ -131,7 +131,7 @@ export default function ProductTable({ products }: Props) {
                     <TableCell>
                       <Image
                         src={
-                          prod.media[0]?.image ? `http://127.0.0.1:8000/${prod.media[0]?.image}` : "/placeholder.png"
+                          prod.media[0]?.image ? `${process.env.NEXT_PUBLIC_BACKEND_API_URL}${prod.media[0]?.image}` : "/placeholder.png"
                         }
                         alt={prod.name}
                         width={56}
