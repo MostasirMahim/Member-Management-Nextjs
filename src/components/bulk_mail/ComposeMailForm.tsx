@@ -24,6 +24,8 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
+import "react-quill/dist/quill.snow.css";
+
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 interface Props {
@@ -210,13 +212,13 @@ export default function ComposeMailForm({ configData, groupData }: Props) {
                 </p>
               </div>
             </div>
-            <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm ring-1 ring-black/5 transition-all focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
-              <Textarea
-                value={value}
-                onChange={(e) => handleChange(e.target.value)}
-                placeholder="Write your email content here..."
-                className="min-h-[220px] resize-none border-0 bg-transparent px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus-visible:ring-0 sm:min-h-[280px] sm:px-5 sm:py-4"
-              />
+            <div className="relative pb-8">
+            <ReactQuill
+            theme="snow"
+            value={value}
+            style={{ height: "220px"}}
+            onChange={handleChange}
+          />
             </div>
           </div>
 
