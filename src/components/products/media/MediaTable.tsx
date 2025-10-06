@@ -124,7 +124,7 @@ export default function MediaTable({ media }: Props) {
                   <Image
                     src={
                       med.image
-                        ? `http://127.0.0.1:8000/${med.image}`
+                        ? `${process.env.NEXT_PUBLIC_BACKEND_API_URL}${med.image}`
                         : "/placeholder.png"
                     }
                     alt={med.product.name}

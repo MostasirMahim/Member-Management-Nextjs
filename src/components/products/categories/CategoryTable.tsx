@@ -64,7 +64,7 @@ export default function CategoryTable({ categories }: Props) {
   };
 
   return (
-    <div>
+    <Card>
       <CardHeader className="flex flex-row items-center gap-2">
         <CardTitle className="flex flex-1 items-center justify-between">
           <div className="flex items-center gap-2">
@@ -175,6 +175,6 @@ export default function CategoryTable({ categories }: Props) {
           categoryId={selectedCategory.id}
         />
       )}
-    </div>
+    </Card>
   );
 }

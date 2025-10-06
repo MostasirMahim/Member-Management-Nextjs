@@ -86,31 +86,28 @@ export default function ProductPage({ product }: ProductPageProps) {
       },
     ]);
   };
-console.log(media);
-console.log(product);
-//TODO :Array(0)
   return (
     <div className="max-w-7xl mx-auto p-6 grid md:grid-cols-2 gap-10">
       {/* Left side images */}
       <div className="relative">
         <div className="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden border border-gray-200 relative">
           <img
-            src={`http://127.0.0.1:8000/${media[validImageIndex]?.image}`}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_API_URL}${media[validImageIndex]?.image}`}
             alt={`Product Image ${validImageIndex + 1}`}
             style={{ width: "100%", height: "auto", objectFit: "cover" }}
           />
 
           <button
             onClick={prevImage}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow hover:bg-gray-100"
+            className="absolute left-2 top-1/2 -translate-y-1/2  rounded-full p-2 shadow bg-primary hover:bg-primary/60"
             aria-label="Previous Image"
             type="button"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={24} className="text-foreground"/>
           </button>
           <button
             onClick={nextImage}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow hover:bg-gray-100"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 shadow bg-primary hover:bg-primary/60"
             aria-label="Next Image"
             type="button"
           >
@@ -134,7 +131,7 @@ console.log(product);
                 type="button"
               >
                 <img
-                  src={`http://127.0.0.1:8000/${mediaItem.image}`}
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_API_URL}${mediaItem.image}`}
                   alt={`Thumbnail ${idx + 1}`}
                   width={80}
                   height={80}
@@ -186,7 +183,7 @@ console.log(product);
               +
             </Button>
           </div>
-          <p className="mt-3 text-md text-gray-800">
+          <p className="mt-3 text-md ">
             {product.data.quantity_in_stock} items available
           </p>
         </div>
@@ -194,7 +191,7 @@ console.log(product);
         {/* Add to cart */}
         <div className="mt-6 flex space-x-4">
           <Button
-            className="flex-1 bg-blue-900 font-bold"
+            className="flex-1 bg-blue-600 text-white font-bold"
             size="lg"
             disabled={product.data.quantity_in_stock === 0}
             onClick={handleAddToCart}
