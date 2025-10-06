@@ -45,7 +45,7 @@ export default async function SingleProductPage({ params }: { params: { id: stri
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div>
       <ProductDetails product={product} />
     </div>
   );
