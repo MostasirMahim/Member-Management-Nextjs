@@ -25,6 +25,7 @@ const formatTimestamp = (timestamp: string) => {
 export async function DashBoardActivityLog() {
   const cookieStore = cookies();
   const authToken = cookieStore.get("access_token")?.value || "";
+  if(authToken === '') return null;
   let responseData: any = {};
   let logs = [];
   try {

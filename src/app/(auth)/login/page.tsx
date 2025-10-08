@@ -36,7 +36,6 @@ export default function page() {
   useEffect(() => {
     if (!isLoading && user) {
       router.replace("/");
-      router.refresh();
     }
   }, [user, isLoading]);
 
@@ -50,7 +49,6 @@ export default function page() {
         await queryClient.invalidateQueries({ queryKey: ["authUser"] });
         toast.success("Login successful.");
         router.replace("/");
-        router.refresh();
       }
     },
     onError: (error: any) => {
@@ -85,8 +83,12 @@ export default function page() {
     },
   });
 
+  if (user) {
+    router.replace("/");
+    return null;
+  }
   if (isLoading) return <LoadingDots />;
-  if (user) return null;
+
   return (
     <div className="flex min-h-screen bg-[#edf3fc] dark:bg-background items-center justify-center  px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-sm rounded-lg shadow-lg">
@@ -101,7 +103,9 @@ export default function page() {
             />
             <div className="text-center space-y-1">
               <h1 className="text-2xl font-bold text-primary">Gagorian Club</h1>
-              <p className="text-sm text-muted-foreground">Your Social Campaigns</p>
+              <p className="text-sm text-muted-foreground">
+                Your Social Campaigns
+              </p>
             </div>
           </div>
           <form onSubmit={formik.handleSubmit} className="space-y-4">
@@ -170,11 +174,7 @@ export default function page() {
                 Forgot Password ?
               </Link>
             </div>
-            <Button
-              className="w-full"
-              type="submit"
-              disabled={isPending}
-            >
+            <Button className="w-full" type="submit" disabled={isPending}>
               {isPending ? "Signing In..." : "Sign In"}
             </Button>
           </form>
